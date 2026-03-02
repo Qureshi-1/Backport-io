@@ -9,6 +9,7 @@ from typing import Dict, Any
 from dataclasses import dataclass
 import re
 import hashlib
+from datetime import datetime, timedelta
 
 app = FastAPI(title="Backpack API Gateway")
 
@@ -42,8 +43,14 @@ metrics = {
 
 # In-Memory Stores (Prod: Redis)
 rate_limits: Dict[str, list[float]] = defaultdict(list)
-cache: OrderedDict[str, tuple[bytes, float]] = OrderedDict(maxlen=1000)  # LRU + TTL
+cache: OrderedDict[str, tuple[bytes, float, dict]] = OrderedDict()  # LRU + TTL
 idempotency: Dict[str, tuple[bytes, float]] = {}  # key: (response, timestamp)
+traffic_log = defaultdict(int)
+
+# Seed mock traffic data so chart isn't empty initially
+for i in range(30):
+    t = (datetime.now() - timedelta(minutes=30-i)).strftime("%H:%M")
+    traffic_log[t] = 0
 
 # WAF Patterns (Basic SQLi/XSS)
 WAF_PATTERNS = [
@@ -108,11 +115,19 @@ async def get_settings():
         "rate_limit_per_minute": settings.rate_limit_per_minute
     }
 
+@app.get("/api/traffic")
+async def get_traffic():
+    data = [{"time": k, "requests": v} for k, v in list(traffic_log.items())[-30:]]
+    return {"traffic_data": data}
+
 # PROXY ENDPOINT (Public API Traffic)
 @app.api_route("/{path:path}", methods=["GET", "POST", "PUT", "DELETE", "PATCH"])
 async def proxy(request: Request, path: str, x_idempotency_key: str = Header(None)):
-    global metrics
+    global metrics, traffic_log
     metrics["total_requests"] += 1
+    current_time = datetime.now().strftime("%H:%M")
+    traffic_log[current_time] += 1
+    
     client_ip = request.client.host
 
     # Rate Limit
@@ -139,10 +154,10 @@ async def proxy(request: Request, path: str, x_idempotency_key: str = Header(Non
     if settings.cache_enabled and request.method == "GET":
         cache_key = get_cache_key(request)
         if cache_key in cache:
-            data, ts = cache[cache_key]
+            data, ts, headers = cache[cache_key]
             if time.time() - ts < 300:  # 5min TTL
                 metrics["cache_hits"] += 1
-                return Response(content=data)
+                return Response(content=data, headers=headers)
 
     # Forward to Backend
     backend_resp = await forward_to_backend(request, settings.target_backend_url)
@@ -150,7 +165,7 @@ async def proxy(request: Request, path: str, x_idempotency_key: str = Header(Non
     # Cache Response (GET)
     if settings.cache_enabled and request.method == "GET":
         cache_key = get_cache_key(request)
-        cache[cache_key] = (backend_resp.body, time.time())
+        cache[cache_key] = (backend_resp.body, time.time(), dict(backend_resp.headers))
 
     # Store Idempotency
     if settings.idempotency_enabled and request.method == "POST" and x_idempotency_key:

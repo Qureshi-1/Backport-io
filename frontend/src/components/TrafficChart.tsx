@@ -1,24 +1,28 @@
 "use client";
 
 import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
-
-const data = [
-  { time: "00:00", requests: 1200 },
-  { time: "02:00", requests: 900 },
-  { time: "04:00", requests: 600 },
-  { time: "06:00", requests: 1500 },
-  { time: "08:00", requests: 3000 },
-  { time: "10:00", requests: 4500 },
-  { time: "12:00", requests: 5200 },
-  { time: "14:00", requests: 4800 },
-  { time: "16:00", requests: 4100 },
-  { time: "18:00", requests: 3800 },
-  { time: "20:00", requests: 2900 },
-  { time: "22:00", requests: 2100 },
-  { time: "24:00", requests: 1500 },
-];
+import { useState, useEffect } from "react";
 
 export default function TrafficChart() {
+  const [data, setData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchTraffic = async () => {
+      try {
+        const response = await fetch("http://localhost:8080/api/traffic");
+        if (response.ok) {
+          const result = await response.json();
+          setData(result.traffic_data);
+        }
+      } catch (error) {
+        console.error("Failed to fetch traffic:", error);
+      }
+    };
+
+    fetchTraffic();
+    const interval = setInterval(fetchTraffic, 5000);
+    return () => clearInterval(interval);
+  }, []);
   return (
     <div className="h-[300px] w-full pt-4">
       <ResponsiveContainer width="100%" height="100%">
