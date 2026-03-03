@@ -25,6 +25,13 @@ const MouseGlow = () => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
+  // MUST call useTransform unconditionally before any early returns (Rules of Hooks)
+  const background = useTransform(
+    [mouseX, mouseY],
+    ([x, y]: number[]) =>
+      `radial-gradient(600px circle at ${x}px ${y}px, rgba(16, 185, 129, 0.05), transparent 80%)`
+  );
+
   useEffect(() => {
     setMounted(true);
     const handleMouseMove = (e: MouseEvent) => {
@@ -39,13 +46,8 @@ const MouseGlow = () => {
 
   return (
     <motion.div
-      className="pointer-events-none fixed inset-0 z-50 transition-opacity duration-300"
-      style={{
-        background: useTransform(
-          [mouseX, mouseY],
-          ([x, y]) => `radial-gradient(600px circle at ${x}px ${y}px, rgba(16, 185, 129, 0.05), transparent 80%)`
-        )
-      }}
+      className="pointer-events-none fixed inset-0 z-50"
+      style={{ background }}
     />
   );
 };
