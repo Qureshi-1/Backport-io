@@ -21,10 +21,12 @@ import { useEffect, useState } from "react";
 // --- Components ---
 
 const MouseGlow = () => {
+  const [mounted, setMounted] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   useEffect(() => {
+    setMounted(true);
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -32,6 +34,8 @@ const MouseGlow = () => {
     window.addEventListener("mousemove", handleMouseMove);
     return () => window.removeEventListener("mousemove", handleMouseMove);
   }, [mouseX, mouseY]);
+
+  if (!mounted) return null;
 
   return (
     <motion.div
@@ -149,12 +153,21 @@ const Logos = () => {
   return (
     <div className="border-y border-white/5 bg-black/30 py-10">
       <div className="mx-auto max-w-7xl px-6">
-        <p className="text-center text-sm font-medium text-zinc-500 mb-8">TRUSTED BY INNOVATIVE TEAMS AT</p>
-        <div className="flex flex-wrap justify-center gap-10 opacity-50 grayscale sm:gap-20">
-          <div className="flex items-center gap-2 text-xl font-bold font-mono"><Globe className="h-6 w-6"/> Vercel</div>
-          <div className="flex items-center gap-2 text-xl font-bold font-sans"><Database className="h-6 w-6"/> Supabase</div>
-          <div className="flex items-center gap-2 text-xl font-bold tracking-tighter"><Server className="h-6 w-6"/> Railway</div>
-          <div className="flex items-center gap-2 text-xl font-bold italic"><Layers className="h-6 w-6"/> PocketBase</div>
+        <p className="text-center text-sm font-medium text-zinc-500 mb-2">POWERED BY OPEN SOURCE</p>
+        <p className="text-center text-xs text-zinc-600 mb-8">100% open source MIT licensed, no vendor lock-in</p>
+        <div className="flex flex-wrap justify-center gap-10 opacity-70 sm:gap-20">
+          <div className="flex items-center gap-3 text-lg font-medium text-zinc-400 hover:text-white transition-colors">
+            <Server className="h-6 w-6" /> FastAPI
+          </div>
+          <div className="flex items-center gap-3 text-lg font-medium text-zinc-400 hover:text-white transition-colors">
+            <Layers className="h-6 w-6" /> Next.js
+          </div>
+          <div className="flex items-center gap-3 text-lg font-medium text-zinc-400 hover:text-white transition-colors">
+            <TerminalSquare className="h-6 w-6" /> Python
+          </div>
+          <div className="flex items-center gap-3 text-lg font-medium text-zinc-400 hover:text-white transition-colors">
+            <Database className="h-6 w-6" /> Docker
+          </div>
         </div>
       </div>
     </div>
