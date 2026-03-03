@@ -5,6 +5,8 @@ import {
   useMotionValue,
   useTransform,
   AnimatePresence,
+  useScroll,
+  useSpring,
 } from "framer-motion";
 import Link from "next/link";
 import {
@@ -22,7 +24,191 @@ import {
   XCircle,
   AlertTriangle,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+
+// ─── Scroll Progress Bar ──────────────────────────────────────────────────────
+const ScrollProgress = () => {
+  const { scrollYProgress } = useScroll();
+  const scaleX = useSpring(scrollYProgress, { stiffness: 200, damping: 30 });
+  return (
+    <motion.div
+      style={{ scaleX, transformOrigin: "left" }}
+      className="fixed top-0 left-0 right-0 z-[60] h-[2px] bg-gradient-to-r from-emerald-500 via-cyan-400 to-emerald-400"
+    />
+  );
+};
+
+// ─── Typewriter cycling text ──────────────────────────────────────────────────
+const BACKENDS = [
+  "Express.js API",
+  "Django REST",
+  "FastAPI",
+  "Laravel",
+  "Rails API",
+  "Go Gin",
+];
+const TypewriterText = () => {
+  const [index, setIndex] = useState(0);
+  const [displayed, setDisplayed] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = BACKENDS[index];
+    const delay = deleting ? 40 : 80;
+    const timer = setTimeout(() => {
+      if (!deleting && displayed === current) {
+        setTimeout(() => setDeleting(true), 1400);
+      } else if (deleting && displayed === "") {
+        setDeleting(false);
+        setIndex((i) => (i + 1) % BACKENDS.length);
+      } else {
+        setDisplayed(
+          deleting
+            ? displayed.slice(0, -1)
+            : current.slice(0, displayed.length + 1),
+        );
+      }
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [displayed, deleting, index]);
+
+  return (
+    <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
+      {displayed}
+      <span className="animate-pulse text-emerald-400">|</span>
+    </span>
+  );
+};
+
+// ─── Floating Live Metrics Card ───────────────────────────────────────────────
+const PATHS = [
+  "/api/products",
+  "/api/orders",
+  "/api/users/me",
+  "/api/auth",
+  "/api/cart",
+];
+const METHODS = ["GET", "GET", "GET", "POST", "POST"];
+
+const LiveMetricsCard = () => {
+  const [reqs, setReqs] = useState(1284);
+  const [hits, setHits] = useState(947);
+  const [blocked, setBlocked] = useState(23);
+  const [log, setLog] = useState([
+    { method: "GET", path: "/api/products", ms: 0.4, type: "cache" },
+    { method: "POST", path: "/api/orders", ms: 12, type: "forward" },
+    { method: "GET", path: "/api/users/me", ms: 0.3, type: "cache" },
+    { method: "POST", path: "/api/login", ms: 0.1, type: "waf" },
+  ]);
+
+  useEffect(() => {
+    const iv = setInterval(() => {
+      const isWaf = Math.random() < 0.1;
+      const isCached = !isWaf && Math.random() < 0.7;
+      const method = METHODS[Math.floor(Math.random() * METHODS.length)];
+      const path = PATHS[Math.floor(Math.random() * PATHS.length)];
+      const ms = isWaf
+        ? 0.1
+        : isCached
+          ? +(Math.random() * 0.5 + 0.1).toFixed(1)
+          : +(Math.random() * 18 + 4).toFixed(0);
+      const entry = {
+        method,
+        path,
+        ms,
+        type: isWaf ? "waf" : isCached ? "cache" : "forward",
+      };
+      setReqs((r) => r + 1);
+      if (isCached) setHits((h) => h + 1);
+      if (isWaf) setBlocked((b) => b + 1);
+      setLog((prev) => [entry, ...prev].slice(0, 4));
+    }, 1200);
+    return () => clearInterval(iv);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 40, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ delay: 0.5, duration: 0.6, type: "spring", stiffness: 120 }}
+      className="relative w-full max-w-sm mx-auto"
+    >
+      <motion.div
+        animate={{ y: [0, -8, 0] }}
+        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        className="rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl shadow-2xl overflow-hidden"
+      >
+        <div className="flex items-center justify-between border-b border-white/5 bg-zinc-900/60 px-4 py-3">
+          <div className="flex items-center gap-2">
+            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-xs font-semibold text-white">
+              Backpack Gateway
+            </span>
+          </div>
+          <span className="text-xs text-zinc-500">live</span>
+        </div>
+        <div className="grid grid-cols-3 divide-x divide-white/5 border-b border-white/5">
+          {[
+            {
+              label: "Requests",
+              value: reqs.toLocaleString(),
+              color: "text-white",
+            },
+            {
+              label: "Cached",
+              value: hits.toLocaleString(),
+              color: "text-emerald-400",
+            },
+            {
+              label: "Blocked",
+              value: String(blocked),
+              color: "text-rose-400",
+            },
+          ].map((s) => (
+            <div key={s.label} className="px-3 py-3 text-center">
+              <p className={`text-lg font-bold tabular-nums ${s.color}`}>
+                {s.value}
+              </p>
+              <p className="text-[10px] text-zinc-500">{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="p-3 space-y-1.5 min-h-[130px]">
+          <AnimatePresence initial={false}>
+            {log.map((entry, i) => (
+              <motion.div
+                key={`${entry.path}-${i}`}
+                initial={{ opacity: 0, x: -8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0 }}
+                className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-2.5 py-1.5"
+              >
+                <span
+                  className={`text-[10px] font-mono font-bold ${entry.method === "GET" ? "text-cyan-400" : "text-purple-400"}`}
+                >
+                  {entry.method}
+                </span>
+                <span className="flex-1 truncate text-[10px] font-mono text-zinc-400">
+                  {entry.path}
+                </span>
+                <span
+                  className={`text-[10px] font-mono ${entry.type === "waf" ? "text-rose-400" : entry.type === "cache" ? "text-emerald-400" : "text-zinc-400"}`}
+                >
+                  {entry.type === "waf"
+                    ? "🛡 blocked"
+                    : entry.type === "cache"
+                      ? `⚡${entry.ms}ms`
+                      : `${entry.ms}ms`}
+                </span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+      <div className="absolute -inset-4 -z-10 bg-emerald-500/10 blur-2xl rounded-full" />
+    </motion.div>
+  );
+};
 
 // ─── Mouse Glow ───────────────────────────────────────────────────────────────
 const MouseGlow = () => {
@@ -241,66 +427,103 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
 
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 const Hero = ({ onDemo }: { onDemo: () => void }) => (
-  <section className="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-    <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
-    <div className="mx-auto max-w-7xl px-6 relative z-10 text-center">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400 mb-8"
-      >
-        <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-        Backpack 1.0 is now live
-      </motion.div>
+  <section className="relative pt-28 pb-16 md:pt-36 md:pb-28 overflow-hidden">
+    <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
 
-      <motion.h1
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
-        className="mx-auto max-w-4xl text-5xl font-bold tracking-tight text-white md:text-7xl lg:text-8xl"
-      >
-        Security & Speed for <br className="hidden md:block" />
-        <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-500">
-          Every Backend
-        </span>
-      </motion.h1>
+    <div className="mx-auto max-w-7xl px-6 relative z-10">
+      <div className="grid lg:grid-cols-2 gap-16 items-center">
+        {/* Left — Text */}
+        <div>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400 mb-8"
+          >
+            <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+            Backpack 1.0 is now live
+          </motion.div>
 
-      <motion.p
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="mx-auto mt-6 max-w-2xl text-lg text-zinc-400 md:text-xl leading-relaxed"
-      >
-        Add rate limiting, intelligent caching, idempotency, and WAF to any
-        backend in 30 seconds. No code changes required.
-      </motion.p>
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-5xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-[1.08]"
+          >
+            Shield your
+            <br />
+            <TypewriterText />
+            <br />
+            <span className="text-white">in 30 seconds.</span>
+          </motion.h1>
 
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4"
-      >
-        <Link
-          href="/dashboard"
-          className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-all"
-        >
-          Start Free{" "}
-          <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-        </Link>
-        <button
-          onClick={onDemo}
-          className="flex h-12 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
-        >
-          <TerminalSquare className="h-4 w-4" /> Watch 1-min Demo
-        </button>
-      </motion.div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="mt-6 max-w-lg text-lg text-zinc-400 leading-relaxed"
+          >
+            Add rate limiting, intelligent caching, idempotency, and WAF to any
+            backend. No code changes required.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="mt-10 flex flex-col sm:flex-row items-start gap-4"
+          >
+            <Link
+              href="/signup"
+              className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-all"
+            >
+              Start Free{" "}
+              <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+            <button
+              onClick={onDemo}
+              className="flex h-12 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
+            >
+              <TerminalSquare className="h-4 w-4" /> Watch Demo
+            </button>
+          </motion.div>
+
+          {/* Social proof */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 flex items-center gap-4"
+          >
+            <div className="flex -space-x-2">
+              {["E", "A", "S", "R"].map((l) => (
+                <div
+                  key={l}
+                  className="h-8 w-8 rounded-full border-2 border-black bg-zinc-700 flex items-center justify-center text-xs font-bold text-white"
+                >
+                  {l}
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-zinc-500">
+              Trusted by <span className="text-white font-medium">500+</span>{" "}
+              developers
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Right — Live Metrics Card */}
+        <div className="hidden lg:flex justify-center">
+          <LiveMetricsCard />
+        </div>
+      </div>
     </div>
-    <div className="pointer-events-none absolute inset-0 -z-10 flex items-center justify-center">
+
+    {/* Background glow */}
+    <div className="pointer-events-none absolute top-0 right-0 -z-10">
       <motion.div
-        animate={{ y: [0, -20, 0] }}
-        transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-        className="h-[600px] w-[600px] rounded-full bg-emerald-500 opacity-10 blur-[130px]"
+        animate={{ scale: [1, 1.1, 1], opacity: [0.06, 0.1, 0.06] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="h-[700px] w-[700px] rounded-full bg-emerald-500 blur-[140px]"
       />
     </div>
   </section>
@@ -822,6 +1045,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
+      <ScrollProgress />
       <MouseGlow />
       <AnimatePresence>
         {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
