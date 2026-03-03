@@ -56,53 +56,50 @@ const MouseGlow = () => {
 const DEMO_LINES = [
   {
     delay: 0,
-    text: "$ docker pull ghcr.io/backpack-io/gateway:latest",
-    color: "text-zinc-300",
-  },
-  {
-    delay: 1000,
-    text: "latest: Pulling from backpack-io/gateway...",
+    text: "# Step 1 \u2014 Sign up at localhost:3000/signup (free, no card)",
     color: "text-zinc-500",
   },
   {
-    delay: 1800,
-    text: "✓  Image pulled successfully",
+    delay: 900,
+    text: "\u2713  Account created \u00b7 API Key: bk_a1b2c3d4e5f6...",
     color: "text-emerald-400",
   },
+  { delay: 1900, text: "", color: "" },
   {
-    delay: 2400,
-    text: "$ docker run -p 8080:8080 -e TARGET_URL=http://your-api.com backpack",
+    delay: 2000,
+    text: "# Step 2 \u2014 Start the gateway (Docker)",
+    color: "text-zinc-500",
+  },
+  {
+    delay: 2800,
+    text: "$ docker run -p 8080:8080 -e TARGET_URL=http://your-api.com backpack/gateway",
     color: "text-zinc-300",
   },
   {
-    delay: 3400,
-    text: "INFO:     Backpack Gateway starting on port 8080",
+    delay: 3700,
+    text: "INFO:     Gateway live on :8080  |  WAF \u00b7 Rate Limit \u00b7 Cache \u2014 active",
     color: "text-zinc-500",
   },
-  {
-    delay: 4000,
-    text: "INFO:     WAF enabled — 47 threat patterns loaded",
-    color: "text-zinc-500",
-  },
+  { delay: 4500, text: "", color: "" },
   {
     delay: 4600,
-    text: "INFO:     LRU Cache ready (max=1000, TTL=5min)",
+    text: "# Step 3 \u2014 Route your requests through Backpack",
     color: "text-zinc-500",
   },
   {
-    delay: 5200,
-    text: "✓  Gateway is live at http://localhost:8080",
+    delay: 5400,
+    text: '$ curl -H "X-API-Key: bk_a1b2c3d4" http://localhost:8080/api/products',
+    color: "text-zinc-300",
+  },
+  {
+    delay: 6200,
+    text: "< HTTP/1.1 200 OK  (served from cache \u26a1 0.4ms)",
     color: "text-emerald-400",
   },
-  { delay: 6000, text: "", color: "" },
+  { delay: 7000, text: "", color: "" },
   {
-    delay: 6100,
-    text: "# Your backend is now protected 🎒",
-    color: "text-cyan-400",
-  },
-  {
-    delay: 6900,
-    text: "# Rate Limiting ✓  Cache ✓  WAF ✓  Idempotency ✓",
+    delay: 7100,
+    text: "# WAF \u2713  Rate Limit \u2713  Cache \u2713  Idempotency \u2713  Done \ud83c\udf92",
     color: "text-cyan-400",
   },
 ];
@@ -164,15 +161,24 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div className="flex items-center justify-between border-t border-white/5 bg-zinc-900/40 px-6 py-4">
           <p className="text-xs text-zinc-500">
-            Backpack Gateway · 1-min setup demo
+            Backpack Gateway · 3-step setup
           </p>
-          <Link
-            href="/dashboard"
-            onClick={onClose}
-            className="rounded-lg bg-emerald-500 px-4 py-2 text-xs font-semibold text-black hover:bg-emerald-400 transition-colors"
-          >
-            Open Dashboard →
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/login"
+              onClick={onClose}
+              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors"
+            >
+              Log In
+            </Link>
+            <Link
+              href="/signup"
+              onClick={onClose}
+              className="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-black hover:bg-emerald-400 transition-colors"
+            >
+              Sign Up Free →
+            </Link>
+          </div>
         </div>
       </motion.div>
     </motion.div>
@@ -186,8 +192,11 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
     className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-xl"
   >
     <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-      <div className="flex items-center gap-2">
-        <ShieldCheck className="h-6 w-6 text-emerald-500" />
+      <div suppressHydrationWarning className="flex items-center gap-2">
+        <ShieldCheck
+          suppressHydrationWarning
+          className="h-6 w-6 text-emerald-500"
+        />
         <span className="text-lg font-semibold tracking-tight text-white">
           Backpack
         </span>
@@ -206,7 +215,7 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
           Pricing
         </a>
       </nav>
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <button
           onClick={onDemo}
           className="hidden md:block text-sm font-medium text-zinc-400 hover:text-white transition-colors"
@@ -214,7 +223,13 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
           Demo
         </button>
         <Link
-          href="/dashboard"
+          href="/login"
+          className="hidden md:block text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+        >
+          Log in
+        </Link>
+        <Link
+          href="/signup"
           className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-transform"
         >
           Start Free
