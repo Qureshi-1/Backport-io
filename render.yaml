@@ -6,12 +6,18 @@ services:
     plan: free
     rootDir: backend
     healthCheckPath: /
+    disk:
+      name: backport-db
+      mountPath: /app/data
+      sizeGB: 1
     envVars:
       - key: PORT
         value: "10000"
+      - key: DB_PATH
+        value: "/app/data/backport.db"
       - key: SECRET_KEY
         generateValue: true
       - key: RAZORPAY_KEY_ID
-        value: "" # Requires user to provide this manualy in dashboard
+        value: ""
       - key: RAZORPAY_KEY_SECRET
-        value: "" # Requires user to provide this manualy in dashboard
+        value: ""
