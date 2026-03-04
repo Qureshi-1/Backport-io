@@ -24,9 +24,22 @@ app = FastAPI(title="Backport API Gateway")
 async def health_check():
     return {"status": "ok", "service": "backport-api"}
 
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://backpack-io.vercel.app",
+    "https://backport-io.vercel.app",
+    # Accept any vercel.app subdomain for previews
+]
+
+# Pull additional origins from env (comma-separated)
+_extra = os.getenv("EXTRA_ALLOWED_ORIGINS", "")
+if _extra:
+    ALLOWED_ORIGINS += [o.strip() for o in _extra.split(",") if o.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
