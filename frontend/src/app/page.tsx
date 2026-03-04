@@ -23,6 +23,7 @@ import {
   X,
   XCircle,
   AlertTriangle,
+  Sparkles,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 
@@ -477,13 +478,17 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
               className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-all"
             >
               Start Free{" "}
-              <ArrowRight suppressHydrationWarning className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              <ArrowRight
+                suppressHydrationWarning
+                className="h-4 w-4 group-hover:translate-x-1 transition-transform"
+              />
             </Link>
             <button
               onClick={onDemo}
               className="flex h-12 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
             >
-              <TerminalSquare suppressHydrationWarning className="h-4 w-4" /> Watch Demo
+              <TerminalSquare suppressHydrationWarning className="h-4 w-4" />{" "}
+              Watch Demo
             </button>
           </motion.div>
 
@@ -544,13 +549,14 @@ const TechStack = () => (
           { icon: Server, label: "FastAPI" },
           { icon: Layers, label: "Next.js" },
           { icon: TerminalSquare, label: "Python" },
+          { icon: Sparkles, label: "Antigravity" },
           { icon: Database, label: "Docker" },
         ].map(({ icon: Icon, label }) => (
           <div
             key={label}
             className="flex cursor-default items-center gap-3 text-lg font-medium text-zinc-400 transition-colors hover:text-white"
           >
-            <Icon className="h-5 w-5" /> {label}
+            <Icon suppressHydrationWarning className="h-5 w-5" /> {label}
           </div>
         ))}
       </div>
@@ -612,7 +618,8 @@ const ProblemSolution = () => (
           className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-8"
         >
           <div className="mb-6 flex items-center gap-2 font-semibold text-emerald-400">
-            <ShieldCheck suppressHydrationWarning className="h-5 w-5" /> With Backpack
+            <ShieldCheck suppressHydrationWarning className="h-5 w-5" /> With
+            Backpack
           </div>
           <ul className="space-y-4">
             {[
@@ -626,7 +633,10 @@ const ProblemSolution = () => (
                 key={p}
                 className="flex items-start gap-3 text-sm text-zinc-300"
               >
-                <CheckCircle2 suppressHydrationWarning className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400" />{" "}
+                <CheckCircle2
+                  suppressHydrationWarning
+                  className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400"
+                />{" "}
                 {p}
               </li>
             ))}
@@ -872,7 +882,10 @@ const Pricing = () => (
                 key={f}
                 className="flex items-center gap-3 text-sm text-zinc-300"
               >
-                <CheckCircle2 suppressHydrationWarning className="h-4 w-4 flex-shrink-0 text-emerald-500" />{" "}
+                <CheckCircle2
+                  suppressHydrationWarning
+                  className="h-4 w-4 flex-shrink-0 text-emerald-500"
+                />{" "}
                 {f}
               </li>
             ))}
@@ -912,7 +925,10 @@ const Pricing = () => (
                 key={f}
                 className="flex items-center gap-3 text-sm text-zinc-300"
               >
-                <CheckCircle2 suppressHydrationWarning className="h-4 w-4 flex-shrink-0 text-emerald-400" />{" "}
+                <CheckCircle2
+                  suppressHydrationWarning
+                  className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                />{" "}
                 {f}
               </li>
             ))}
@@ -957,13 +973,17 @@ const FinalCTA = ({ onDemo }: { onDemo: () => void }) => (
             className="group flex h-14 items-center gap-2 rounded-full bg-white px-10 text-base font-semibold text-black transition-transform hover:scale-105 active:scale-95"
           >
             Start Free Now{" "}
-            <ArrowRight suppressHydrationWarning className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            <ArrowRight
+              suppressHydrationWarning
+              className="h-4 w-4 transition-transform group-hover:translate-x-1"
+            />
           </Link>
           <button
             onClick={onDemo}
             className="flex h-14 items-center gap-2 rounded-full border border-zinc-700 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-900"
           >
-            <TerminalSquare suppressHydrationWarning className="h-4 w-4" /> See the Demo
+            <TerminalSquare suppressHydrationWarning className="h-4 w-4" /> See
+            the Demo
           </button>
         </div>
       </motion.div>
@@ -977,7 +997,10 @@ const Footer = () => (
     <div className="mx-auto mb-12 grid max-w-7xl gap-10 px-6 md:grid-cols-4">
       <div>
         <div className="mb-4 flex items-center gap-2">
-          <ShieldCheck suppressHydrationWarning className="h-5 w-5 text-emerald-500" />
+          <ShieldCheck
+            suppressHydrationWarning
+            className="h-5 w-5 text-emerald-500"
+          />
           <span className="text-base font-semibold text-white">Backpack</span>
         </div>
         <p className="text-sm leading-relaxed text-zinc-500">
