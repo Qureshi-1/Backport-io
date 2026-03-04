@@ -1068,6 +1068,31 @@ const Pricing = () => {
             </a>
           </div>
         </div>
+
+        {/* Refer & Earn Banner */}
+        <div className="mt-12 mx-auto max-w-4xl rounded-3xl border border-emerald-500/20 bg-emerald-500/5 p-6 backdrop-blur-sm sm:flex sm:items-center sm:justify-between sm:px-8">
+          <div>
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+              <span className="text-xl">🎁</span> Refer & Earn
+            </h3>
+            <p className="mt-1 text-sm text-zinc-400 max-w-lg">
+              Are you a college student or indie developer? Share Backpack with
+              friends and get{" "}
+              <strong className="text-emerald-400">
+                up to 6 months of Cloud Pro entirely free
+              </strong>
+              . Start referring right from your dashboard.
+            </p>
+          </div>
+          <div className="mt-6 sm:mt-0 flex-shrink-0">
+            <Link
+              href="/dashboard/billing"
+              className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
+            >
+              Get my Referral Link
+            </Link>
+          </div>
+        </div>
       </div>
     </section>
   );
