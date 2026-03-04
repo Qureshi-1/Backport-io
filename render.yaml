@@ -1,18 +1,18 @@
 services:
   - type: web
     name: backpack-backend
-    env: docker
+    env: python
     region: ohio
     plan: free
     rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
     disk:
       name: backport-db
       mountPath: /app/data
       sizeGB: 1
     envVars:
-      - key: PORT
-        value: "10000"
       - key: DB_PATH
         value: "/app/data/backport.db"
       - key: SECRET_KEY
