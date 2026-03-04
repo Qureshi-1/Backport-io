@@ -129,9 +129,12 @@ export default function SignupPage() {
               </div>
 
               {error && (
-                <p className="text-sm text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2">
-                  {error}
-                </p>
+                <div className="text-sm space-y-1 text-rose-400 bg-rose-500/10 border border-rose-500/20 rounded-lg px-3 py-2">
+                  <p>{error}</p>
+                  <p className="text-[10px] opacity-70">
+                    Target: {GATEWAY_URL}/auth/signup
+                  </p>
+                </div>
               )}
 
               <button

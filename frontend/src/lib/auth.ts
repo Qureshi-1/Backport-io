@@ -1,6 +1,9 @@
 // Auth utilities — token storage, auth headers, fetch wrapper
 
 export const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+if (typeof window !== "undefined") {
+  console.log("DEBUG: Backport Gateway URL is set to:", GATEWAY_URL);
+}
 const TOKEN_KEY = "backpack_token";
 const SELECTED_KEY = "backpack_api_key";
 
