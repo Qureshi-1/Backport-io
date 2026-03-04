@@ -348,7 +348,7 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
         </div>
         <div className="flex items-center justify-between border-t border-white/5 bg-zinc-900/40 px-6 py-4">
           <p className="text-xs text-zinc-500">
-            Backpack Gateway · 3-step setup
+            Backport Gateway · 3-step setup
           </p>
           <div className="flex items-center gap-2">
             <Link
@@ -385,7 +385,7 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
           className="h-6 w-6 text-emerald-500"
         />
         <span className="text-lg font-semibold tracking-tight text-white">
-          Backpack
+          Backport
         </span>
       </div>
       <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
@@ -441,7 +441,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
             className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400 mb-8"
           >
             <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-            Backpack 1.0 is now live
+            Backport 1.0 is now live
           </motion.div>
 
           <motion.h1
@@ -1194,7 +1194,7 @@ const Footer = () => (
     </div>
     <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/5 px-6 pt-8 md:flex-row">
       <p className="text-xs text-zinc-600">
-        &copy; {new Date().getFullYear()} Backpack.io · MIT License
+        &copy; {new Date().getFullYear()} Backport.io · MIT License
       </p>
       <p className="text-xs text-zinc-600">
         Built with ❤️ using FastAPI + Next.js + Docker

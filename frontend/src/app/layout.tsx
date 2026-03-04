@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Backpack | API Gateway",
+  title: "Backport | API Gateway",
   description: "Secure and cache your backend seamlessly",
 };
 

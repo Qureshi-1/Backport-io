@@ -18,11 +18,11 @@ from dotenv import load_dotenv
 
 load_dotenv() # Load variables from .env file
 
-app = FastAPI(title="Backpack API Gateway")
+app = FastAPI(title="Backport API Gateway")
 
 @app.get("/")
 async def health_check():
-    return {"status": "ok", "service": "backpack-api"}
+    return {"status": "ok", "service": "backport-api"}
 
 app.add_middleware(
     CORSMiddleware,

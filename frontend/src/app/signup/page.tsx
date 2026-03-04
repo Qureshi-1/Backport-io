@@ -54,7 +54,7 @@ export default function SignupPage() {
               suppressHydrationWarning
               className="h-7 w-7 text-emerald-500"
             />
-            <span className="text-xl font-semibold text-white">Backpack</span>
+            <span className="text-xl font-semibold text-white">Backport</span>
           </Link>
           <h2 className="text-3xl font-bold text-white mb-3 leading-tight">
             Ship with a production-ready
@@ -64,7 +64,7 @@ export default function SignupPage() {
             </span>
           </h2>
           <p className="text-zinc-400 mb-8 text-sm leading-relaxed">
-            Backpack sits between your users and your backend — protecting,
+            Backport sits between your users and your backend — protecting,
             caching, and rate limiting every request automatically.
           </p>
           <ul className="space-y-3">
@@ -88,7 +88,7 @@ export default function SignupPage() {
             className="flex items-center justify-center gap-2 mb-8 md:hidden"
           >
             <ShieldCheck className="h-7 w-7 text-emerald-500" />
-            <span className="text-xl font-semibold text-white">Backpack</span>
+            <span className="text-xl font-semibold text-white">Backport</span>
           </Link>
 
           <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-8 backdrop-blur-md shadow-2xl">

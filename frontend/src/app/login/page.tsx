@@ -44,14 +44,14 @@ export default function LoginPage() {
         {/* Logo */}
         <Link href="/" className="flex items-center justify-center gap-2 mb-10">
           <ShieldCheck className="h-7 w-7 text-emerald-500" />
-          <span className="text-xl font-semibold text-white">Backpack</span>
+          <span className="text-xl font-semibold text-white">Backport</span>
         </Link>
 
         {/* Card */}
         <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-8 backdrop-blur-md shadow-2xl">
           <h1 className="text-2xl font-bold text-white mb-1">Welcome back</h1>
           <p className="text-sm text-zinc-400 mb-8">
-            Sign in to your Backpack dashboard
+            Sign in to your Backport dashboard
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -110,7 +110,7 @@ export default function LoginPage() {
         </div>
 
         <p className="text-center text-xs text-zinc-700 mt-6">
-          &copy; {new Date().getFullYear()} Backpack.io · MIT License
+          &copy; {new Date().getFullYear()} Backport.io · MIT License
         </p>
       </div>
     </div>

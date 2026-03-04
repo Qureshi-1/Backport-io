@@ -53,7 +53,7 @@ export default function Sidebar() {
       <div className="flex h-16 items-center border-b border-zinc-800 px-6">
         <Shield className="mr-3 h-5 w-5 text-emerald-500 flex-shrink-0" />
         <span className="text-base font-semibold text-zinc-50 tracking-tight">
-          Backpack
+          Backport
         </span>
         <Link
           href="/"
