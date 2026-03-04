@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: backpack-backend
+    env: docker
+    region: ohio
+    plan: free
+    rootDir: backend
+    healthCheckPath: /
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: RAZORPAY_KEY_ID
+        value: "" # Requires user to provide this manualy in dashboard
+      - key: RAZORPAY_KEY_SECRET
+        value: "" # Requires user to provide this manualy in dashboard
