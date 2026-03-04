@@ -11,16 +11,18 @@ import re
 from collections import defaultdict, OrderedDict
 from typing import Dict, Any, Optional
 from datetime import datetime, timedelta
-from datetime import datetime, timedelta
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 import razorpay
+from dotenv import load_dotenv
+
+load_dotenv() # Load variables from .env file
 
 app = FastAPI(title="Backpack API Gateway")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
