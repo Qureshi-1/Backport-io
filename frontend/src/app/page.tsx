@@ -903,22 +903,21 @@ const Pricing = () => {
 
         <div className="mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {/* Free */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6">
-            <h3 className="mb-2 text-xl font-semibold text-white">
-              Self-Hosted
-            </h3>
+          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
+            <h3 className="mb-2 text-xl font-semibold text-white">Hobby</h3>
             <div className="mb-4 flex items-baseline gap-2">
               <span className="text-3xl font-bold text-white">$0</span>
               <span className="text-sm text-zinc-500">/forever</span>
             </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500">
-              For developers who love owning their stack.
+            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
+              Perfect for side projects or self-hosting lovers.
             </p>
             <ul className="mb-8 space-y-3">
               {[
-                "Unlimited Requests",
+                "10,000 Requests / month",
+                "Or Self-host for unlimited",
                 "Basic WAF patterns",
-                "In-memory LRU Cache",
+                "In-memory Cache",
                 "Community support",
               ].map((f) => (
                 <li
@@ -933,13 +932,12 @@ const Pricing = () => {
                 </li>
               ))}
             </ul>
-            <a
-              href="https://github.com/Qureshi-1/Backpack-io"
-              target="_blank"
+            <Link
+              href="/signup"
               className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
-              View on GitHub
-            </a>
+              Start for Free
+            </Link>
           </div>
 
           {/* Plus */}
