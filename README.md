@@ -59,36 +59,32 @@ Dashboard will be available at **`http://localhost:3000`**.
 
 ## 🐳 Self-Hosting (Docker)
 
-To deploy Backpack on your own infrastructure, we recommend using Docker.
+To deploy Backpack on your own infrastructure (VPS or Cloud), deploying via Docker Compose is highly recommended. Backpack stores data securely in a local `backpack.db` SQLite file via Docker Volumes, so all configurations and generated API keys remain persistent across container restarts.
 
-**`docker-compose.yml`**:
-
-```yaml
-version: "3.8"
-
-services:
-  gateway:
-    image: backpack-gateway:latest
-    build: ./backend
-    ports:
-      - "8080:8080"
-    environment:
-      - TARGET_BACKEND_URL=https://api.yourcompany.com
-    restart: always
-
-  dashboard:
-    image: backpack-dashboard:latest
-    build: ./frontend
-    ports:
-      - "3000:3000"
-    restart: always
-```
-
-Run the stack:
+### Quick Start with Docker
 
 ```bash
-docker-compose up -d
+# Clone the repository
+git clone https://github.com/yourusername/backpack.git
+cd backpack
+
+# Build and start all services in the background
+docker-compose up --build -d
 ```
+
+### Services Included
+
+- **Backend Gateway (Port `8080`)**: The core FastAPI reverse proxy caching, enforcing WAF, idempotency, and routing traffic.
+- **Frontend Dashboard (Port `3000`)**: The beautifully designed multi-tenant React (Next.js) Admin Panel where users can sign up, create API keys, view their analytics, and upgrade billing limits.
+- **Dummy Target API (Port `3001`)**: An internal dummy backend provided for testing your gateway out-of-the-box before pointing it to your actual production backend.
+
+### 💳 Built-In SaaS Features
+
+Backpack comes with a built-in MVP Billing and Authentication system out of the box:
+
+- **Auth**: Secure JWT-based Authentication.
+- **Multi-tenant Keys**: Each user can generate and track their own API gate-keys.
+- **Subscription Logic**: Dashboard users start on a Free plan (10k requests limit/month) and can upgrade to Pro directly through the dashboard.
 
 ---
 
