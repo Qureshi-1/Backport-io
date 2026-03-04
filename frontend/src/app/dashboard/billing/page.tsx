@@ -279,6 +279,86 @@ export default function BillingPage() {
           </div>
         </div>
       )}
+
+      {/* Refer & Earn UI */}
+      <div className="rounded-2xl border border-white/10 bg-zinc-900/50 p-6">
+        <div className="mb-6">
+          <h2 className="text-lg font-semibold text-white">
+            🎁 Refer & Earn (Beta)
+          </h2>
+          <p className="text-sm text-zinc-400 mt-1">
+            Refer 1 friend to get a 10%–25% real-time discount key. Refer 10
+            friends who upgrade to Plus/Pro, and you get the{" "}
+            <strong className="text-emerald-400">
+              Plus Plan FREE for lifetime!
+            </strong>
+          </p>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="col-span-1 lg:col-span-2 space-y-4">
+            <label className="text-xs font-medium text-zinc-400">
+              Your Unique Referral Link
+            </label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                readOnly
+                value="https://backpack.io/r/dev_9x2b3q"
+                className="flex-1 rounded-xl border border-zinc-700 bg-zinc-800 py-2.5 px-4 text-sm text-white focus:outline-none"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    "https://backpack.io/r/dev_9x2b3q",
+                  );
+                  alert("Copied to clipboard!");
+                }}
+                className="flex items-center gap-2 rounded-xl bg-zinc-800 px-4 py-2.5 text-sm font-medium text-white hover:bg-zinc-700 transition"
+              >
+                <Copy className="h-4 w-4" /> Copy
+              </button>
+            </div>
+            <p className="text-xs text-zinc-500">
+              When a user signs up using this link, they get mapped to your
+              account.
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-zinc-700 bg-zinc-800/50 p-4">
+            <p className="text-xs font-medium text-zinc-400 mb-2">
+              Progress to Free Plus
+            </p>
+            <div className="flex items-end gap-2 mb-3">
+              <span className="text-3xl font-bold text-white">0</span>
+              <span className="text-sm font-medium text-zinc-500 mb-1">
+                / 10 Upgrades
+              </span>
+            </div>
+            <div className="h-1.5 w-full bg-zinc-700 rounded-full overflow-hidden">
+              <div className="h-full bg-emerald-500 w-[5%]" />
+            </div>
+            <p className="text-[10px] text-zinc-400 mt-2">
+              10 successful premium referrals left.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-8 pt-6 border-t border-white/5">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-sm font-medium text-white">
+              Your Earned Discount Keys
+            </h3>
+            <span className="bg-emerald-500/10 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-500/20">
+              1-Time Use Only
+            </span>
+          </div>
+          <div className="rounded-lg border border-zinc-800 bg-black/50 p-6 text-center text-sm text-zinc-500">
+            No keys earned yet. Start referring friends to unlock your first 15%
+            discount key!
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
