@@ -901,15 +901,15 @@ const Pricing = () => {
           </div>
         </div>
 
-        <div className="mx-auto grid max-w-4xl gap-8 md:grid-cols-2">
+        <div className="mx-auto grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           {/* Free */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm">
-            <h3 className="mb-2 text-2xl font-semibold text-white">
+          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6">
+            <h3 className="mb-2 text-xl font-semibold text-white">
               Self-Hosted
             </h3>
             <div className="mb-4 flex items-baseline gap-2">
-              <span className="text-4xl font-bold text-white">$0</span>
-              <span className="text-zinc-500">/forever</span>
+              <span className="text-3xl font-bold text-white">$0</span>
+              <span className="text-sm text-zinc-500">/forever</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500">
               For developers who love owning their stack.
@@ -919,7 +919,7 @@ const Pricing = () => {
                 "Unlimited Requests",
                 "Basic WAF patterns",
                 "In-memory LRU Cache",
-                "Community support (GitHub)",
+                "Community support",
               ].map((f) => (
                 <li
                   key={f}
@@ -936,40 +936,33 @@ const Pricing = () => {
             <a
               href="https://github.com/Qureshi-1/Backpack-io"
               target="_blank"
-              className="block w-full rounded-xl bg-white/10 py-3 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
+              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
               View on GitHub
             </a>
           </div>
 
-          {/* Pro */}
-          <div className="relative rounded-3xl border border-emerald-500/50 bg-black p-8 shadow-[0_0_60px_-20px_rgba(16,185,129,0.4)]">
-            <div className="absolute right-8 top-0 -translate-y-1/2">
-              <span className="rounded-full bg-emerald-500 px-3 py-1 text-xs font-bold uppercase tracking-wider text-black">
-                Most Popular
-              </span>
-            </div>
-            <h3 className="mb-2 text-2xl font-semibold text-white">
-              Cloud Pro
-            </h3>
+          {/* Plus */}
+          <div className="rounded-3xl border border-white/10 bg-zinc-900/40 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
+            <h3 className="mb-2 text-xl font-semibold text-white">Plus</h3>
             <div className="mb-4 flex items-baseline gap-2 transition-all">
-              <span className="text-4xl font-bold text-white">
-                ${isYearly ? "39" : "49"}
+              <span className="text-3xl font-bold text-white">
+                ${isYearly ? "15" : "19"}
               </span>
-              <span className="text-zinc-500">/month</span>
+              <span className="text-sm text-zinc-500">/month</span>
             </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500">
+            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
               {isYearly
-                ? "Billed $468 annually. Save $120."
-                : "Billed monthly. Cancel anytime."}
+                ? "Billed $180 annually. Save $48."
+                : "Perfect for indie hackers."}
             </p>
             <ul className="mb-8 space-y-3">
               {[
-                "1,000,000 Requests / month",
-                "AI-enhanced WAF rules",
-                "Up to 10 API Gateways",
-                "Razorpay / Stripe Billing",
-                "Priority email support",
+                "250,000 Requests / month",
+                "Standard WAF rules",
+                "Up to 3 API Gateways",
+                "Managed Hosting",
+                "Email support",
               ].map((f) => (
                 <li
                   key={f}
@@ -985,10 +978,96 @@ const Pricing = () => {
             </ul>
             <Link
               href="/dashboard"
-              className="block w-full rounded-xl bg-emerald-500 py-3 text-center text-sm font-semibold text-black transition-colors hover:bg-emerald-400"
+              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
+            >
+              Get Plus
+            </Link>
+          </div>
+
+          {/* Pro */}
+          <div className="relative rounded-3xl border border-emerald-500/50 bg-black p-8 lg:p-6 shadow-[0_0_60px_-20px_rgba(16,185,129,0.4)] flex flex-col">
+            <div className="absolute right-6 top-0 -translate-y-1/2">
+              <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-black">
+                Most Popular
+              </span>
+            </div>
+            <h3 className="mb-2 text-xl font-semibold text-white">Cloud Pro</h3>
+            <div className="mb-4 flex items-baseline gap-2 transition-all">
+              <span className="text-3xl font-bold text-white">
+                ${isYearly ? "39" : "49"}
+              </span>
+              <span className="text-sm text-zinc-500">/month</span>
+            </div>
+            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
+              {isYearly
+                ? "Billed $468 annually. Save $120."
+                : "For teams handling traffic."}
+            </p>
+            <ul className="mb-8 space-y-3">
+              {[
+                "1,000,000 Requests / mo",
+                "AI-enhanced WAF rules",
+                "Up to 10 API Gateways",
+                "Distributed Redis",
+                "Priority support",
+              ].map((f) => (
+                <li
+                  key={f}
+                  className="flex items-center gap-3 text-sm text-zinc-300"
+                >
+                  <CheckCircle2
+                    suppressHydrationWarning
+                    className="h-4 w-4 flex-shrink-0 text-emerald-400"
+                  />{" "}
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/dashboard"
+              className="mt-auto block w-full rounded-xl bg-emerald-500 py-2.5 text-center text-sm font-semibold text-black transition-colors hover:bg-emerald-400"
             >
               Get Started Free
             </Link>
+          </div>
+
+          {/* Enterprise */}
+          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
+            <h3 className="mb-2 text-xl font-semibold text-white">
+              Enterprise
+            </h3>
+            <div className="mb-4 flex items-baseline gap-2">
+              <span className="text-3xl font-bold text-white">Custom</span>
+            </div>
+            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
+              For massive scale and dedicated infrastructure.
+            </p>
+            <ul className="mb-8 space-y-3">
+              {[
+                "Custom Volume Limits",
+                "Custom Rate Limits",
+                "Unlimited Gateways",
+                "Dedicated VPC Deployment",
+                "24/7 Phone Support",
+              ].map((f) => (
+                <li
+                  key={f}
+                  className="flex items-center gap-3 text-sm text-zinc-300"
+                >
+                  <CheckCircle2
+                    suppressHydrationWarning
+                    className="h-4 w-4 flex-shrink-0 text-zinc-600"
+                  />{" "}
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <a
+              href="mailto:founder@startup.com"
+              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
+            >
+              Contact Sales
+            </a>
           </div>
         </div>
       </div>
