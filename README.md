@@ -1,124 +1,326 @@
 <div align="center">
-  <h1>🎒 Backpack</h1>
-  <p><b>The modern, lightweight API Gateway to secure and cache your backend seamlessly.</b></p>
-  <br/>
+
+# 🛡️ Backport
+
+### API Gateway SaaS — Shield your backend in 30 seconds.
+
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-backpack--io.vercel.app-emerald?style=for-the-badge&logo=vercel)](https://backpack-io.vercel.app)
+[![Backend](https://img.shields.io/badge/Backend-Render-purple?style=for-the-badge&logo=render)](https://backpack-backend-wldo.onrender.com)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.111-green?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com)
+[![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=nextdotjs)](https://nextjs.org)
+
+**Backport** sits between your users and your backend — protecting, caching, and rate limiting every request automatically. No SDK. No code changes. Just point your traffic through Backport.
+
 </div>
 
-![Dashboard Overview](https://raw.githubusercontent.com/placeholder/image/main/dashboard.png)
+---
 
-Backpack is a developer-friendly API Gateway designed with aesthetics and performance in mind. Built with **FastAPI** on the backend and an ultra-fast **Next.js** dashboard, Backpack proxies your traffic while providing enterprise-grade features out of the box.
+## 🚀 Live URLs
+
+| Service                 | URL                                             |
+| ----------------------- | ----------------------------------------------- |
+| 🌐 Frontend (Vercel)    | https://backpack-io.vercel.app                  |
+| ⚙️ Backend API (Render) | https://backpack-backend-wldo.onrender.com      |
+| 📖 API Docs (Swagger)   | https://backpack-backend-wldo.onrender.com/docs |
+
+> **Note:** The free tier Render backend may take 30–60 seconds to wake up on first request.
+
+---
 
 ## ✨ Features
 
-- **⚡ Zero-Knowledge Proxying:** Routes traffic reliably without modifying your payloads.
-- **🛡 WAF (Web Application Firewall):** Intercepts and blocks malicious payloads like SQLi and XSS before they touch your backend.
-- **🚦 Sliding Window Rate Limiting:** Prevent API abuse effectively using distributed memory counters.
-- **💾 LRU Caching:** Sub-millisecond in-memory caching for GET requests to drastically reduce backend load.
-- **🔄 POST Idempotency:** Safely handles duplicate mutations, guaranteeing endpoints execute only once per unique request.
-- **📊 Real-time Dashboard:** A gorgeous, dark-mode real-time UI to monitor traffic, cache hits, and thwarted threats.
+| Feature                    | Description                                        |
+| -------------------------- | -------------------------------------------------- |
+| 🛡️ **WAF**                 | Blocks SQLi, XSS, and malicious bots automatically |
+| 🚦 **Rate Limiting**       | Sliding window rate limiting per IP per minute     |
+| ⚡ **Caching**             | LRU cache for GET requests (5 min TTL)             |
+| 🔑 **API Key Management**  | Generate, name, and manage multiple gateways       |
+| 📊 **Real-time Dashboard** | Live traffic charts, metrics, and threat counters  |
+| 💳 **Billing (Razorpay)**  | Upgrade to Pro with INR payments                   |
+| 🔒 **JWT Auth**            | Secure signup/login with 7-day tokens              |
+| 🎁 **Refer & Earn**        | Earn one-time discount keys for referrals          |
+| 🐋 **Docker Support**      | Self-host with Docker Compose in one command       |
 
 ---
 
-## 🚀 Quick Start
+## 🏗️ Architecture
 
-### 1. Backend (FastAPI Gateway)
-
-Make sure you have Python 3.9+ installed.
-
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/backpack.git
-cd backpack/backend
-
-# Create a virtual environment & install dependencies
-python -m venv venv
-source venv/bin/activate  # On Windows: .\venv\Scripts\activate
-pip install fastapi uvicorn httpx
-
-# Start the gateway
-uvicorn main:app --reload --host 0.0.0.0 --port 8080
+```
+Browser / Client
+      │
+      ▼
+┌─────────────────────┐
+│  Vercel (Next.js)   │  ← Dashboard UI + Next.js API Proxy
+│  /api/proxy/*       │  ← Proxies browser requests (no CORS)
+└─────────┬───────────┘
+          │  Server-to-server (no CORS)
+          ▼
+┌─────────────────────┐
+│  Render (FastAPI)   │  ← Auth, Gateway Logic, Billing
+│  SQLite Persistent  │  ← User data, API keys, settings
+└─────────┬───────────┘
+          │  Forwarded requests
+          ▼
+┌─────────────────────┐
+│  Your Backend API   │  ← Express / Django / FastAPI / anything
+└─────────────────────┘
 ```
 
-### 2. Frontend (Next.js Dashboard)
+---
 
-Make sure you have Node.js 18+ installed.
+## ⚡ Quick Start (Local Dev)
+
+### Prerequisites
+
+- Node.js 18+
+- Python 3.11+
+- Git
+
+### 1. Clone the repo
 
 ```bash
-cd backpack/frontend
+git clone https://github.com/Qureshi-1/Backpack-io.git
+cd Backpack-io
+```
 
-# Install dependencies
+### 2. Backend Setup
+
+```bash
+cd backend
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+# macOS/Linux
+source venv/bin/activate
+
+pip install -r requirements.txt
+
+# Create .env file
+cp ../.env.example .env
+# Edit .env with your keys
+
+uvicorn main:app --reload --port 8080
+```
+
+Backend will be live at: `http://localhost:8080`
+Swagger docs at: `http://localhost:8080/docs`
+
+### 3. Frontend Setup
+
+```bash
+cd frontend
 npm install
 
-# Start the development server
+# Create .env.local
+echo "NEXT_PUBLIC_API_URL=http://localhost:8080" > .env.local
+
 npm run dev
 ```
 
-Dashboard will be available at **`http://localhost:3000`**.
+Frontend will be live at: `http://localhost:3000`
 
----
-
-## 🐳 Self-Hosting (Docker)
-
-To deploy Backpack on your own infrastructure (VPS or Cloud), deploying via Docker Compose is highly recommended. Backpack stores data securely in a local `backpack.db` SQLite file via Docker Volumes, so all configurations and generated API keys remain persistent across container restarts.
-
-### Quick Start with Docker
+### 4. Or use Docker Compose (easiest)
 
 ```bash
-# Clone the repository
-git clone https://github.com/yourusername/backpack.git
-cd backpack
-
-# Build and start all services in the background
-docker-compose up --build -d
+# Run everything with one command
+docker compose up -d --build
 ```
-
-### Services Included
-
-- **Backend Gateway (Port `8080`)**: The core FastAPI reverse proxy caching, enforcing WAF, idempotency, and routing traffic.
-- **Frontend Dashboard (Port `3000`)**: The beautifully designed multi-tenant React (Next.js) Admin Panel where users can sign up, create API keys, view their analytics, and upgrade billing limits.
-- **Dummy Target API (Port `3001`)**: An internal dummy backend provided for testing your gateway out-of-the-box before pointing it to your actual production backend.
-
-### 💳 Built-In SaaS Features
-
-Backpack comes with a built-in MVP Billing and Authentication system out of the box:
-
-- **Auth**: Secure JWT-based Authentication.
-- **Multi-tenant Keys**: Each user can generate and track their own API gate-keys.
-- **Subscription Logic**: Dashboard users start on a Free plan (10k requests limit/month) and can upgrade to Pro directly through the dashboard.
 
 ---
 
-## 📸 Screenshots
+## 🚀 Deployment
 
-> **Note:** Drop your actual product screenshots in the `public/` directory or upload them to GitHub and paste the image links here before launching on Product Hunt!
+### Frontend → Vercel
 
-### 📊 Real-time Dashboard
+1. Import `Qureshi-1/Backpack-io` repository on [vercel.com](https://vercel.com)
+2. Set **Root Directory** to `frontend`
+3. Add Environment Variable:
 
-![Dashboard Screenshot Placeholder](https://via.placeholder.com/800x450/111111/4ade80?text=Your+Epic+Dashboard+Screenshot+Here)
+| Key                   | Value                               |
+| --------------------- | ----------------------------------- |
+| `NEXT_PUBLIC_API_URL` | `https://your-backend.onrender.com` |
 
-### ⚙️ Gateway Settings
+4. Deploy!
 
-![Settings Screenshot Placeholder](https://via.placeholder.com/800x450/111111/4ade80?text=Your+Settings+Screenshot+Here)
+### Backend → Render (Python, No Docker)
+
+1. Create a new **Web Service** on [render.com](https://render.com)
+2. Connect `Qureshi-1/Backpack-io` repository
+3. Configure settings:
+
+| Setting            | Value                                          |
+| ------------------ | ---------------------------------------------- |
+| **Language**       | `Python 3`                                     |
+| **Root Directory** | `backend`                                      |
+| **Build Command**  | `pip install -r requirements.txt`              |
+| **Start Command**  | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+
+4. Add a **Persistent Disk** (Disks tab):
+
+| Setting        | Value         |
+| -------------- | ------------- |
+| **Name**       | `backport-db` |
+| **Mount Path** | `/app/data`   |
+| **Size**       | 1 GB          |
+
+5. Add Environment Variables:
+
+| Key                   | Value                     |
+| --------------------- | ------------------------- |
+| `SECRET_KEY`          | Random string (32+ chars) |
+| `DB_PATH`             | `/app/data/backport.db`   |
+| `RAZORPAY_KEY_ID`     | Your Razorpay key         |
+| `RAZORPAY_KEY_SECRET` | Your Razorpay secret      |
+
+---
+
+## 🔑 Environment Variables
+
+### Backend (Render Dashboard)
+
+| Variable              | Required | Description                                         |
+| --------------------- | -------- | --------------------------------------------------- |
+| `SECRET_KEY`          | ✅       | JWT signing secret (use a long random string)       |
+| `DB_PATH`             | ✅       | SQLite path — use `/app/data/backport.db` on Render |
+| `RAZORPAY_KEY_ID`     | ⚠️       | Razorpay API Key ID (test or live)                  |
+| `RAZORPAY_KEY_SECRET` | ⚠️       | Razorpay API Secret Key                             |
+
+Generate a secure `SECRET_KEY`:
+
+```bash
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+### Frontend (Vercel Dashboard)
+
+| Variable              | Required | Description             |
+| --------------------- | -------- | ----------------------- |
+| `NEXT_PUBLIC_API_URL` | ✅       | Your Render backend URL |
+
+---
+
+## 📡 API Reference
+
+### Auth
+
+| Method | Endpoint       | Body                | Description                              |
+| ------ | -------------- | ------------------- | ---------------------------------------- |
+| `POST` | `/auth/signup` | `{email, password}` | Create account, returns JWT + API key    |
+| `POST` | `/auth/login`  | `{email, password}` | Login, returns JWT + API key             |
+| `GET`  | `/auth/me`     | —                   | Get current user (requires Bearer token) |
+
+### Gateway Management
+
+| Method   | Endpoint          | Auth            | Description                  |
+| -------- | ----------------- | --------------- | ---------------------------- |
+| `GET`    | `/api/keys`       | JWT             | List all your API keys       |
+| `POST`   | `/api/keys`       | JWT             | Create new API key/gateway   |
+| `DELETE` | `/api/keys/{key}` | JWT             | Delete/deactivate a key      |
+| `GET`    | `/api/settings`   | JWT + X-API-Key | Get gateway settings         |
+| `POST`   | `/api/settings`   | JWT + X-API-Key | Update target URL & settings |
+
+### Metrics
+
+| Method | Endpoint       | Auth | Description                         |
+| ------ | -------------- | ---- | ----------------------------------- |
+| `GET`  | `/api/metrics` | JWT  | Total requests, cache hits, threats |
+| `GET`  | `/api/traffic` | JWT  | Hourly traffic data (last 24h)      |
+
+### Billing
+
+| Method | Endpoint                    | Auth | Description                   |
+| ------ | --------------------------- | ---- | ----------------------------- |
+| `POST` | `/api/billing/create-order` | JWT  | Create Razorpay order         |
+| `POST` | `/api/billing/verify`       | JWT  | Verify payment & upgrade plan |
+
+### Proxy (Public Gateway)
+
+```http
+GET /{any-path}
+X-API-Key: bk_your_api_key_here
+
+→ Forwards to your configured target backend URL
+```
+
+---
+
+## 💰 Pricing
+
+| Plan            | Price   | Requests/mo | Gateways  |
+| --------------- | ------- | ----------- | --------- |
+| **Hobby**       | Free    | 10,000      | 1         |
+| **Plus**        | ₹499/mo | 100,000     | 3         |
+| **Cloud Pro**   | ₹999/mo | 1,000,000   | 10        |
+| **Enterprise**  | Custom  | Unlimited   | Unlimited |
+| **Self-Hosted** | Free    | Unlimited   | Unlimited |
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer            | Technology                              |
+| ---------------- | --------------------------------------- |
+| Frontend         | Next.js 14, Tailwind CSS, Framer Motion |
+| Backend          | FastAPI (Python 3.11), SQLite           |
+| Auth             | JWT (python-jose), bcrypt (passlib)     |
+| Payments         | Razorpay                                |
+| Deployment       | Vercel (frontend), Render (backend)     |
+| Containerization | Docker + Docker Compose                 |
+
+---
+
+## 📂 Project Structure
+
+```
+Backpack-io/
+├── backend/
+│   ├── main.py           # FastAPI app (auth, proxy, billing)
+│   ├── requirements.txt  # Python dependencies
+│   └── Dockerfile        # For self-hosting
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── page.tsx              # Landing page
+│   │   │   ├── dashboard/            # Dashboard pages
+│   │   │   ├── login/                # Auth pages
+│   │   │   ├── signup/
+│   │   │   └── api/proxy/[...path]/  # Next.js API proxy (CORS bypass)
+│   │   ├── components/
+│   │   │   ├── Sidebar.tsx
+│   │   │   └── TrafficChart.tsx
+│   │   └── lib/
+│   │       └── auth.ts               # Auth utilities
+│   └── Dockerfile
+├── render.yaml           # Render deployment config
+├── docker-compose.yml    # Local dev with Docker
+├── .env.example          # Environment variables template
+└── README.md
+```
 
 ---
 
 ## 🤝 Contributing
 
-We love our contributors! Here's how you can help:
-
-1. Fork the repo.
-2. Create a new branch (`git checkout -b feature/amazing-feature`).
-3. Commit your changes (`git commit -m 'Add amazing feature'`).
-4. Push to the branch (`git push origin feature/amazing-feature`).
-5. Open a Pull Request.
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/my-feature`
+3. Commit changes: `git commit -m 'feat: add my feature'`
+4. Push: `git push origin feat/my-feature`
+5. Open a Pull Request
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) file for details.
 
-<br/>
+---
+
 <div align="center">
-  <b>Built with ❤️ for developers.</b>
+
+**Built with ❤️ using FastAPI + Next.js + Docker**
+
+[Live Demo](https://backpack-io.vercel.app) · [Report Bug](https://github.com/Qureshi-1/Backpack-io/issues) · [Request Feature](https://github.com/Qureshi-1/Backpack-io/issues)
+
 </div>
