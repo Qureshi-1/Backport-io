@@ -6,5 +6,5 @@ python-jose[cryptography]==3.3.0
 httpx==0.26.0
 razorpay==1.4.1
 python-multipart==0.0.7
-pydantic==2.5.3
+pydantic==1.10.13
 python-dotenv==1.0.1
