@@ -2,8 +2,7 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Build context is repo ROOT, Dockerfile is at /backend/Dockerfile
-# So all paths must be prefixed with backend/
+# Build context is repo ROOT, so prefix paths with backend/
 COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
