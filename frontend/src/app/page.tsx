@@ -352,14 +352,14 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
           </p>
           <div className="flex items-center gap-2">
             <Link
-              href="/login"
+              href="/auth/login"
               onClick={onClose}
               className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors"
             >
               Log In
             </Link>
             <Link
-              href="/signup"
+              href="/auth/signup"
               onClick={onClose}
               className="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-black hover:bg-emerald-400 transition-colors"
             >
@@ -410,13 +410,13 @@ const Header = ({ onDemo }: { onDemo: () => void }) => (
           Demo
         </button>
         <Link
-          href="/login"
+          href="/auth/login"
           className="hidden md:block text-sm font-medium text-zinc-400 hover:text-white transition-colors"
         >
           Log in
         </Link>
         <Link
-          href="/signup"
+          href="/auth/signup"
           className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-transform"
         >
           Start Free
@@ -474,7 +474,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
             className="mt-10 flex flex-col sm:flex-row items-start gap-4"
           >
             <Link
-              href="/signup"
+              href="/auth/signup"
               className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black hover:scale-105 active:scale-95 transition-all"
             >
               Start Free{" "}
@@ -933,7 +933,7 @@ const Pricing = () => {
               ))}
             </ul>
             <Link
-              href="/signup"
+              href="/auth/signup"
               className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
               Start for Free
