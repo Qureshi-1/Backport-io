@@ -4,19 +4,21 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from config import CORS_ORIGINS
-from database import init_db
+from database import engine, Base
+import models
 import auth, user, payment, feedback, proxy
 
 print(f"✅ Starting Backport Gateway | Python {sys.version}")
 
-# ── Safe DB Init ──────────────────────────────────────────────────────────────
-try:
-    init_db()
-    print("✅ Database initialized")
-except Exception as e:
-    print(f"⚠️  DB init warning: {e}")
-
 app = FastAPI(title="Backport API Gateway")
+
+@app.on_event("startup")
+async def startup():
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database initialized")
+    except Exception as e:
+        print(f"⚠️  DB init warning: {e}")
 
 # ── Custom CORS — works with any origin, no credentials conflict ──────────────
 class CORSMiddleware(BaseHTTPMiddleware):

@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:////tmp/backport.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./backport.db")
 SECRET_KEY = os.getenv("SECRET_KEY", "backport-secret-key-change-this")
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
