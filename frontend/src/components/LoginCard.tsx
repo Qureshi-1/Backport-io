@@ -26,8 +26,16 @@ export default function LoginCard({
   onSubmit,
 }: LoginCardProps) {
   return (
-    <div className="w-full max-w-md bg-black/80 backdrop-blur-md p-8 rounded-none border border-green-500/50 shadow-[0_0_30px_rgba(0,255,135,0.2)]">
-      <div className="text-center mb-8">
+    <div className="w-full max-w-md bg-black/80 backdrop-blur-md p-8 rounded-none border border-green-500/50 shadow-[0_0_30px_rgba(0,255,135,0.2)] relative">
+      <div className="absolute top-4 left-4">
+        <Link
+          href="/"
+          className="text-green-400 hover:text-green-300 font-mono text-sm transition-colors"
+        >
+          &larr; Back to Home
+        </Link>
+      </div>
+      <div className="text-center mb-8 mt-6">
         <h1 className="text-2xl font-bold text-green-400 font-mono tracking-wider drop-shadow-[0_0_8px_rgba(0,255,135,0.8)]">
           // ACCESS_PORTAL
         </h1>

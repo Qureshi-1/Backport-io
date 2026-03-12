@@ -17,12 +17,20 @@ export default function Navbar() {
 
   return (
     <nav className="border-b border-zinc-800 bg-zinc-950 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-      <Link href="/dashboard" className="flex items-center gap-2">
-        <ShieldCheck className="h-6 w-6 text-emerald-500" />
-        <span className="font-bold text-white text-lg tracking-tight">
-          Backport
-        </span>
-      </Link>
+      <div className="flex items-center gap-6">
+        <Link href="/dashboard" className="flex items-center gap-2">
+          <ShieldCheck className="h-6 w-6 text-emerald-500" />
+          <span className="font-bold text-white text-lg tracking-tight">
+            Backport
+          </span>
+        </Link>
+        <Link
+          href="/"
+          className="hidden sm:block text-sm font-medium text-zinc-400 hover:text-emerald-400 transition-colors"
+        >
+          &larr; Backport.io
+        </Link>
+      </div>
 
       {/* Desktop Nav */}
 

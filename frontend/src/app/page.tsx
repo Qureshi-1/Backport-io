@@ -354,10 +354,16 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
             Backport Gateway · 3-step setup
           </p>
           <div className="flex items-center gap-2">
+            <button
+              onClick={onClose}
+              className="rounded-lg border border-emerald-500/30 px-3 py-1.5 text-xs font-medium text-emerald-400 hover:text-emerald-300 hover:border-emerald-500/80 transition-colors"
+            >
+              ✕ Close Demo
+            </button>
             <Link
               href="/auth/login"
               onClick={onClose}
-              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors"
+              className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors hidden sm:block"
             >
               Log In
             </Link>
