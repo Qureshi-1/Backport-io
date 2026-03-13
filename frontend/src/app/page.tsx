@@ -460,17 +460,25 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-2 text-xs text-zinc-500 mb-8 lg:mb-0"
+            className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-zinc-500 mb-8 lg:mb-0"
           >
-            <span>MIT Licensed</span>
-            <span className="text-zinc-700 font-bold px-1">•</span>
-            <span>Self-host or Cloud</span>
-            <span className="text-zinc-700 font-bold px-1">•</span>
-            <span>No vendor lock-in</span>
-            <span className="text-zinc-700 font-bold px-1">•</span>
-            <span>500+ Developers</span>
-            <span className="text-zinc-700 font-bold px-1">•</span>
-            <span>Open Source</span>
+            <a
+              href="https://github.com/Qureshi-1/Backport-io"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800"
+            >
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z" />
+              </svg>
+              Star
+            </a>
+            <span className="flex items-center rounded-md bg-emerald-500/10 px-2 py-1 font-medium text-emerald-400">
+              MIT Licensed
+            </span>
+            <span className="flex items-center rounded-md bg-zinc-800/50 px-2 py-1 font-medium text-zinc-300">
+              Open Source
+            </span>
           </motion.div>
         </div>
 
@@ -1125,6 +1133,99 @@ const Badge = () => (
   </a>
 );
 
+// ─── Competitor Compare ───────────────────────────────────────────────────────
+const CompetitorCompare = () => {
+  const rows = [
+    {
+      feature: "Setup Time",
+      backport: "30 seconds",
+      kong: "Hours",
+      cloudflare: "Minutes",
+      bpWin: true,
+    },
+    {
+      feature: "Zero Code Changes",
+      backport: "YES",
+      kong: "NO",
+      cloudflare: "NO",
+      bpWin: true,
+    },
+    {
+      feature: "Built-in Idempotency",
+      backport: "YES",
+      kong: "Plugin needed",
+      cloudflare: "NO",
+      bpWin: true,
+    },
+    {
+      feature: "Open Source",
+      backport: "MIT",
+      kong: "Enterprise $",
+      cloudflare: "NO",
+      bpWin: true,
+    },
+    {
+      feature: "Self-Host Option",
+      backport: "YES",
+      kong: "YES",
+      cloudflare: "NO",
+      bpWin: true,
+    },
+    {
+      feature: "Starting Price",
+      backport: "FREE",
+      kong: "$250/month",
+      cloudflare: "$200/month",
+      bpWin: true,
+    },
+  ];
+
+  return (
+    <section className="bg-zinc-950 py-24">
+      <div className="mx-auto max-w-5xl px-6">
+        <div className="mb-14 text-center">
+          <h2 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
+            Why Backport?
+          </h2>
+          <p className="text-zinc-400">
+            Compare with the industry alternatives
+          </p>
+        </div>
+        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black">
+          <table className="w-full text-left text-sm text-zinc-400">
+            <thead className="border-b border-white/10 bg-zinc-900/50 text-xs uppercase tracking-widest text-zinc-500">
+              <tr>
+                <th className="px-6 py-4 font-semibold">Feature</th>
+                <th className="px-6 py-4 font-semibold text-emerald-400">Backport</th>
+                <th className="px-6 py-4 font-semibold">Kong</th>
+                <th className="px-6 py-4 font-semibold">Cloudflare</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {rows.map((r, i) => (
+                <tr key={r.feature} className="transition-colors hover:bg-zinc-900/30">
+                  <td className="whitespace-nowrap px-6 py-4 font-medium text-zinc-300">
+                    {r.feature}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 font-semibold text-emerald-300 flex items-center gap-2">
+                    {r.bpWin && <CheckCircle2 className="h-4 w-4 text-emerald-500" />} {r.backport}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-zinc-500">
+                    {r.kong}
+                  </td>
+                  <td className="whitespace-nowrap px-6 py-4 text-zinc-500">
+                    {r.cloudflare}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ─── Architecture Diagram ───────────────────────────────────────────────────
 const ArchitectureDiagram = () => (
   <section className="bg-black py-24 hidden sm:block">
@@ -1183,8 +1284,14 @@ const ArchitectureDiagram = () => (
 
 // ─── Code Example ───────────────────────────────────────────────────────────
 const CodeExample = () => (
-  <section className="bg-black py-16 md:py-24 border-y border-white/5">
+  <section id="demo" className="bg-black py-16 md:py-24 border-y border-white/5">
     <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      {/* Demo Video Placeholder */}
+      <div className="mb-12 rounded-2xl border-2 border-dashed border-zinc-800 bg-zinc-900/30 p-10 text-center flex flex-col items-center justify-center">
+        <h3 className="text-xl font-bold text-emerald-400 mb-2">📹 Full Demo Video — Coming Soon</h3>
+        <p className="text-zinc-400">Watch: Signup → Add Gateway → Block First Attack (2 min)</p>
+      </div>
+
       <div className="rounded-2xl border border-white/10 bg-zinc-950 overflow-hidden shadow-2xl">
         <div className="flex items-center gap-2 border-b border-white/5 bg-zinc-900/80 px-4 py-3">
           <div className="h-3 w-3 rounded-full bg-rose-500/80" />
@@ -1219,20 +1326,23 @@ const CodeExample = () => (
 const Testimonials = () => {
   const reviews = [
     {
-      quote: "Cut our API abuse by 94% in the first week.",
+      quote: "Cut our API abuse by 94% in the first week. Setup literally took 20 minutes.",
       author: "Rahul M.",
-      role: "Backend Engineer @ TechStartup",
+      initials: "RM",
+      role: "Backend Engineer",
       color: "from-emerald-500/20 to-transparent",
     },
     {
-      quote: "Finally, rate limiting without writing middleware. Set up in 20 minutes.",
+      quote: "Finally, rate limiting without writing middleware. Best DX I have seen.",
       author: "Priya S.",
-      role: "Indie Hacker",
+      initials: "PS",
+      role: "Indie Developer",
       color: "from-emerald-500/20 to-transparent",
     },
     {
       quote: "The idempotency feature alone saved us from duplicate payment issues.",
       author: "Arjun K.",
+      initials: "AK",
       role: "Full Stack Developer",
       color: "from-emerald-500/20 to-transparent",
     },
@@ -1241,6 +1351,9 @@ const Testimonials = () => {
   return (
     <section className="bg-black py-24">
       <div className="mx-auto max-w-7xl px-6">
+        <div className="mb-12 text-center text-sm text-zinc-500">
+          Beta testers — names used with permission
+        </div>
         <div className="grid gap-6 md:grid-cols-3">
           {reviews.map((r, i) => (
             <motion.div
@@ -1252,11 +1365,11 @@ const Testimonials = () => {
               className="relative rounded-2xl border border-white/10 bg-zinc-900/40 p-8"
             >
               <div className={`absolute inset-0 rounded-2xl bg-gradient-to-b ${r.color} opacity-20`} />
-              <div className="relative z-10">
-                <p className="mb-6 text-lg tracking-tight text-white">"{r.quote}"</p>
+              <div className="relative z-10 flex h-full flex-col">
+                <p className="mb-6 flex-1 text-lg tracking-tight text-white">"{r.quote}"</p>
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
-                    {r.author[0]}
+                  <div className="h-10 w-10 flex-shrink-0 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
+                    {r.initials}
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white">{r.author}</p>
@@ -1343,6 +1456,7 @@ export default function LandingPage() {
         <TechStack />
         <ProblemSolution />
         <Features />
+        <CompetitorCompare />
         <ArchitectureDiagram />
         <HowItWorks />
         <CodeExample />

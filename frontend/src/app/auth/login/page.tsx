@@ -44,7 +44,15 @@ export default function LoginPage() {
       toast.success("Welcome back!");
       router.push("/dashboard");
     } catch (err: any) {
-      const msg = err.message || "Login failed";
+      let msg = err.message || "Login failed";
+      
+      const lowerMsg = msg.toLowerCase();
+      if (lowerMsg.includes("credentials") || lowerMsg.includes("unauthorized") || lowerMsg.includes("password") || lowerMsg.includes("incorrect")) {
+        msg = "Invalid email or password. Please try again.";
+      } else if (lowerMsg.includes("not found") || lowerMsg.includes("no account")) {
+        msg = "Account not found. Consider signing up.";
+      }
+      
       setError(msg);
       toast.error(msg);
     } finally {

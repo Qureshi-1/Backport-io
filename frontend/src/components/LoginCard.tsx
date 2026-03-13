@@ -92,19 +92,27 @@ export default function LoginCard({
           className="w-full bg-green-500 hover:bg-green-400 text-black font-bold font-mono py-3 uppercase tracking-widest flex items-center justify-center gap-2 transition-all hover:shadow-[0_0_20px_#00ff87] disabled:opacity-50 disabled:hover:shadow-none"
         >
           {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-          {loading ? "AUTHENTICATING..." : "INITIATE_LOGIN"}
+          {loading ? "INITIALIZING..." : "ACCESS_PORTAL"}
         </button>
-      </form>
 
-      <div className="mt-8 text-center text-xs font-mono text-green-600/60">
-        NO CONNECTION PROTOCOL?{" "}
-        <Link
-          href="/auth/signup"
-          className="text-green-400 hover:text-green-300 hover:underline hover:drop-shadow-[0_0_5px_rgba(0,255,135,0.8)] transition-all"
-        >
-          ESTABLISH_NEW_UPLINK
-        </Link>
-      </div>
+        <div className="flex justify-between items-center text-xs font-mono">
+          <Link
+            href="/auth/forgot-password"
+            className="text-green-500 hover:text-green-400 transition-colors underline decoration-dotted underline-offset-2"
+          >
+            Forgot Passphrase?
+          </Link>
+          <div className="text-green-600/60">
+            NO UPLINK?{" "}
+            <Link
+              href="/auth/signup"
+              className="text-green-400 hover:text-green-300 hover:underline hover:drop-shadow-[0_0_5px_rgba(0,255,135,0.8)] transition-all"
+            >
+              INITIALIZE_ACCOUNT
+            </Link>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

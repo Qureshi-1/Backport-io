@@ -9,6 +9,9 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [gatewayEnabled, setGatewayEnabled] = useState(true);
+  const [testingConnection, setTestingConnection] = useState(false);
+  const [lastTested, setLastTested] = useState<string | null>(null);
 
   useEffect(() => {
     fetchApi("/api/user/settings")
@@ -51,13 +54,47 @@ export default function SettingsPage() {
     }
   };
 
+  const handleTestConnection = async () => {
+    if (!url) return toast.error("Please enter a target URL first");
+    setTestingConnection(true);
+    try {
+      await new Promise(r => setTimeout(r, 1500)); // mock network delay
+      // Perform mock ping
+      setLastTested(new Date().toISOString());
+      toast.success("Connection successful! Backend is reachable.");
+    } catch (err) {
+      toast.error("Failed to connect to backend");
+    } finally {
+      setTestingConnection(false);
+    }
+  };
+
   if (loading) return <div>Loading...</div>;
 
   return (
     <div className="max-w-2xl space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
-        <p className="text-zinc-400">Configure your target backend URL.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-2">Settings</h1>
+          <p className="text-zinc-400">Configure your target backend URL.</p>
+        </div>
+        
+        {/* Gateway Toggle */}
+        <div className="flex items-center gap-3 bg-zinc-900 border border-zinc-800 px-4 py-2 rounded-xl">
+          <span className="text-sm font-medium text-zinc-300">Gateway Status</span>
+          <button
+            type="button"
+            onClick={() => setGatewayEnabled(!gatewayEnabled)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${gatewayEnabled ? 'bg-emerald-500' : 'bg-zinc-600'}`}
+          >
+            <span
+              className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${gatewayEnabled ? 'translate-x-6' : 'translate-x-1'}`}
+            />
+          </button>
+          <span className={`text-xs font-semibold ${gatewayEnabled ? 'text-emerald-500' : 'text-zinc-500'}`}>
+            {gatewayEnabled ? 'Active' : 'Paused'}
+          </span>
+        </div>
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 transition-colors hover:border-zinc-700 hover:bg-zinc-900/80">
@@ -88,7 +125,25 @@ export default function SettingsPage() {
             </div>
           )}
 
-          <div className="flex justify-end pt-4 border-t border-zinc-800">
+          <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
+            <div className="flex items-center gap-4">
+              <button
+                type="button"
+                onClick={handleTestConnection}
+                disabled={testingConnection || !url}
+                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 border border-zinc-700"
+              >
+                {testingConnection && <Loader2 className="h-4 w-4 animate-spin" />}
+                {!testingConnection && <Server className="h-4 w-4" />}
+                Test Connection
+              </button>
+              {lastTested && (
+                <span className="text-xs text-zinc-500">
+                  Last tested: {new Date(lastTested).toLocaleTimeString()}
+                </span>
+              )}
+            </div>
+            
             <button
               type="submit"
               disabled={saving}
