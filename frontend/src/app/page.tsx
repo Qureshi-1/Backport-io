@@ -409,7 +409,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
           >
             Shield your
             <br />
-            <TypewriterText />
+            {/* Fallback space + text in case JS is disabled or fails */}
+            <span className="inline-block min-w-[200px]">
+              <TypewriterText />
+            </span>
             <br />
             <span className="text-white">in 30 seconds.</span>
           </motion.h1>
@@ -441,7 +444,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
               />
             </Link>
             <button
-              onClick={onDemo}
+              onClick={() => {
+                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+                onDemo(); // Optional: still open terminal immediately if desired, or just scroll
+              }}
               className="flex h-12 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
             >
               <TerminalSquare suppressHydrationWarning className="h-4 w-4" />{" "}
@@ -772,7 +778,7 @@ const CompareTable = () => {
     {
       feature: "Uptime SLA",
       self: "You manage it",
-      cloud: "99.99% guaranteed",
+      cloud: "99.9% guaranteed",
     },
     { feature: "Support", self: "Community (GitHub)", cloud: "Priority email" },
     { feature: "Price", self: "$0 forever", cloud: "$39 / month" },
@@ -1047,7 +1053,7 @@ const Pricing = () => {
           </div>
           <div className="mt-6 sm:mt-0 flex-shrink-0">
             <Link
-              href="/dashboard/billing"
+              href="/auth/signup?next=/dashboard/billing"
               className="inline-flex items-center gap-2 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-5 py-2.5 text-sm font-semibold text-emerald-400 transition-colors hover:bg-emerald-500/20"
             >
               Get my Referral Link
@@ -1089,7 +1095,10 @@ const FinalCTA = ({ onDemo }: { onDemo: () => void }) => (
             Start Free — No credit card required
           </Link>
           <button
-            onClick={onDemo}
+            onClick={() => {
+              document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
+              onDemo();
+            }}
             className="flex h-14 items-center gap-2 rounded-full border border-zinc-700 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-900"
           >
             <TerminalSquare suppressHydrationWarning className="h-4 w-4" /> See

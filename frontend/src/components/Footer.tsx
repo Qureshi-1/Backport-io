@@ -31,14 +31,14 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <Link href="/docs" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Docs
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <Link href="/changelog" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Changelog
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
@@ -46,14 +46,14 @@ export default function Footer() {
           <p className="mb-4 text-sm font-semibold text-white">Company</p>
           <ul className="space-y-2">
             <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <Link href="/about" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 About
-              </a>
+              </Link>
             </li>
             <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <Link href="/blog" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Blog
-              </a>
+              </Link>
             </li>
             <li>
               <a href="https://github.com/Qureshi-1/Backport-io" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
@@ -61,7 +61,7 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="https://twitter.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <a href="https://twitter.com/backportio" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400" target="_blank" rel="noopener noreferrer">
                 Twitter
               </a>
             </li>
@@ -81,7 +81,7 @@ export default function Footer() {
               </Link>
             </li>
             <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+              <a href="mailto:security@backportio.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Security
               </a>
             </li>
@@ -96,6 +96,9 @@ export default function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/5 px-6 pt-8 md:flex-row">
         <p className="text-xs text-zinc-600">
           &copy; {new Date().getFullYear()} Backport. MIT Licensed. Built for developers.
+        </p>
+        <p className="text-xs text-zinc-600">
+          Built with Next.js & FastAPI
         </p>
       </div>
     </footer>
