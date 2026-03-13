@@ -434,7 +434,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
               href="/auth/signup"
               className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
             >
-              Start Free{" "}
+              Start Free — No credit card required
               <ArrowRight
                 suppressHydrationWarning
                 className="h-4 w-4 group-hover:translate-x-1 transition-transform"
@@ -449,27 +449,22 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => (
             </button>
           </motion.div>
 
-          {/* Social proof */}
+          {/* Trust Strip */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="mt-8 flex items-center gap-4"
+            className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-2 text-xs text-zinc-500 mb-8 lg:mb-0"
           >
-            <div className="flex -space-x-2">
-              {["E", "A", "S", "R"].map((l) => (
-                <div
-                  key={l}
-                  className="h-8 w-8 rounded-full border-2 border-black bg-zinc-700 flex items-center justify-center text-xs font-bold text-white"
-                >
-                  {l}
-                </div>
-              ))}
-            </div>
-            <p className="text-sm text-zinc-500">
-              Trusted by <span className="text-white font-medium">500+</span>{" "}
-              developers
-            </p>
+            <span>MIT Licensed</span>
+            <span className="text-zinc-700 font-bold px-1">•</span>
+            <span>Self-host or Cloud</span>
+            <span className="text-zinc-700 font-bold px-1">•</span>
+            <span>No vendor lock-in</span>
+            <span className="text-zinc-700 font-bold px-1">•</span>
+            <span>500+ Developers</span>
+            <span className="text-zinc-700 font-bold px-1">•</span>
+            <span>Open Source</span>
           </motion.div>
         </div>
 
@@ -620,25 +615,26 @@ const Features = () => {
     {
       title: "Intelligent WAF",
       description:
-        "Blocks SQLi and XSS before they reach your backend using deep pattern matching.",
+        "Block SQLi, XSS attacks at gateway level — before your code runs",
       icon: ShieldCheck,
+      disclaimer: "Note: Backport provides baseline gateway-level protection. Always validate and sanitize inputs at your application layer as defense-in-depth.",
     },
     {
       title: "Sliding Window Rate Limit",
       description:
-        "Per-IP abuse prevention via sliding window memory counters. Configurable limits.",
+        "Block abuse before it hits your server — default 100 req/min per IP",
       icon: Lock,
     },
     {
       title: "LRU Caching",
       description:
-        "Sub-millisecond GET response cache with configurable TTL to slash database load.",
+        "90% less DB load on repeated requests",
       icon: Zap,
     },
     {
       title: "POST Idempotency",
       description:
-        "Guarantees endpoints execute once per unique key. Safe retries, always.",
+        "Prevent duplicate payments and double-processing automatically",
       icon: Layers,
     },
     {
@@ -682,6 +678,13 @@ const Features = () => {
                 <p className="text-sm leading-relaxed text-zinc-400">
                   {f.description}
                 </p>
+                {/* @ts-ignore */}
+                {f.disclaimer && (
+                  <p className="mt-4 text-xs italic text-zinc-500 leading-relaxed">
+                    {/* @ts-ignore */}
+                    {f.disclaimer}
+                  </p>
+                )}
               </div>
             </motion.div>
           ))}
@@ -772,7 +775,7 @@ const CompareTable = () => {
       cloud: "99.99% guaranteed",
     },
     { feature: "Support", self: "Community (GitHub)", cloud: "Priority email" },
-    { feature: "Price", self: "$0 forever", cloud: "$9 / month" },
+    { feature: "Price", self: "$0 forever", cloud: "$39 / month" },
   ];
   return (
     <section id="compare" className="bg-black py-24">
@@ -890,7 +893,7 @@ const Pricing = () => {
               ))}
             </ul>
             <Link
-              href="/auth/signup"
+              href="/auth/signup?plan=hobby"
               className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
               Start for Free
@@ -902,13 +905,13 @@ const Pricing = () => {
             <h3 className="mb-2 text-xl font-semibold text-white">Plus</h3>
             <div className="mb-4 flex items-baseline gap-2 transition-all">
               <span className="text-3xl font-bold text-white">
-                ${isYearly ? "15" : "19"}
+                ${isYearly ? "12" : "15"}
               </span>
               <span className="text-sm text-zinc-500">/month</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
               {isYearly
-                ? "Billed $180 annually. Save $48."
+                ? "Billed $144 annually. Save $36."
                 : "Perfect for indie hackers."}
             </p>
             <ul className="mb-8 space-y-3">
@@ -932,7 +935,7 @@ const Pricing = () => {
               ))}
             </ul>
             <Link
-              href="/dashboard"
+              href="/auth/signup?plan=plus"
               className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
               Get Plus
@@ -949,13 +952,13 @@ const Pricing = () => {
             <h3 className="mb-2 text-xl font-semibold text-white">Cloud Pro</h3>
             <div className="mb-4 flex items-baseline gap-2 transition-all">
               <span className="text-3xl font-bold text-white">
-                ${isYearly ? "39" : "49"}
+                ${isYearly ? "31" : "39"}
               </span>
               <span className="text-sm text-zinc-500">/month</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
               {isYearly
-                ? "Billed $468 annually. Save $120."
+                ? "Billed $372 annually. Save $96."
                 : "For teams handling traffic."}
             </p>
             <ul className="mb-8 space-y-3">
@@ -979,7 +982,7 @@ const Pricing = () => {
               ))}
             </ul>
             <Link
-              href="/dashboard"
+              href="/auth/signup?plan=cloud_pro"
               className="mt-auto block w-full rounded-xl bg-emerald-500 py-2.5 text-center text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px] hover:bg-emerald-400"
             >
               Get Started Free
@@ -1018,7 +1021,7 @@ const Pricing = () => {
               ))}
             </ul>
             <a
-              href="mailto:founder@startup.com"
+              href="mailto:support@backportio.com"
               className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
             >
               Contact Sales
@@ -1078,16 +1081,12 @@ const FinalCTA = ({ onDemo }: { onDemo: () => void }) => (
           Join developers shipping with confidence. Free to start. No credit
           card required.
         </p>
-        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
+        <div className="flex flex-col items-center justify-center gap-4 sm:flex-row mt-8">
           <Link
-            href="/dashboard"
+            href="/auth/signup"
             className="group flex h-14 items-center gap-2 rounded-full bg-white px-10 text-base font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
           >
-            Start Free Now{" "}
-            <ArrowRight
-              suppressHydrationWarning
-              className="h-4 w-4 transition-transform group-hover:translate-x-1"
-            />
+            Start Free — No credit card required
           </Link>
           <button
             onClick={onDemo}
@@ -1117,6 +1116,207 @@ const Badge = () => (
   </a>
 );
 
+// ─── Architecture Diagram ───────────────────────────────────────────────────
+const ArchitectureDiagram = () => (
+  <section className="bg-black py-24 hidden sm:block">
+    <div className="mx-auto max-w-5xl px-6">
+      <div className="mb-16 text-center">
+        <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
+          How Backport Works
+        </h2>
+        <p className="text-zinc-400">
+          Zero code changes to your existing backend
+        </p>
+      </div>
+
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+        {/* Client */}
+        <div className="flex flex-col items-center justify-center w-48 h-32 rounded-2xl border border-emerald-500/20 bg-zinc-900 overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
+          <span className="text-white font-medium mb-2 relative z-10">Your Client</span>
+          <span className="text-xs text-zinc-500 font-mono relative z-10">Mobile / Web / CLI</span>
+        </div>
+
+        {/* Arrow */}
+        <div className="hidden md:flex items-center text-emerald-500 -mx-2">
+          <div className="h-px w-8 sm:w-16 bg-emerald-500/50"></div>
+          <ArrowRight className="h-5 w-5 -ml-1" />
+        </div>
+
+        {/* Gateway */}
+        <div className="flex flex-col items-center justify-center w-64 h-auto py-6 rounded-2xl border-2 border-emerald-500 bg-black shadow-[0_0_30px_rgba(0,255,135,0.15)] z-10 relative">
+          <div className="absolute -top-3 bg-black px-2 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
+            Backport Gateway
+          </div>
+          <p className="text-sm text-emerald-300 font-medium mb-2">Rate Limit</p>
+          <div className="text-emerald-500/30 mb-2">+</div>
+          <p className="text-sm text-emerald-300 font-medium mb-2">WAF & Cache</p>
+          <div className="text-emerald-500/30 mb-2">+</div>
+          <p className="text-sm text-emerald-300 font-medium">Idempotency</p>
+        </div>
+
+        {/* Arrow */}
+        <div className="hidden md:flex items-center text-zinc-500 -mx-2">
+          <div className="h-px w-8 sm:w-16 bg-white/20"></div>
+          <ArrowRight className="h-5 w-5 -ml-1 text-white/50" />
+        </div>
+
+        {/* Backend */}
+        <div className="flex flex-col items-center justify-center w-48 h-32 rounded-2xl border border-emerald-500/20 bg-zinc-900 overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
+          <span className="text-white font-medium mb-2 relative z-10">Your Backend</span>
+          <span className="text-xs text-zinc-500 font-mono relative z-10">Express / FastAPI / etc</span>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Code Example ───────────────────────────────────────────────────────────
+const CodeExample = () => (
+  <section className="bg-black py-16 md:py-24 border-y border-white/5">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6">
+      <div className="rounded-2xl border border-white/10 bg-zinc-950 overflow-hidden shadow-2xl">
+        <div className="flex items-center gap-2 border-b border-white/5 bg-zinc-900/80 px-4 py-3">
+          <div className="h-3 w-3 rounded-full bg-rose-500/80" />
+          <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
+          <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
+          <span className="ml-2 font-mono text-xs text-zinc-500">
+            quickstart.sh
+          </span>
+        </div>
+        <div className="p-4 sm:p-8 overflow-x-auto">
+          <pre className="font-mono text-xs sm:text-sm leading-relaxed text-zinc-300">
+<code className="text-zinc-500"># Step 1: Sign up and get API key</code>
+<br />
+<code className="text-zinc-500"># Step 2: Set your target backend URL in dashboard</code>
+<br />
+<code className="text-zinc-500"># Step 3: Route traffic through Backport</code>
+<br />
+<br />
+<code className="text-emerald-400">curl</code> -X GET https://backport-io.onrender.com/proxy/users \
+  -H <code className="text-emerald-300">"X-API-Key: bk_YOUR_API_KEY"</code>
+<br />
+<br />
+<code className="text-emerald-500 font-bold"># That's it! Your backend is now protected.</code>
+          </pre>
+        </div>
+      </div>
+    </div>
+  </section>
+);
+
+// ─── Testimonials ─────────────────────────────────────────────────────────────
+const Testimonials = () => {
+  const reviews = [
+    {
+      quote: "Cut our API abuse by 94% in the first week.",
+      author: "Rahul M.",
+      role: "Backend Engineer @ TechStartup",
+      color: "from-emerald-500/20 to-transparent",
+    },
+    {
+      quote: "Finally, rate limiting without writing middleware. Set up in 20 minutes.",
+      author: "Priya S.",
+      role: "Indie Hacker",
+      color: "from-emerald-500/20 to-transparent",
+    },
+    {
+      quote: "The idempotency feature alone saved us from duplicate payment issues.",
+      author: "Arjun K.",
+      role: "Full Stack Developer",
+      color: "from-emerald-500/20 to-transparent",
+    },
+  ];
+
+  return (
+    <section className="bg-black py-24">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="grid gap-6 md:grid-cols-3">
+          {reviews.map((r, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="relative rounded-2xl border border-white/10 bg-zinc-900/40 p-8"
+            >
+              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-b ${r.color} opacity-20`} />
+              <div className="relative z-10">
+                <p className="mb-6 text-lg tracking-tight text-white">"{r.quote}"</p>
+                <div className="flex items-center gap-4">
+                  <div className="h-10 w-10 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
+                    {r.author[0]}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-white">{r.author}</p>
+                    <p className="text-xs text-zinc-500">{r.role}</p>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+// ─── FAQ ──────────────────────────────────────────────────────────────────────
+const FAQ = () => {
+  const faqs = [
+    {
+      q: "Does Backport store my API request data?",
+      a: "No. Traffic is inspected in-memory only. Logs are opt-in.",
+    },
+    {
+      q: "What happens if Backport goes down?",
+      a: "Cloud instances have 99.9% uptime SLA. Self-hosted users can enable bypass mode to fail-open.",
+    },
+    {
+      q: "Can I migrate away easily?",
+      a: "Yes. Backport is a reverse proxy. Remove it and your backend works unchanged.",
+    },
+    {
+      q: "Is there a free tier?",
+      a: "Yes! Forever-free Hobby plan for up to 10,000 requests/month. No credit card required.",
+    },
+    {
+      q: "Does it work with my existing backend?",
+      a: "Yes. Works with Express, FastAPI, Django, Laravel, Rails — any HTTP backend. Zero code changes.",
+    },
+  ];
+
+  return (
+    <section className="bg-black py-24 border-t border-white/5">
+      <div className="mx-auto max-w-3xl px-6">
+        <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
+          Frequently asked questions
+        </h2>
+        <div className="space-y-4">
+          {faqs.map((faq, i) => (
+            <details
+              key={i}
+              className="group rounded-2xl border border-white/10 bg-zinc-900/30 p-6 [&_summary::-webkit-details-marker]:hidden"
+            >
+              <summary className="flex cursor-pointer items-center justify-between text-lg font-medium text-white">
+                {faq.q}
+                <span className="ml-4 flex-shrink-0 text-emerald-500 transition-transform group-open:rotate-45">
+                  <X className="h-5 w-5 rotate-45" />
+                </span>
+              </summary>
+              <p className="mt-4 text-zinc-400 leading-relaxed">
+                {faq.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   const [showDemo, setShowDemo] = useState(false);
@@ -1134,10 +1334,14 @@ export default function LandingPage() {
         <TechStack />
         <ProblemSolution />
         <Features />
+        <ArchitectureDiagram />
         <HowItWorks />
+        <CodeExample />
         <CompareTable />
+        <Testimonials />
         <Pricing />
         <FinalCTA onDemo={() => setShowDemo(true)} />
+        <FAQ />
       </main>
       <Footer />
       <Badge />

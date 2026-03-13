@@ -14,45 +14,30 @@ export default function Footer() {
             <span className="text-base font-semibold text-white">Backport</span>
           </div>
           <p className="text-sm leading-relaxed text-zinc-500">
-            Zero-code API gateway. Security and speed for every backend.
+            Open source API Gateway. Security and speed for every backend.
           </p>
         </div>
         <div>
           <p className="mb-4 text-sm font-semibold text-white">Product</p>
           <ul className="space-y-2">
             <li>
-              <Link href="/#features" className="text-sm text-zinc-500 transition-colors hover:text-white">
+              <Link href="/#features" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Features
               </Link>
             </li>
             <li>
-              <Link href="/#pricing" className="text-sm text-zinc-500 transition-colors hover:text-white">
+              <Link href="/#pricing" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Pricing
               </Link>
             </li>
             <li>
-              <Link href="/terms" className="text-sm text-zinc-500 transition-colors hover:text-white">
-                Terms of Service
-              </Link>
-            </li>
-            <li>
-              <Link href="/privacy" className="text-sm text-zinc-500 transition-colors hover:text-white">
-                Privacy Policy
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <p className="mb-4 text-sm font-semibold text-white">Developers</p>
-          <ul className="space-y-2">
-            <li>
-              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-white">
+              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Docs
               </a>
             </li>
             <li>
-              <a href="https://github.com/Qureshi-1/Backport-io" className="text-sm text-zinc-500 transition-colors hover:text-white">
-                GitHub
+              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Changelog
               </a>
             </li>
           </ul>
@@ -61,12 +46,47 @@ export default function Footer() {
           <p className="mb-4 text-sm font-semibold text-white">Company</p>
           <ul className="space-y-2">
             <li>
-              <a href="https://twitter.com" className="text-sm text-zinc-500 transition-colors hover:text-white">
-                Twitter
+              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                About
               </a>
             </li>
             <li>
-              <a href="mailto:founder@backport.dev" className="text-sm text-zinc-500 transition-colors hover:text-white">
+              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Blog
+              </a>
+            </li>
+            <li>
+              <a href="https://github.com/Qureshi-1/Backport-io" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                GitHub
+              </a>
+            </li>
+            <li>
+              <a href="https://twitter.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Twitter
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p className="mb-4 text-sm font-semibold text-white">Legal</p>
+          <ul className="space-y-2">
+            <li>
+              <Link href="/privacy" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link href="/terms" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <a href="#" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
+                Security
+              </a>
+            </li>
+            <li>
+              <a href="mailto:support@backportio.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Contact
               </a>
             </li>
@@ -75,10 +95,7 @@ export default function Footer() {
       </div>
       <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 border-t border-white/5 px-6 pt-8 md:flex-row">
         <p className="text-xs text-zinc-600">
-          &copy; {new Date().getFullYear()} Backport.io · MIT License
-        </p>
-        <p className="text-xs text-zinc-600">
-          Built with ❤️ using FastAPI + Next.js + Docker
+          &copy; {new Date().getFullYear()} Backport. MIT Licensed. Built for developers.
         </p>
       </div>
     </footer>

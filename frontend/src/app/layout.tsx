@@ -8,11 +8,17 @@ import { Toaster } from "react-hot-toast";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: {
-    template: "%s | Backport API Gateway",
-    default: "Backport | API Gateway",
+  title: 'Backport | Open Source API Gateway – Rate Limiting + WAF + Cache',
+  description: 'Add rate limiting, intelligent caching, idempotency and WAF to any backend in 30 seconds. No code changes required. Free to start.',
+  openGraph: {
+    title: 'Backport – Shield your backend in 30 seconds',
+    description: 'Add rate limiting, caching, idempotency and WAF to any backend. No SDK, no code changes.',
+    url: 'https://backport-io.vercel.app',
   },
-  description: "Protect your backend in 30 seconds with Backport.",
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Backport – Open Source API Gateway',
+  }
 };
 
 export default function RootLayout({
