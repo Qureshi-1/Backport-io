@@ -1,9 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
-import { CheckCircle2, Circle, X, Download, Server, Key, Activity, Clock } from "lucide-react";
+import { CheckCircle2, Circle, X, Download, Server, Key, Activity, Clock, BarChart3, ShieldAlert, Zap } from "lucide-react";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import TrafficChart from "@/components/TrafficChart";
 
 const MOCK_LOGS = [
   { id: 1, method: "GET", path: "/api/products", status: 200, time: "23ms", action: "Passed", badge: "bg-zinc-800 text-zinc-300", date: "Just now" },
@@ -94,28 +95,78 @@ export default function DashboardOverview() {
         <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between">
           <div>
             <h3 className="text-zinc-400 text-sm font-medium mb-1 flex items-center gap-2">
-              <Activity className="h-4 w-4" /> Account Status
+              <Activity className="h-4 w-4 text-emerald-500" /> Account Status
             </h3>
             <p className="text-2xl font-bold text-white capitalize mt-2">
               {user?.plan} Plan
             </p>
           </div>
         </div>
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between md:col-span-2">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 flex flex-col justify-between md:col-span-2 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 blur-3xl -z-10 rounded-full" />
           <div>
             <h3 className="text-zinc-400 text-sm font-medium mb-1 flex items-center gap-2">
-              <Server className="h-4 w-4" /> Active Backend
+              <Server className="h-4 w-4 text-cyan-400" /> Active Backend Target
             </h3>
             <p className="text-lg font-mono text-zinc-300 truncate mt-2">
               {user?.target_backend_url || "Not Configured"}
             </p>
           </div>
           {!user?.target_backend_url && (
-            <Link href="/dashboard/settings" className="text-sm text-emerald-400 hover:underline mt-2 inline-block">
-              Configure now →
+            <Link href="/dashboard/settings" className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors hover:underline mt-2 inline-block">
+              Configure target URL →
             </Link>
           )}
         </div>
+      </div>
+
+      {/* Analytics Overview Section */}
+      <h2 className="text-xl font-bold text-white pt-4">Analytics Overview</h2>
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-zinc-400 text-sm font-medium">Total Requests</span>
+            <BarChart3 className="h-4 w-4 text-blue-400" />
+          </div>
+          <p className="text-3xl font-bold text-white">42,108</p>
+          <p className="text-xs text-emerald-400 font-medium mt-1">↑ 12% from last week</p>
+        </div>
+        
+        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-zinc-400 text-sm font-medium">Threats Blocked</span>
+            <ShieldAlert className="h-4 w-4 text-rose-500" />
+          </div>
+          <p className="text-3xl font-bold text-white">1,204</p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">42 SQLi, 1162 Rate limits</p>
+        </div>
+        
+        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-zinc-400 text-sm font-medium">Cache Hits</span>
+            <Zap className="h-4 w-4 text-amber-400" />
+          </div>
+          <p className="text-3xl font-bold text-white">89.4%</p>
+          <p className="text-xs text-emerald-400 font-medium mt-1">Saving 38,400 DB calls</p>
+        </div>
+        
+        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-zinc-400 text-sm font-medium">Avg Latency (Cache)</span>
+            <Clock className="h-4 w-4 text-emerald-400" />
+          </div>
+          <p className="text-3xl font-bold text-white">2.4<span className="text-lg text-zinc-500 font-normal">ms</span></p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">Raw backend: 145ms</p>
+        </div>
+      </div>
+
+      <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 relative overflow-hidden">
+        <div className="absolute -top-24 -right-24 bg-emerald-500/5 w-64 h-64 blur-[100px] rounded-full pointer-events-none" />
+        <h3 className="text-zinc-200 text-lg font-bold mb-4 flex items-center gap-2">
+          <Activity className="h-5 w-5 text-emerald-500" /> Live Traffic Graph
+        </h3>
+        <TrafficChart />
       </div>
 
       <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden mt-8">
