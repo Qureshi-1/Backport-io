@@ -262,7 +262,7 @@ const DEMO_LINES = [
   },
   {
     delay: 2800,
-    text: "$ docker run -p 8080:8080 -e TARGET_URL=https://backpack-backend-wldo.onrender.com Backport/gateway",
+    text: "$ docker run -p 8080:8080 -e TARGET_URL=https://backport-io.onrender.com Backport/gateway",
     color: "text-zinc-300",
   },
   {
@@ -278,7 +278,7 @@ const DEMO_LINES = [
   },
   {
     delay: 5400,
-    text: '$ curl -H "X-API-Key: bk_a1b2c3d4" https://backpack-backend-wldo.onrender.com/api/products',
+    text: '$ curl -H "X-API-Key: bk_a1b2c3d4" https://backport-io.onrender.com/api/products',
     color: "text-zinc-300",
   },
   {
@@ -1310,7 +1310,7 @@ const CodeExample = () => (
 <code className="text-zinc-500"># Step 3: Route traffic through Backport</code>
 <br />
 <br />
-<code className="text-emerald-400">curl</code> -X GET https://backpack-backend-wldo.onrender.com/proxy/users \
+<code className="text-emerald-400">curl</code> -X GET https://backport-io.onrender.com/proxy/users \
   -H <code className="text-emerald-300">"X-API-Key: bk_YOUR_API_KEY"</code>
 <br />
 <br />

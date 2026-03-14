@@ -155,7 +155,7 @@ export default function ApiKeysPage() {
         </p>
         <pre className="bg-black border border-white/5 p-4 rounded-lg text-sm font-mono text-zinc-300 overflow-x-auto">
           <code>
-            {`curl -X GET https://backpack-backend-wldo.onrender.com/proxy/your/api/path
+            {`curl -X GET https://backport-io.onrender.com/proxy/your/api/path
   -H "X-API-Key: bk_YOUR_API_KEY"`}
           </code>
         </pre>

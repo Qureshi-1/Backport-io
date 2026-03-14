@@ -62,7 +62,7 @@ export default function DocsPage() {
               
               <div className="text-zinc-500 mb-2">// 2. Call your Backport Proxy with your provisioned API Key:</div>
               <div className="text-emerald-400">
-                fetch('https://backpack-backend-wldo.onrender.com/proxy/users', {'{'} <br/>
+                fetch('https://backport-io.onrender.com/proxy/users', {'{'} <br/>
                 &nbsp;&nbsp;headers: {'{'} 'X-API-Key': 'bk_live_abcdef123456' {'}'} <br/>
                 {'}'})
               </div>
@@ -103,7 +103,7 @@ export default function DocsPage() {
               Double-posting payments is a nightmare. Backport makes all <code>POST</code> requests completely safe. Pass an <code>Idempotency-Key</code> header to tell the gateway this action must only happen once.
             </p>
             <div className="bg-black border border-zinc-800 rounded-xl p-4 my-6 font-mono text-sm text-zinc-300">
-              <span className="text-emerald-400">curl</span> -X POST https://backpack-backend-wldo.onrender.com/proxy/checkout \<br/>
+              <span className="text-emerald-400">curl</span> -X POST https://backport-io.onrender.com/proxy/checkout \<br/>
               &nbsp;&nbsp;-H <span className="text-amber-300">"X-API-Key: bk_12345"</span> \<br/>
               &nbsp;&nbsp;-H <span className="text-amber-300">"Idempotency-Key: transaction_88910"</span> \<br/>
               &nbsp;&nbsp;-d <span className="text-blue-300">'{"{"}"amount": 5000{"}"}'</span>
