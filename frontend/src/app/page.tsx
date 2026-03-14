@@ -245,8 +245,8 @@ const MouseGlow = () => {
 // ─── Demo Modal ───────────────────────────────────────────────────────────────
 const DEMO_LINES = [
   {
-    delay: 0,
-    text: "# Step 1 \u2014 Sign up at localhost:3000/signup (free, no card)",
+    delay: 500,
+    text: "# Step 1 — Sign up at backport-io.vercel.app/auth/signup (free, no card)",
     color: "text-zinc-500",
   },
   {
@@ -262,7 +262,7 @@ const DEMO_LINES = [
   },
   {
     delay: 2800,
-    text: "$ docker run -p 8080:8080 -e TARGET_URL=http://your-api.com Backport/gateway",
+    text: "$ docker run -p 8080:8080 -e TARGET_URL=https://backpack-backend-wldo.onrender.com Backport/gateway",
     color: "text-zinc-300",
   },
   {
@@ -278,7 +278,7 @@ const DEMO_LINES = [
   },
   {
     delay: 5400,
-    text: '$ curl -H "X-API-Key: bk_a1b2c3d4" http://localhost:8080/api/products',
+    text: '$ curl -H "X-API-Key: bk_a1b2c3d4" https://backpack-backend-wldo.onrender.com/api/products',
     color: "text-zinc-300",
   },
   {
@@ -725,9 +725,9 @@ const HowItWorks = () => (
         <div className="absolute top-8 left-[33%] right-[33%] hidden h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0 md:block" />
         {[
           {
-            n: "1",
-            title: "Deploy Backport",
-            body: "Run the Docker image anywhere — localhost, Render, Fly, Railway. Takes under 30 seconds.",
+            icon: Activity,
+            title: "Multi-Environment",
+            body: "Run the Docker image anywhere — Render, Fly, Railway, AWS. Takes under 30 seconds.",
           },
           {
             n: "2",
@@ -1310,7 +1310,7 @@ const CodeExample = () => (
 <code className="text-zinc-500"># Step 3: Route traffic through Backport</code>
 <br />
 <br />
-<code className="text-emerald-400">curl</code> -X GET https://backport-io.onrender.com/proxy/users \
+<code className="text-emerald-400">curl</code> -X GET https://backpack-backend-wldo.onrender.com/proxy/users \
   -H <code className="text-emerald-300">"X-API-Key: bk_YOUR_API_KEY"</code>
 <br />
 <br />

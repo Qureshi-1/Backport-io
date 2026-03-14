@@ -20,20 +20,26 @@ async def startup():
     except Exception as e:
         print(f"⚠️  DB init warning: {e}")
 
-# ── Custom CORS — works with any origin, no credentials conflict ──────────────
+# ── Custom CORS — strict matching against environment origins ──────────────
 class CORSMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        origin = request.headers.get("origin", "*")
+        req_origin = request.headers.get("origin")
+        
+        # Determine allowed origin for response
+        # If no origin header, or origin is in our allowed list, allow it
+        allowed_origin = req_origin if req_origin in CORS_ORIGINS else CORS_ORIGINS[0]
+        
         if request.method == "OPTIONS":
             from starlette.responses import Response as SR
             r = SR(status_code=200)
-            r.headers["Access-Control-Allow-Origin"] = origin
+            r.headers["Access-Control-Allow-Origin"] = allowed_origin
             r.headers["Access-Control-Allow-Credentials"] = "true"
             r.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,PATCH,OPTIONS"
             r.headers["Access-Control-Allow-Headers"] = "Authorization,Content-Type,X-API-Key"
             return r
+            
         response = await call_next(request)
-        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Origin"] = allowed_origin
         response.headers["Access-Control-Allow-Credentials"] = "true"
         response.headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,PATCH,OPTIONS"
         response.headers["Access-Control-Allow-Headers"] = "Authorization,Content-Type,X-API-Key"

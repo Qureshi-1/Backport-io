@@ -1,7 +1,7 @@
 const TOKEN_KEY = "backport_token";
 const API_KEY_KEY = "backport_api_key";
 
-export const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || "https://backport-io.onrender.com";
+export const GATEWAY_URL = process.env.NEXT_PUBLIC_API_URL || "https://backpack-backend-wldo.onrender.com";
 
 export const auth = {
   getToken: () => typeof window !== "undefined" ? localStorage.getItem(TOKEN_KEY) : null,

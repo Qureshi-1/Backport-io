@@ -1,6 +1,6 @@
 import { auth } from "./auth";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://backport-io.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://backpack-backend-wldo.onrender.com";
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const headers = {

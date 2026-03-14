@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_GATEWAY_URL ||
   process.env.NEXT_PUBLIC_API_URL ||
-  "http://localhost:8080";
+  "https://backpack-backend-wldo.onrender.com";
 
 export async function GET(
   req: NextRequest,

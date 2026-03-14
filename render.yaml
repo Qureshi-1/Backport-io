@@ -22,3 +22,7 @@ services:
         value: ""
       - key: RAZORPAY_KEY_SECRET
         value: ""
+      - key: FRONTEND_URL
+        value: "https://backport-io.vercel.app"
+      - key: CORS_ORIGINS
+        value: "https://backport-io.vercel.app,https://backport-io.vercel.app"

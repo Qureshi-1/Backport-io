@@ -36,7 +36,7 @@ npm run start
 docker run -p 8080:8080 -e BACKEND_URL=http://host.docker.internal:3000 qureshi/backport
 ```
 
-Now, instead of sending requests to `localhost:3000`, send them to `localhost:8080`. Backport will filter, cache, and rate-limit the traffic before forwarding it!
+Now, instead of sending requests to your backend directly, send them to `https://backpack-backend-wldo.onrender.com`. Backport will filter, cache, and rate-limit the traffic before forwarding it!
 
 ## 💻 Developer Experience (Fluent API Usage)
 
@@ -45,7 +45,7 @@ If you prefer to integrate Backport programmatically, here is how you use our SD
 ### 1. Activating Rate Limiting
 No backend code needed. Just set your limits in the Backport UI or via headers:
 ```bash
-curl -H "X-API-Key: your_key" http://localhost:8080/api/users
+curl -H "X-API-Key: your_key" https://backpack-backend-wldo.onrender.com/api/users
 # If you exceed 100 req/min, Backport instantly returns:
 # HTTP/1.1 429 Too Many Requests
 ```
@@ -53,18 +53,17 @@ curl -H "X-API-Key: your_key" http://localhost:8080/api/users
 ### 2. Using Idempotency (For Payments)
 Send an `Idempotency-Key` header with your POST request. If the UI glitches and sends the request twice, Backport intercepts the second one.
 ```bash
-curl -X POST http://localhost:8080/api/checkout \
-  -H "X-API-Key: your_key" \
-  -H "Idempotency-Key: idemp_99xz21" \
-  -d '{"cart_id": 123}'
+curl -X POST https://backpack-backend-wldo.onrender.com/api/checkout \
+  -H "Idempotency-Key: transaction-12345" \
+  -d '{"amount": 100}'
 ```
 
 ### 3. Transparent Caching
 For heavy GET endpoints (like `/api/analytics`), Backport caches the response in memory (LRU cache). 
 ```bash
-curl http://localhost:8080/api/analytics
-# 1st request: 400ms (Fetch from DB)
-# 2. request: 0.5ms (Served from Backport Cache)
+curl https://backpack-backend-wldo.onrender.com/api/analytics
+# First hit: 200ms
+# Second hit: 2ms (served from Backport's blazing fast LRU cache)
 ```
 
 ## 📖 Documentation Outline
