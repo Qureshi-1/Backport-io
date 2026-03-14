@@ -28,5 +28,17 @@ class Feedback(Base):
     admin_comment = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     user_email = Column(String, nullable=False)
-    
     user = relationship("User", back_populates="feedbacks")
+
+class ApiLog(Base):
+    __tablename__ = "api_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    method = Column(String, nullable=False)
+    path = Column(String, nullable=False)
+    status_code = Column(Integer, nullable=False)
+    latency_ms = Column(Integer, nullable=False)
+    was_cached = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    
+    user = relationship("User")

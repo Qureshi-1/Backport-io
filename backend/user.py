@@ -10,7 +10,16 @@ class SettingsUpdate(BaseModel):
     target_backend_url: str
 
 @router.get("/me")
-def get_me(user: User = Depends(get_current_user)):
+def get_me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    from models import ApiLog
+    from sqlalchemy import func
+    
+    # Calculate stats
+    total_reqs = db.query(func.count(ApiLog.id)).filter(ApiLog.user_id == user.id).scalar() or 0
+    cached_reqs = db.query(func.count(ApiLog.id)).filter(ApiLog.user_id == user.id, ApiLog.was_cached == True).scalar() or 0
+    avg_latency = db.query(func.avg(ApiLog.latency_ms)).filter(ApiLog.user_id == user.id).scalar() or 0
+    threats = db.query(func.count(ApiLog.id)).filter(ApiLog.user_id == user.id, ApiLog.status_code >= 400).scalar() or 0
+
     return {
         "id": user.id,
         "email": user.email,
@@ -18,7 +27,13 @@ def get_me(user: User = Depends(get_current_user)):
         "plan": user.plan,
         "target_backend_url": user.target_backend_url,
         "created_at": user.created_at,
-        "is_admin": user.is_admin
+        "is_admin": user.is_admin,
+        "analytics": {
+            "total_requests": total_reqs,
+            "cache_hits": cached_reqs,
+            "avg_latency": round(avg_latency, 1),
+            "threats_blocked": threats
+        }
     }
 
 @router.get("/settings")

@@ -129,17 +129,17 @@ export default function DashboardOverview() {
             <span className="text-zinc-400 text-sm font-medium">Total Requests</span>
             <BarChart3 className="h-4 w-4 text-blue-400" />
           </div>
-          <p className="text-3xl font-bold text-white">42,108</p>
-          <p className="text-xs text-emerald-400 font-medium mt-1">↑ 12% from last week</p>
+          <p className="text-3xl font-bold text-white">{user?.analytics?.total_requests?.toLocaleString() || "0"}</p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">Processed today</p>
         </div>
         
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-zinc-400 text-sm font-medium">Threats Blocked</span>
+            <span className="text-zinc-400 text-sm font-medium">Threats / Errors</span>
             <ShieldAlert className="h-4 w-4 text-rose-500" />
           </div>
-          <p className="text-3xl font-bold text-white">1,204</p>
-          <p className="text-xs text-zinc-500 font-medium mt-1">42 SQLi, 1162 Rate limits</p>
+          <p className="text-3xl font-bold text-white">{user?.analytics?.threats_blocked?.toLocaleString() || "0"}</p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">Status 400+ blocked</p>
         </div>
         
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
@@ -147,17 +147,17 @@ export default function DashboardOverview() {
             <span className="text-zinc-400 text-sm font-medium">Cache Hits</span>
             <Zap className="h-4 w-4 text-amber-400" />
           </div>
-          <p className="text-3xl font-bold text-white">89.4%</p>
-          <p className="text-xs text-emerald-400 font-medium mt-1">Saving 38,400 DB calls</p>
+          <p className="text-3xl font-bold text-white">{user?.analytics?.cache_hits?.toLocaleString() || "0"}</p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">Served directly from memory</p>
         </div>
         
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-xl p-5">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-zinc-400 text-sm font-medium">Avg Latency (Cache)</span>
+            <span className="text-zinc-400 text-sm font-medium">Avg Latency</span>
             <Clock className="h-4 w-4 text-emerald-400" />
           </div>
-          <p className="text-3xl font-bold text-white">2.4<span className="text-lg text-zinc-500 font-normal">ms</span></p>
-          <p className="text-xs text-zinc-500 font-medium mt-1">Raw backend: 145ms</p>
+          <p className="text-3xl font-bold text-white">{user?.analytics?.avg_latency || 0}<span className="text-lg text-zinc-500 font-normal">ms</span></p>
+          <p className="text-xs text-zinc-500 font-medium mt-1">Across all gateway traffic</p>
         </div>
       </div>
 
