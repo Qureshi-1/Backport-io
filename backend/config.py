@@ -11,9 +11,9 @@ TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
 
-FRONTEND_URL = os.getenv("FRONTEND_URL", "https://backport-io.vercel.app")
+FRONTEND_URL = os.getenv("FRONTEND_URL", "https://backport-io.vercel.app").strip().strip('"').strip("'").rstrip("/")
 CORS_ORIGINS_STR = os.getenv("CORS_ORIGINS", FRONTEND_URL)
-CORS_ORIGINS = [o.strip() for o in CORS_ORIGINS_STR.split(",") if o.strip()]
+CORS_ORIGINS = [o.strip().strip('"').strip("'").rstrip("/") for o in CORS_ORIGINS_STR.split(",") if o.strip()]
 
 ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@backport.dev")
 PORT = int(os.getenv("PORT", 8080))

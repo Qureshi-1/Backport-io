@@ -27,7 +27,8 @@ class CORSMiddleware(BaseHTTPMiddleware):
         
         # Determine allowed origin for response
         # If no origin header, or origin is in our allowed list, allow it
-        allowed_origin = req_origin if req_origin in CORS_ORIGINS else CORS_ORIGINS[0]
+        fallback_origin = CORS_ORIGINS[0] if len(CORS_ORIGINS) > 0 else "https://backport-io.vercel.app"
+        allowed_origin = req_origin if req_origin in CORS_ORIGINS else fallback_origin
         
         if request.method == "OPTIONS":
             from starlette.responses import Response as SR
