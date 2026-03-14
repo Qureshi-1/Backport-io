@@ -10,6 +10,10 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [gatewayEnabled, setGatewayEnabled] = useState(true);
+  const [rateLimitEnabled, setRateLimitEnabled] = useState(true);
+  const [cachingEnabled, setCachingEnabled] = useState(false);
+  const [idempotencyEnabled, setIdempotencyEnabled] = useState(true);
+  const [wafEnabled, setWafEnabled] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
   const [lastTested, setLastTested] = useState<string | null>(null);
 
@@ -17,6 +21,10 @@ export default function SettingsPage() {
     fetchApi("/api/user/settings")
       .then((res) => {
         setUrl(res.target_backend_url || "");
+        setRateLimitEnabled(res.rate_limit_enabled ?? true);
+        setCachingEnabled(res.caching_enabled ?? false);
+        setIdempotencyEnabled(res.idempotency_enabled ?? true);
+        setWafEnabled(res.waf_enabled ?? false);
         setLoading(false);
       })
       .catch((err) => {
@@ -43,7 +51,13 @@ export default function SettingsPage() {
     try {
       await fetchApi("/api/user/settings", {
         method: "PUT",
-        body: JSON.stringify({ target_backend_url: url }),
+        body: JSON.stringify({ 
+          target_backend_url: url,
+          rate_limit_enabled: rateLimitEnabled,
+          caching_enabled: cachingEnabled,
+          idempotency_enabled: idempotencyEnabled,
+          waf_enabled: wafEnabled,
+        }),
       });
       toast.success("Settings saved successfully!");
     } catch (err: any) {
@@ -124,6 +138,51 @@ export default function SettingsPage() {
               <span>{error}</span>
             </div>
           )}
+
+          <div className="pt-4 border-t border-zinc-800 space-y-4">
+            <h3 className="text-zinc-300 font-semibold mb-4">Security & Performance Features</h3>
+            
+            <div className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
+              <div>
+                <h4 className="text-sm font-medium text-zinc-200">Rate Limiting</h4>
+                <p className="text-xs text-zinc-500 mt-1">Cap traffic at 60 req/min (Free Tier limit rules)</p>
+              </div>
+              <button type="button" onClick={() => setRateLimitEnabled(!rateLimitEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${rateLimitEnabled ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${rateLimitEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
+              <div>
+                <h4 className="text-sm font-medium text-zinc-200">LRU Caching (GET)</h4>
+                <p className="text-xs text-zinc-500 mt-1">Cache successful GET endpoints for 5 minutes.</p>
+              </div>
+              <button type="button" onClick={() => setCachingEnabled(!cachingEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${cachingEnabled ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${cachingEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
+              <div>
+                <h4 className="text-sm font-medium text-zinc-200">Idempotency</h4>
+                <p className="text-xs text-zinc-500 mt-1">Drop duplicated POSTs returning same response safely.</p>
+              </div>
+              <button type="button" onClick={() => setIdempotencyEnabled(!idempotencyEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${idempotencyEnabled ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${idempotencyEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
+              <div>
+                <h4 className="text-sm font-medium text-zinc-200">WAF Blocklist</h4>
+                <p className="text-xs text-zinc-500 mt-1">Auto-block SQL Injection rules and malicious tags.</p>
+              </div>
+              <button type="button" onClick={() => setWafEnabled(!wafEnabled)} className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${wafEnabled ? 'bg-emerald-500' : 'bg-zinc-700'}`}>
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${wafEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+            
+          </div>
 
           <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
             <div className="flex items-center gap-4">

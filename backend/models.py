@@ -15,6 +15,11 @@ class User(Base):
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
     is_admin = Column(Boolean, default=False)
     
+    rate_limit_enabled = Column(Boolean, default=True)
+    caching_enabled = Column(Boolean, default=False)
+    idempotency_enabled = Column(Boolean, default=True)
+    waf_enabled = Column(Boolean, default=False)
+    
     feedbacks = relationship("Feedback", back_populates="user")
 
 class Feedback(Base):

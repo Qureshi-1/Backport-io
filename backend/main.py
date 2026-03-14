@@ -17,6 +17,15 @@ async def startup():
     try:
         Base.metadata.create_all(bind=engine)
         print("✅ Database initialized")
+        
+        # Auto-migrate new columns
+        with engine.begin() as conn:
+            from sqlalchemy import text
+            for col, dev_val in [("rate_limit_enabled", "true"), ("caching_enabled", "false"), ("idempotency_enabled", "true"), ("waf_enabled", "false")]:
+                try:
+                    conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} BOOLEAN DEFAULT {dev_val}"))
+                except Exception:
+                    pass
     except Exception as e:
         print(f"⚠️  DB init warning: {e}")
 
