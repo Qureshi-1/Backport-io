@@ -755,72 +755,7 @@ const HowItWorks = () => (
   </section>
 );
 
-// ─── Comparison Table ─────────────────────────────────────────────────────────
-const CompareTable = () => {
-  const rows = [
-    {
-      feature: "Deployment",
-      self: "Your infrastructure",
-      cloud: "Managed globally",
-    },
-    {
-      feature: "Rate Limiting",
-      self: "In-memory counters",
-      cloud: "Redis cluster",
-    },
-    {
-      feature: "Cache Storage",
-      self: "In-process LRU",
-      cloud: "Distributed Redis",
-    },
-    {
-      feature: "WAF Rules",
-      self: "Built-in patterns",
-      cloud: "AI-enhanced rules",
-    },
-    { feature: "Dashboard", self: "✓", cloud: "✓ + Alerts & Logs" },
-    {
-      feature: "Uptime SLA",
-      self: "You manage it",
-      cloud: "99.9% guaranteed",
-    },
-    { feature: "Support", self: "Community (GitHub)", cloud: "Priority email" },
-    { feature: "Price", self: "$0 forever", cloud: "$31 / month" },
-  ];
-  return (
-    <section id="compare" className="bg-black py-24">
-      <div className="mx-auto max-w-5xl px-6">
-        <div className="mb-14 text-center">
-          <h2 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
-            Self-Host vs Cloud Pro
-          </h2>
-          <p className="text-zinc-400">
-            Pick what fits your scale. Switch anytime, no lock-in.
-          </p>
-        </div>
-        <div className="overflow-hidden rounded-2xl border border-white/10">
-          <div className="grid grid-cols-3 bg-zinc-900/60 px-6 py-4 text-xs font-semibold uppercase tracking-widest text-zinc-500">
-            <span>Feature</span>
-            <span className="text-center">Self-Hosted</span>
-            <span className="text-center text-emerald-400">Cloud Pro</span>
-          </div>
-          {rows.map((r, i) => (
-            <div
-              key={r.feature}
-              className={`grid grid-cols-3 border-t border-white/5 px-6 py-4 text-sm ${i % 2 === 0 ? "bg-zinc-900/20" : ""}`}
-            >
-              <span className="font-medium text-zinc-400">{r.feature}</span>
-              <span className="text-center text-zinc-300">{r.self}</span>
-              <span className="text-center font-medium text-emerald-300">
-                {r.cloud}
-              </span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+
 
 // ─── Pricing ─────────────────────────────────────────────────────────────────
 const Pricing = () => {
@@ -1151,10 +1086,10 @@ const CompetitorCompare = () => {
       bpWin: true,
     },
     {
-      feature: "Self-Host Option",
-      backport: "YES",
-      kong: "YES",
-      cloudflare: "NO",
+      feature: "Setup Complexity",
+      backport: "Low",
+      kong: "High",
+      cloudflare: "Medium",
       bpWin: true,
     },
     {
@@ -1443,7 +1378,6 @@ export default function LandingPage() {
         <ArchitectureDiagram />
         <HowItWorks />
         <CodeExample />
-        <CompareTable />
         <Testimonials />
         <Pricing />
         <FinalCTA onDemo={() => setShowDemo(true)} />
