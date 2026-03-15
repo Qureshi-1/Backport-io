@@ -1,19 +1,40 @@
 "use client";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
-import { ShieldCheck, LogOut, Menu, X } from "lucide-react";
+import { ShieldCheck, LogOut, Menu, X, ShieldAlert } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchApi } from "@/lib/api";
 
 export default function Navbar() {
   const router = useRouter();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    fetchApi("/api/user/me")
+      .then((d) => {
+        setIsAdmin(d.is_admin === true);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleLogout = () => {
     auth.logout();
   };
+
+  const baseLinks = [
+    { name: "Overview", href: "/dashboard" },
+    { name: "API Keys", href: "/dashboard/api-keys" },
+    { name: "Settings", href: "/dashboard/settings" },
+    { name: "Billing", href: "/dashboard/billing" },
+  ];
+
+  const allLinks = isAdmin
+    ? [...baseLinks, { name: "⚡ Admin", href: "/dashboard/admin" }]
+    : baseLinks;
 
   return (
     <nav className="border-b border-zinc-800 bg-zinc-950 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
@@ -33,19 +54,19 @@ export default function Navbar() {
       </div>
 
       {/* Desktop Nav */}
-
       <div className="hidden md:flex flex-1 items-center justify-center gap-2 lg:gap-6 text-sm text-zinc-400 font-medium">
-        {[
-          { name: "Overview", href: "/dashboard" },
-          { name: "API Keys", href: "/dashboard/api-keys" },
-          { name: "Settings", href: "/dashboard/settings" },
-          { name: "Billing", href: "/dashboard/billing" },
-        ].map((link) => (
+        {allLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={`px-3 py-2 rounded-lg transition-colors ${
-               pathname === link.href ? "bg-zinc-800 text-white" : "hover:bg-zinc-800/50 hover:text-white"
+               pathname === link.href
+                 ? link.href === "/dashboard/admin"
+                   ? "bg-emerald-500/20 text-emerald-400"
+                   : "bg-zinc-800 text-white"
+                 : link.href === "/dashboard/admin"
+                   ? "text-emerald-500 hover:bg-emerald-500/10 hover:text-emerald-400"
+                   : "hover:bg-zinc-800/50 hover:text-white"
             }`}
           >
             {link.name}
@@ -91,12 +112,7 @@ export default function Navbar() {
             className="md:hidden absolute top-full left-0 right-0 border-b border-zinc-800 bg-zinc-950/95 backdrop-blur-xl overflow-hidden"
           >
             <div className="flex flex-col p-4 space-y-2">
-              {[
-                { name: "Overview", href: "/dashboard" },
-                { name: "API Keys", href: "/dashboard/api-keys" },
-                { name: "Settings", href: "/dashboard/settings" },
-                { name: "Billing", href: "/dashboard/billing" },
-              ].map((link) => (
+              {allLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

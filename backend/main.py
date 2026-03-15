@@ -26,14 +26,14 @@ async def startup():
                     conn.execute(text(f"ALTER TABLE users ADD COLUMN {col} BOOLEAN DEFAULT {dev_val}"))
                 except Exception:
                     pass
-        # Auto-set Admin
+        # Auto-set Admin — always run on startup
         with SessionLocal() as db:
             from models import User
             admin_user = db.query(User).filter(User.email == ADMIN_EMAIL).first()
-            if admin_user and not admin_user.is_admin:
+            if admin_user:
                 admin_user.is_admin = True
                 db.commit()
-                print(f"👑 Admin privileges granted to {ADMIN_EMAIL}")
+                print(f"👑 Admin privileges ensured for {ADMIN_EMAIL}")
     except Exception as e:
         print(f"⚠️  DB init warning: {e}")
 
