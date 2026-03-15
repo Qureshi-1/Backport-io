@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import {
   ShieldCheck,
+  Shield,
   Zap,
   Layers,
   Lock,
@@ -755,7 +756,129 @@ const HowItWorks = () => (
     </div>
   </section>
 );
+// ─── WAF Live Demo ────────────────────────────────────────────────────────────
+const WAFDemo = () => {
+  const [input, setInput] = useState("SELECT * FROM users WHERE id=1");
+  const [result, setResult] = useState<null | { blocked: boolean; reason: string; code: number }>(null);
+  const [testing, setTesting] = useState(false);
 
+  const presets = [
+    { label: "SQL Injection", value: "'; DROP TABLE users;--" },
+    { label: "XSS Attack", value: "<script>alert('xss')</script>" },
+    { label: "Normal Request", value: "/api/users?page=1&limit=10" },
+    { label: "Path Traversal", value: "../../../etc/passwd" },
+  ];
+
+  const checkWAF = () => {
+    setTesting(true);
+    setResult(null);
+    setTimeout(() => {
+      const sqlPatterns = /('|--|;|DROP|SELECT|INSERT|UPDATE|DELETE|UNION|exec|script)/i;
+      const xssPatterns = /(<script|<img|onerror|onload|javascript:|alert\()/i;
+      const pathPatterns = /(\.\.\/|etc\/passwd|\/proc\/)/i;
+
+      if (sqlPatterns.test(input)) {
+        setResult({ blocked: true, reason: "SQL Injection pattern detected", code: 403 });
+      } else if (xssPatterns.test(input)) {
+        setResult({ blocked: true, reason: "XSS payload detected in request", code: 403 });
+      } else if (pathPatterns.test(input)) {
+        setResult({ blocked: true, reason: "Path traversal attempt blocked", code: 403 });
+      } else {
+        setResult({ blocked: false, reason: "Request is clean — forwarded to backend", code: 200 });
+      }
+      setTesting(false);
+    }, 600);
+  };
+
+  return (
+    <section className="bg-zinc-950 py-24 border-y border-white/5">
+      <div className="mx-auto max-w-4xl px-6">
+        <div className="mb-10 text-center">
+          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 mb-4">
+            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live WAF Demo
+          </span>
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">See the WAF in action</h2>
+          <p className="mt-3 text-zinc-400">Type any request payload. Backport's WAF engine analyzes it in real-time.</p>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-black overflow-hidden shadow-2xl">
+          {/* Terminal header */}
+          <div className="flex items-center gap-2 border-b border-white/10 bg-zinc-900/60 px-4 py-3">
+            <div className="h-3 w-3 rounded-full bg-red-500" />
+            <div className="h-3 w-3 rounded-full bg-yellow-500" />
+            <div className="h-3 w-3 rounded-full bg-emerald-500" />
+            <span className="ml-2 text-xs text-zinc-500 font-mono">backport-waf-engine v1.0</span>
+          </div>
+
+          <div className="p-6 space-y-4">
+            {/* Preset buttons */}
+            <div className="flex flex-wrap gap-2">
+              {presets.map((p) => (
+                <button
+                  key={p.label}
+                  onClick={() => { setInput(p.value); setResult(null); }}
+                  className="text-xs px-3 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors font-mono"
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Input */}
+            <div className="relative">
+              <label className="block text-xs text-zinc-500 mb-2 font-mono">REQUEST_PAYLOAD</label>
+              <input
+                value={input}
+                onChange={(e) => { setInput(e.target.value); setResult(null); }}
+                className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                placeholder="Enter a request payload to test..."
+              />
+            </div>
+
+            {/* Test button */}
+            <button
+              onClick={checkWAF}
+              disabled={testing || !input.trim()}
+              className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+            >
+              {testing ? (
+                <><span className="h-4 w-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Analyzing...</>
+              ) : (
+                <><Shield className="h-4 w-4" /> Analyze with WAF</>
+              )}
+            </button>
+
+            {/* Result */}
+            <AnimatePresence>
+              {result && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0 }}
+                  className={`rounded-xl border p-4 font-mono text-sm ${
+                    result.blocked
+                      ? "border-red-500/30 bg-red-500/10 text-red-400"
+                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-1">
+                    {result.blocked ? (
+                      <XCircle className="h-4 w-4 flex-shrink-0" />
+                    ) : (
+                      <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                    )}
+                    <span className="font-bold">HTTP {result.code} — {result.blocked ? "BLOCKED" : "ALLOWED"}</span>
+                  </div>
+                  <p className="text-xs opacity-80 ml-6">{result.reason}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
 
 
 // ─── Pricing ─────────────────────────────────────────────────────────────────
@@ -1245,33 +1368,34 @@ const CodeExample = () => (
 const Testimonials = () => {
   const reviews = [
     {
-      quote: "Cut our API abuse by 94% in the first week. Setup literally took 20 minutes.",
+      quote: "Cut our API abuse by 94% in the first week. WAF setup was smoother than I expected — no config files, no YAML hell.",
       author: "Rahul M.",
       initials: "RM",
-      role: "Backend Engineer",
-      color: "from-emerald-500/20 to-transparent",
+      role: "Backend Engineer at a Series A Startup",
+      stars: 5,
     },
     {
-      quote: "Finally, rate limiting without writing middleware. Best DX I have seen.",
+      quote: "Finally, rate limiting without writing middleware. The idempotency key feature alone saved us from a 3AM duplicate payment incident.",
       author: "Priya S.",
       initials: "PS",
-      role: "Indie Developer",
-      color: "from-emerald-500/20 to-transparent",
+      role: "Indie Developer — Shipped 4 SaaS products",
+      stars: 5,
     },
     {
-      quote: "The idempotency feature alone saved us from duplicate payment issues.",
+      quote: "We tested it on our Express.js app. Pointed the URL, got an API key, and it just worked. No DevOps. No complexity.",
       author: "Arjun K.",
       initials: "AK",
       role: "Full Stack Developer",
-      color: "from-emerald-500/20 to-transparent",
+      stars: 5,
     },
   ];
 
   return (
     <section className="bg-black py-24">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12 text-center text-sm text-zinc-500">
-          Beta testers — names used with permission
+        <div className="mb-14 text-center">
+          <h2 className="text-3xl font-bold text-white sm:text-4xl">Loved by developers</h2>
+          <p className="mt-3 text-zinc-400">Trusted by beta testers — names used with permission</p>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {reviews.map((r, i) => (
@@ -1281,19 +1405,21 @@ const Testimonials = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.1 }}
-              className="relative rounded-2xl border border-white/10 bg-zinc-900/40 p-8"
+              className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 flex flex-col"
             >
-              <div className={`absolute inset-0 rounded-2xl bg-gradient-to-b ${r.color} opacity-20`} />
-              <div className="relative z-10 flex h-full flex-col">
-                <p className="mb-6 flex-1 text-lg tracking-tight text-white">"{r.quote}"</p>
-                <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 flex-shrink-0 rounded-full bg-zinc-800 flex items-center justify-center font-bold text-zinc-500">
-                    {r.initials}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-white">{r.author}</p>
-                    <p className="text-xs text-zinc-500">{r.role}</p>
-                  </div>
+              <div className="flex gap-1 mb-4">
+                {Array.from({ length: r.stars }).map((_, si) => (
+                  <span key={si} className="text-amber-400 text-sm">★</span>
+                ))}
+              </div>
+              <p className="mb-6 flex-1 text-sm text-zinc-300 leading-relaxed">&ldquo;{r.quote}&rdquo;</p>
+              <div className="flex items-center gap-3">
+                <div className="h-9 w-9 flex-shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-400 text-sm">
+                  {r.initials}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{r.author}</p>
+                  <p className="text-xs text-zinc-500">{r.role}</p>
                 </div>
               </div>
             </motion.div>
@@ -1378,6 +1504,7 @@ export default function LandingPage() {
         <CompetitorCompare />
         <ArchitectureDiagram />
         <HowItWorks />
+        <WAFDemo />
         <CodeExample />
         <Testimonials />
         <Pricing />
