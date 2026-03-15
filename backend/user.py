@@ -64,15 +64,18 @@ def update_settings(data: SettingsUpdate, user: User = Depends(get_current_user)
     db.commit()
     return {"status": "success"}
 
+@router.get("/feedback/")
 @router.get("/feedback")
 def get_user_feedback(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     feedbacks = db.query(Feedback).filter(Feedback.user_id == user.id).order_by(Feedback.created_at.desc()).all()
     return feedbacks
 
+@router.get("/keys/")
 @router.get("/keys")
 def get_api_keys(user: User = Depends(get_current_user)):
     return [{"id": k.id, "name": k.name, "key": k.key, "created_at": k.created_at} for k in user.api_keys]
 
+@router.post("/keys/")
 @router.post("/keys")
 def create_api_key(data: ApiKeyCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     # Limit check
@@ -81,11 +84,17 @@ def create_api_key(data: ApiKeyCreate, user: User = Depends(get_current_user), d
         from fastapi import HTTPException
         raise HTTPException(status_code=400, detail=f"Plan limit reached: Max {max_keys} keys for {user.plan} plan")
     
-    new_key = ApiKey(user_id=user.id, name=data.name)
-    db.add(new_key)
-    db.commit()
-    return {"status": "success", "key": new_key.key}
+    try:
+        new_key = ApiKey(user_id=user.id, name=data.name)
+        db.add(new_key)
+        db.commit()
+        db.refresh(new_key)
+        return {"status": "success", "key": new_key.key}
+    except Exception as e:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
 
+@router.delete("/keys/{key_id}/")
 @router.delete("/keys/{key_id}")
 def delete_api_key(key_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     key_obj = db.query(ApiKey).filter(ApiKey.id == key_id, ApiKey.user_id == user.id).first()
