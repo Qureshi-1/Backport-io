@@ -464,8 +464,8 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
             transition={{ delay: 0.2 }}
             className="mt-6 max-w-lg text-lg text-zinc-400 leading-relaxed"
           >
-            Add rate limiting, intelligent caching, idempotency, and WAF to any
-            backend. No code changes required.
+            Protect APIs with Rate Limiting, WAF & Cache — Reduce latency, prevent
+            abuse, and save costs. Zero code changes required.
           </motion.p>
 
           <motion.div
@@ -476,9 +476,9 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
           >
             <Link
               href={isLogged ? "/dashboard" : "/auth/signup"}
-              className="group flex h-12 items-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
+              className="group flex h-12 items-center justify-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
             >
-              {isLogged ? "Go to Dashboard" : "Start Free — No credit card required"}
+              {isLogged ? "Go to Dashboard" : "Start Free"}
               <ArrowRight
                 suppressHydrationWarning
                 className="h-4 w-4 group-hover:translate-x-1 transition-transform"
@@ -489,11 +489,34 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
                 document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
                 onDemo(); // Optional: still open terminal immediately if desired, or just scroll
               }}
-              className="flex h-12 items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
+              className="flex h-12 items-center justify-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
             >
               <TerminalSquare suppressHydrationWarning className="h-4 w-4" />{" "}
               Watch Demo
             </button>
+          </motion.div>
+
+          {/* Quick Install CLI */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-10 max-w-md hidden sm:block"
+          >
+            <p className="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider">Quick Install</p>
+            <div className="flex items-center justify-between bg-[#000000] border border-zinc-800 rounded-lg p-1 pl-4">
+              <code className="text-sm font-mono text-emerald-400">npx backport init</code>
+              <button 
+                onClick={() => {
+                  navigator.clipboard.writeText("npx backport init");
+                  alert("Copied to clipboard!");
+                }}
+                className="p-2 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
+                title="Copy to clipboard"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+              </button>
+            </div>
           </motion.div>
 
           {/* Trust Strip */}
