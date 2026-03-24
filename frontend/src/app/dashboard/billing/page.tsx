@@ -103,13 +103,16 @@ export default function BillingPage() {
       setProcessingPlan(planId);
       setError("");
 
-      const order = await fetchApi("/api/billing/create-order", { method: "POST" });
+      const order = await fetchApi("/api/billing/create-order", { 
+        method: "POST",
+        body: JSON.stringify({ plan_id: planId })
+      });
 
       if (order.mock) {
-        alert(order.discount_applied ? "🧪 Test mode: 60% Referral Discount Active! Pay only " + (order.amount/100) + " INR" : "🧪 Test mode: Razorpay not configured. Upgrading to Pro.");
+        alert(order.discount_applied ? `🧪 Test mode: 60% Referral Discount Active! Pay only ${order.amount/100} INR` : `🧪 Test mode: Razorpay not configured. Upgrading to ${planId.toUpperCase()}.`);
         const verify = await fetchApi("/api/billing/verify", {
           method: "POST",
-          body: JSON.stringify({ mock: true }),
+          body: JSON.stringify({ mock: true, plan_id: planId }),
         });
         setPlan(verify.plan);
         setProcessingPlan(null);
@@ -121,7 +124,7 @@ export default function BillingPage() {
         amount: order.amount,
         currency: order.currency,
         name: "Backport",
-        description: "Backport Cloud Pro Upgrade" + (order.discount_applied ? " (Referral Discount)" : ""),
+        description: `Backport ${planId.toUpperCase()} Upgrade` + (order.discount_applied ? " (Referral Discount)" : ""),
         order_id: order.order_id,
         handler: async function (response: any) {
           const verify = await fetchApi("/api/billing/verify", {
@@ -130,9 +133,10 @@ export default function BillingPage() {
               razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_signature: response.razorpay_signature,
+              plan_id: planId
             }),
           });
-          if (verify.status === "success") setPlan("pro");
+          if (verify.status === "success") setPlan(planId);
         },
         theme: { color: "#10b981" },
       };
@@ -180,7 +184,7 @@ export default function BillingPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {PLANS.map((p) => {
           const isCurrent = plan === p.id || (plan === "free" && p.id === "free");
-          const isClickable = p.id === "pro" && plan !== "pro";
+          const isClickable = (p.id === "pro" || p.id === "plus") && plan !== p.id;
 
           return (
             <div

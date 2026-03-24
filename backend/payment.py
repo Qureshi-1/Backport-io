@@ -18,6 +18,10 @@ class VerifyReq(BaseModel):
     razorpay_payment_id: str
     razorpay_signature: str
     mock: bool = False
+    plan_id: str = "pro"
+
+class CreateOrderReq(BaseModel):
+    plan_id: str
 
 @router.get("/plan")
 def get_plan(user: User = Depends(get_current_user)):
@@ -28,11 +32,14 @@ def get_plan(user: User = Depends(get_current_user)):
     }
 
 @router.post("/create-order")
-def create_order(user: User = Depends(get_current_user)):
-    if user.plan == "pro":
-        raise HTTPException(status_code=400, detail="Already on Pro plan")
+def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
+    if user.plan == req.plan_id:
+        raise HTTPException(status_code=400, detail=f"Already on {req.plan_id.title()} plan")
 
-    base_amount = 3900 # INR 3900
+    if req.plan_id not in ["plus", "pro"]:
+        raise HTTPException(status_code=400, detail="Invalid plan selected")
+
+    base_amount = 1500 if req.plan_id == "plus" else 3900 # INR 1500 or 3900
     
     # If user was referred, give 60% discount (Pay only 40%)
     final_amount = base_amount
@@ -51,7 +58,8 @@ def create_order(user: User = Depends(get_current_user)):
                 "receipt": f"rcpt_{user.id}",
                 "notes": {
                     "user_id": str(user.id),
-                    "discounted": str(is_discounted)
+                    "discounted": str(is_discounted),
+                    "plan": req.plan_id
                 }
             }
             order = rzp_client.order.create(data=order_data)
@@ -60,7 +68,8 @@ def create_order(user: User = Depends(get_current_user)):
                 "amount": order["amount"],
                 "currency": order["currency"],
                 "key_id": RAZORPAY_KEY_ID,
-                "discount_applied": is_discounted
+                "discount_applied": is_discounted,
+                "plan_id": req.plan_id
             }
         except Exception:
             pass  # Fallback to mock
@@ -71,7 +80,8 @@ def create_order(user: User = Depends(get_current_user)):
         "currency": "INR",
         "key_id": RAZORPAY_KEY_ID or "mock_key",
         "mock": True,
-        "discount_applied": is_discounted
+        "discount_applied": is_discounted,
+        "plan_id": req.plan_id
     }
 
 @router.post("/verify")
@@ -93,7 +103,7 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
         raise HTTPException(status_code=500, detail="Razorpay not configured")
 
     if success:
-        user.plan = "pro"
+        user.plan = req.plan_id
         
         # Handle Referrer Reward
         if getattr(user, 'referred_by_id', None):
@@ -118,6 +128,6 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
                     # In a real app, we'd add 30 days to an expiry date column
         
         db.commit()
-        return {"status": "success", "plan": "pro"}
+        return {"status": "success", "plan": req.plan_id}
     
     return {"status": "error", "message": "Verification failed"}
