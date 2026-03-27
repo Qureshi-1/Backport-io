@@ -39,7 +39,8 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
     if req.plan_id not in ["plus", "pro"]:
         raise HTTPException(status_code=400, detail="Invalid plan selected")
 
-    base_amount = 1500 if req.plan_id == "plus" else 3900 # INR 1500 or 3900
+    # TEMP LAUNCH TEST: Set Plus plan to 10 INR for testing live Razorpay keys
+    base_amount = 10 if req.plan_id == "plus" else 3900 # INR 10 or 3900
     
     # If user was referred, give 60% discount (Pay only 40%)
     final_amount = base_amount
