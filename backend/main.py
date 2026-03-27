@@ -108,7 +108,7 @@ app.add_middleware(
 async def global_exception_handler(request: Request, exc: Exception):
     import traceback
     traceback.print_exc()
-    return JSONResponse(status_code=500, content={"error": "Internal server error", "detail": str(exc)})
+    return JSONResponse(status_code=500, content={"error": "Internal server error"})
 
 # 3. Health Endpoint (Public)
 @app.get("/health")
@@ -139,7 +139,7 @@ class PureCORSMiddleware(BaseHTTPMiddleware):
                 traceback.print_exc()
                 response = JSONResponse(
                     status_code=500, 
-                    content={"error": "Internal server error", "detail": str(e)}
+                    content={"error": "Internal server error"}
                 )
         
         response.headers["Access-Control-Allow-Origin"] = "*"

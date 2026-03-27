@@ -1050,7 +1050,7 @@ const Pricing = () => {
           <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
             <h3 className="mb-2 text-xl font-semibold text-white">Hobby</h3>
             <div className="mb-4 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">$0</span>
+              <span className="text-3xl font-bold text-white">Free</span>
               <span className="text-sm text-zinc-500">/forever</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">

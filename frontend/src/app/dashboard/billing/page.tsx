@@ -8,7 +8,7 @@ const PLANS = [
   {
     id: "free",
     name: "Hobby",
-    price: "$0",
+    price: "Free",
     period: "/forever",
     desc: "Perfect for side projects or early stage applications.",
     features: [

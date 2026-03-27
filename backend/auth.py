@@ -48,8 +48,6 @@ def signup(req: AuthReq, db: Session = Depends(get_db)):
             referred_by = referrer.id
             referrer.referrals_count += 1
 
-            referrer.referrals_count += 1
-
     # Generate 6-digit OTP verification token
     verification_token = "".join(random.choices(string.digits, k=6))
 
