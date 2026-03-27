@@ -1086,16 +1086,16 @@ const Pricing = () => {
 
           {/* Plus */}
           <div className="rounded-3xl border border-white/10 bg-zinc-900/40 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
-            <h3 className="mb-2 text-xl font-semibold text-white">Plus (TEST)</h3>
+            <h3 className="mb-2 text-xl font-semibold text-white">Plus</h3>
             <div className="mb-4 flex items-baseline gap-2 transition-all">
               <span className="text-3xl font-bold text-white">
-                ₹10
+                {isYearly ? "₹1,200" : "₹1,500"}
               </span>
-              <span className="text-sm text-zinc-500">/test</span>
+              <span className="text-sm text-zinc-500">/month</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
               {isYearly
-                ? "Billed $144 annually. Save $36."
+                ? "Billed ₹14,400 annually. Save ₹3,600."
                 : "Perfect for indie hackers."}
             </p>
             <ul className="mb-8 space-y-3">
@@ -1136,13 +1136,13 @@ const Pricing = () => {
             <h3 className="mb-2 text-xl font-semibold text-white">Cloud Pro</h3>
             <div className="mb-4 flex items-baseline gap-2 transition-all">
               <span className="text-3xl font-bold text-white">
-                ${isYearly ? "31" : "39"}
+                {isYearly ? "₹3,120" : "₹3,900"}
               </span>
               <span className="text-sm text-zinc-500">/month</span>
             </div>
             <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
               {isYearly
-                ? "Billed $372 annually. Save $96."
+                ? "Billed ₹37,440 annually. Save ₹9,360."
                 : "For teams handling traffic."}
             </p>
             <ul className="mb-8 space-y-3">

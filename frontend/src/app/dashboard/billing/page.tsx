@@ -24,7 +24,7 @@ const PLANS = [
   {
     id: "plus",
     name: "Plus",
-    price: "$15",
+    price: "₹1,500",
     period: "/month",
     desc: "Perfect for indie hackers.",
     features: [
@@ -40,7 +40,7 @@ const PLANS = [
   {
     id: "pro",
     name: "Cloud Pro",
-    price: "$39",
+    price: "₹3,900",
     period: "/month",
     desc: "For teams handling traffic.",
     features: [

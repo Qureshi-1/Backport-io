@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: backpack-backend
+    name: backport-backend
     runtime: python
     pythonVersion: "3.11.9"
     region: ohio
