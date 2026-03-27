@@ -86,11 +86,6 @@ export default function Footer() {
               </a>
             </li>
             <li>
-              <a href="https://status.backportio.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
-                Status
-              </a>
-            </li>
-            <li>
               <a href="mailto:support@backportio.com" className="text-sm text-zinc-500 transition-colors hover:text-emerald-400">
                 Contact
               </a>

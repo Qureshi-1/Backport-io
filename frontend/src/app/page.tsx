@@ -1652,7 +1652,7 @@ export default function LandingPage() {
         <HowItWorks />
         <WAFDemo />
         <CodeExample />
-        <Testimonials />
+        {/* <Testimonials /> */}
         <Pricing />
         <FinalCTA onDemo={() => setShowDemo(true)} />
         <FAQ />

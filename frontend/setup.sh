@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Backpack Repository Setup Script initializing..."
+echo "🚀 Backport Repository Setup Script initializing..."
 
 # Check if git is already initialized
 if [ ! -d ".git" ]; then

@@ -23,10 +23,10 @@ const PLANS = [
   },
   {
     id: "plus",
-    name: "Plus (TEST)",
-    price: "₹10",
-    period: "/test",
-    desc: "Test Razorpay Live Mode.",
+    name: "Plus",
+    price: "$15",
+    period: "/month",
+    desc: "Perfect for indie hackers.",
     features: [
       "250,000 Requests / month",
       "Standard WAF rules",
