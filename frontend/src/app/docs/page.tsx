@@ -81,7 +81,7 @@ export default function DocsPage() {
             </p>
             <div className="bg-black border border-zinc-800 rounded-xl p-4 my-4 font-mono text-sm">
               <div className="text-zinc-500 mb-2"># Initialize Backport in your project</div>
-              <div className="text-emerald-400">npx backport init</div>
+              <div className="text-emerald-400">npx backport-io init</div>
               <div className="text-zinc-500 mt-4 mb-2"># This will:</div>
               <div className="text-zinc-400"># 1. Create a backport.config.json in your project root</div>
               <div className="text-zinc-400"># 2. Prompt you for your API key</div>
@@ -89,7 +89,7 @@ export default function DocsPage() {
               <div className="text-zinc-400"># 4. Set up the gateway proxy URL</div>
             </div>
             <p className="text-zinc-400 text-sm border-l-2 border-emerald-500 pl-4 py-1 bg-emerald-500/5 mb-6">
-              <strong className="text-emerald-400">Note:</strong> The <code className="text-emerald-300 bg-emerald-500/10 px-1 py-0.5 rounded">npx backport init</code> command is available for projects that want to self-host Backport. For managed Cloud hosting, simply sign up at <a href="/auth/signup" className="text-emerald-400 underline">backport-io.vercel.app</a> and use the dashboard.
+              <strong className="text-emerald-400">Note:</strong> The <code className="text-emerald-300 bg-emerald-500/10 px-1 py-0.5 rounded">npx backport-io init</code> command is available for projects that want to self-host Backport. For managed Cloud hosting, simply sign up at <a href="/auth/signup" className="text-emerald-400 underline">backport-io.vercel.app</a> and use the dashboard.
             </p>
 
             <h3 className="text-lg font-semibold text-white mt-8 mb-3">Option 2: Docker</h3>

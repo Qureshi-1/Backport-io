@@ -505,10 +505,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
           >
             <p className="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider">Quick Install</p>
             <div className="flex items-center justify-between bg-[#000000] border border-zinc-800 rounded-lg p-1 pl-4">
-              <code className="text-sm font-mono text-emerald-400">npx backport init</code>
+              <code className="text-sm font-mono text-emerald-400">npx backport-io init</code>
               <button 
                 onClick={() => {
-                  navigator.clipboard.writeText("npx backport init");
+                  navigator.clipboard.writeText("npx backport-io init");
                   alert("Copied to clipboard!");
                 }}
                 className="p-2 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
