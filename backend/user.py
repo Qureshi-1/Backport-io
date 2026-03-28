@@ -92,11 +92,12 @@ def get_api_keys(user: User = Depends(get_current_user)):
 @router.post("/keys/")
 @router.post("/keys")
 def create_api_key(data: ApiKeyCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Limit check
-    max_keys = 3 if user.plan == "pro" else 1
+    # Limit check — Free: 1, Plus: 3, Pro: 10
+    plan_limits = {"free": 1, "plus": 3, "pro": 10}
+    max_keys = plan_limits.get(user.plan, 1)
     if len(user.api_keys) >= max_keys:
         from fastapi import HTTPException
-        raise HTTPException(status_code=400, detail=f"Plan limit reached: Max {max_keys} keys for {user.plan} plan")
+        raise HTTPException(status_code=400, detail=f"Plan limit reached. Your {user.plan.title()} plan allows up to {max_keys} API key{'s' if max_keys > 1 else ''}. Upgrade your plan for more.")
     
     try:
         new_key = ApiKey(user_id=user.id, name=data.name)
@@ -106,7 +107,9 @@ def create_api_key(data: ApiKeyCreate, user: User = Depends(get_current_user), d
         return {"status": "success", "key": new_key.key}
     except Exception as e:
         from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="Failed to create API key. Please try again.")
 
 @router.delete("/keys/{key_id}/")
 @router.delete("/keys/{key_id}")

@@ -92,7 +92,7 @@ export default function ApiKeysPage() {
     </div>
   );
 
-  const maxKeys = plan === "pro" ? 3 : 1;
+  const maxKeys = plan === "pro" ? 10 : plan === "plus" ? 3 : 1;
   const canCreateMore = keys.length < maxKeys;
 
   return (
@@ -177,12 +177,12 @@ export default function ApiKeysPage() {
 
         {plan === "free" && (
           <div className="p-4 bg-zinc-800/30 border-t border-zinc-800 text-sm text-zinc-400 flex items-center justify-between">
-            <p>Free plan is limited to 1 gateway.</p>
+            <p>Free plan is limited to 1 API gateway. Upgrade for more.</p>
             <a
               href="/dashboard/billing"
               className="text-emerald-400 hover:underline font-medium"
             >
-              Upgrade to Pro →
+              Upgrade Plan →
             </a>
           </div>
         )}
