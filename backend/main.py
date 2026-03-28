@@ -10,7 +10,15 @@ from config import CORS_ORIGINS, ADMIN_EMAIL
 
 print(f"✅ Starting Backport Gateway | Python {sys.version}")
 
-app = FastAPI(title="Backport API Gateway")
+app = FastAPI(
+    title="Backport API Gateway",
+    description="Open-source API Gateway providing enterprise-grade security — WAF, Rate Limiting, LRU Caching & Idempotency — with zero code changes to your backend.",
+    version="1.2.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    contact={"name": "Backport", "url": "https://backport-io.vercel.app", "email": "support@backportio.com"},
+    license_info={"name": "MIT", "url": "https://opensource.org/licenses/MIT"},
+)
 
 @app.on_event("startup")
 async def startup():
@@ -113,7 +121,26 @@ async def global_exception_handler(request: Request, exc: Exception):
 # 3. Health Endpoint (Public)
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "1.1.6", "cors": "pure_brute_force"}
+    from proxy import _lru_cache, _rate_limits, WAF_PATTERNS
+    return {
+        "status": "ok",
+        "version": "1.2.0",
+        "gateway": "Backport",
+        "docs": "/docs",
+        "waf_patterns": len(WAF_PATTERNS),
+        "cache_entries": len(_lru_cache),
+        "active_rate_limits": len(_rate_limits),
+    }
+
+@app.get("/")
+def root():
+    return {
+        "name": "Backport API Gateway",
+        "version": "1.2.0",
+        "docs": "/docs",
+        "health": "/health",
+        "website": "https://backport-io.vercel.app",
+    }
 
 # 4. Include Routers
 app.include_router(auth.router)
