@@ -1,18 +1,193 @@
 @import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap");
 
 :root {
-  --background: #000000;
-  --foreground: #ededed;
+  --background: #0e0e0e;
+  --foreground: #e2e2e2;
+  /* V7 Neon Cyber Palette */
+  --cyan: #00f0ff;
+  --cyan-dim: #00dbe9;
+  --green: #34ff8c;
+  --green-dim: #00e478;
+  --surface: #131313;
+  --surface-low: #1b1b1b;
+  --surface-container: #1f1f1f;
+  --surface-high: #2a2a2a;
+  --surface-highest: #353535;
+  --outline: #849495;
+  --outline-variant: #3b494b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Code", monospace;
+  --font-headline: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─── V7 Monolith Design System ─────────────────────────── */
+
+.font-headline {
+  font-family: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+}
+
+.font-body {
+  font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ─── Glitch text animation ───────────────────────────────────── */
+@keyframes glitch1 {
+  0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(-2px, 0); }
+  20% { clip-path: inset(30% 0 50% 0); transform: translate(2px, 0); }
+  40% { clip-path: inset(60% 0 20% 0); transform: translate(-1px, 0); }
+  60% { clip-path: inset(80% 0 5% 0); transform: translate(1px, 0); }
+  80% { clip-path: inset(10% 0 70% 0); transform: translate(0px, 0); }
+}
+@keyframes glitch2 {
+  0%, 100% { clip-path: inset(50% 0 30% 0); transform: translate(2px, 0); }
+  20% { clip-path: inset(10% 0 80% 0); transform: translate(-2px, 0); }
+  60% { clip-path: inset(70% 0 10% 0); transform: translate(1px, 0); }
+}
+
+.glitch-text {
+  position: relative;
+}
+.glitch-text::before,
+.glitch-text::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+.glitch-text:hover::before {
+  opacity: 0.7;
+  color: #00f0ff;
+  animation: glitch1 0.4s steps(1) infinite;
+}
+.glitch-text:hover::after {
+  opacity: 0.7;
+  color: #34ff8c;
+  animation: glitch2 0.4s steps(1) infinite;
+}
+
+/* ─── Troika-3D overlay canvas fix ───────────────────────────── */
+canvas {
+  outline: none;
+}
+
+
+/* Neon cyan glow */
+.glow-cyan {
+  box-shadow: 0 0 30px rgba(0, 240, 255, 0.15);
+}
+
+.glow-cyan-strong {
+  box-shadow: 0 0 60px rgba(0, 240, 255, 0.25);
+}
+
+.glow-green {
+  box-shadow: 0 0 30px rgba(52, 255, 140, 0.2);
+}
+
+.text-glow-cyan {
+  text-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+}
+
+.text-glow-green {
+  text-shadow: 0 0 10px rgba(52, 255, 140, 0.5);
+}
+
+/* Scanline overlay animation */
+@keyframes scanmove {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100%); }
+}
+
+.scanline-bg {
+  background: linear-gradient(to bottom, transparent 50%, rgba(0, 240, 255, 0.04) 50%);
+  background-size: 100% 4px;
+}
+
+.scanline-anim::after {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, transparent, rgba(0, 240, 255, 0.04), transparent);
+  height: 20%;
+  animation: scanmove 4s linear infinite;
+  pointer-events: none;
+}
+
+/* Monolith 3D card hover */
+.monolith-card {
+  transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1), box-shadow 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.monolith-card:hover {
+  transform: perspective(1000px) translateY(-6px) rotateX(2deg) rotateY(-1deg);
+  box-shadow: -8px 8px 30px rgba(0, 240, 255, 0.06);
+}
+
+/* Glitch hover text */
+.glitch-hover:hover {
+  text-shadow: 2px 0 #00f0ff, -2px 0 #34ff8c;
+  transition: text-shadow 0.1s ease;
+}
+
+/* Blinking terminal cursor */
+@keyframes blink {
+  from, to { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.terminal-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background-color: #00f0ff;
+  animation: blink 1s step-end infinite;
+  vertical-align: middle;
+  margin-left: 4px;
+}
+
+/* Cyber grid background */
+.bg-cyber-grid {
+  background-image:
+    linear-gradient(to right, rgba(0, 240, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Nav active border glow */
+.nav-active {
+  color: #00f0ff;
+  border-bottom: 2px solid #00f0ff;
+  padding-bottom: 2px;
+}
+
+/* Fade-in on scroll utility */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+/* Pulse glow animation for live indicators */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 4px rgba(52, 255, 140, 0.4); }
+  50% { box-shadow: 0 0 12px rgba(52, 255, 140, 0.8); }
+}
+
+.pulse-glow {
+  animation: glowPulse 2s ease-in-out infinite;
 }

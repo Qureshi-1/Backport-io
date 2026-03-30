@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { auth } from "@/lib/auth";
@@ -9,56 +9,65 @@ import { auth } from "@/lib/auth";
 export default function Header({ onDemo }: { onDemo?: () => void }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     setIsLogged(auth.isLoggedIn());
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <header
       suppressHydrationWarning
-      className="fixed top-0 left-0 right-0 z-40 border-b border-white/5 bg-black/50 backdrop-blur-xl"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-[#0e0e0e]/90 backdrop-blur-xl border-b border-[#00F0FF]/20 shadow-[0_0_30px_rgba(0,240,255,0.08)]"
+          : "bg-[#0e0e0e]/60 backdrop-blur-md border-b border-[#00F0FF]/10"
+      }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <ShieldCheck
-            suppressHydrationWarning
-            className="h-6 w-6 text-emerald-500"
-          />
-          <span className="text-lg font-semibold tracking-tight text-white">
-            Backport
+        {/* Logo */}
+        <Link href="/" className="flex items-center gap-2 group">
+          <span className="text-lg font-bold tracking-tighter text-[#00F0FF] font-headline uppercase glitch-hover select-none">
+            BACKPORT-IO
           </span>
         </Link>
-        <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">
-          <Link href="/docs" className="hover:text-white transition-colors">
-            Docs
-          </Link>
-          <Link href="/#features" className="hover:text-white transition-colors">
-            Features
-          </Link>
-          <Link href="/#how-it-works" className="hover:text-white transition-colors">
-            How it Works
-          </Link>
-          <Link href="/#compare" className="hover:text-white transition-colors">
-            Compare
-          </Link>
-          <Link href="/#pricing" className="hover:text-white transition-colors">
-            Pricing
-          </Link>
+
+        {/* Desktop Nav */}
+        <nav className="hidden md:flex items-center gap-8">
+          {[
+            { href: "/#features", label: "Features" },
+            { href: "/#how-it-works", label: "Network" },
+            { href: "/docs", label: "Docs" },
+            { href: "/#pricing", label: "Pricing" },
+            { href: "/#compare", label: "Compare" },
+          ].map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="font-headline tracking-tighter uppercase text-[13px] text-white/50 hover:text-[#00F0FF] hover:text-shadow-[0_0_8px_rgba(0,240,255,0.5)] transition-all duration-200"
+            >
+              {item.label}
+            </Link>
+          ))}
         </nav>
+
+        {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          {onDemo ? (
+          {onDemo && (
             <button
               onClick={onDemo}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+              className="font-headline uppercase text-[11px] tracking-widest text-white/40 hover:text-[#00F0FF] transition-colors px-3 py-2"
             >
               Demo
             </button>
-          ) : null}
+          )}
           {isLogged ? (
             <Link
               href="/dashboard"
-              className="rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
+              className="bg-[#00F0FF] text-[#003338] px-5 py-2 font-headline font-bold uppercase tracking-widest text-[12px] hover:bg-[#34FF8C] transition-all duration-200 active:scale-95 shadow-[0_0_20px_rgba(0,240,255,0.3)]"
             >
               Dashboard
             </Link>
@@ -66,69 +75,92 @@ export default function Header({ onDemo }: { onDemo?: () => void }) {
             <>
               <Link
                 href="/auth/login"
-                className="text-sm font-medium text-zinc-400 hover:text-white transition-colors"
+                className="font-headline uppercase text-[11px] tracking-widest text-white/40 hover:text-white transition-colors px-3 py-2"
               >
-                Log in
+                Log In
               </Link>
               <Link
                 href="/auth/signup"
-                className="rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
+                className="bg-[#00F0FF] text-[#003338] px-5 py-2 font-headline font-bold uppercase tracking-widest text-[12px] hover:bg-[#34FF8C] transition-all duration-200 active:scale-95 shadow-[0_0_20px_rgba(0,240,255,0.3)]"
               >
-                Start Free
+                Deploy Node
               </Link>
             </>
           )}
         </div>
+
+        {/* Mobile menu toggle */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden text-zinc-400 hover:text-white transition-colors"
+          className="md:hidden text-[#00F0FF] hover:text-[#34FF8C] transition-colors"
         >
           {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
         </button>
       </div>
+
+      {/* Mobile Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            className="md:hidden border-t border-white/5 bg-black/95 backdrop-blur-xl overflow-hidden"
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-t border-[#00F0FF]/10 bg-[#0e0e0e]/98 backdrop-blur-xl overflow-hidden"
           >
-            <div className="flex flex-col gap-4 px-6 py-6">
-              <Link href="/docs" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">Docs</Link>
-              <Link href="/#features" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">Features</Link>
-              <Link href="/#how-it-works" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">How it Works</Link>
-              <Link href="/#compare" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">Compare</Link>
-              <Link href="/#pricing" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">Pricing</Link>
-              <div className="h-px bg-white/5 my-2" />
-              {onDemo && (
-                <button
-                  onClick={() => { onDemo(); setMobileMenuOpen(false); }}
-                  className="text-left text-sm font-medium text-zinc-400 hover:text-white"
-                >
-                  Watch Demo
-                </button>
-              )}
-              {isLogged ? (
+            <div className="flex flex-col gap-1 px-6 py-6">
+              {[
+                { href: "/#features", label: "Features" },
+                { href: "/#how-it-works", label: "Network" },
+                { href: "/docs", label: "Docs" },
+                { href: "/#pricing", label: "Pricing" },
+                { href: "/#compare", label: "Compare" },
+              ].map((item) => (
                 <Link
-                  href="/dashboard"
+                  key={item.label}
+                  href={item.href}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="mt-2 text-center rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:-translate-y-[2px]"
+                  className="font-headline uppercase text-[12px] tracking-widest text-white/50 hover:text-[#00F0FF] transition-colors py-3 border-b border-white/5"
                 >
-                  Go to Dashboard
+                  {item.label}
                 </Link>
-              ) : (
-                <>
-                  <Link href="/auth/login" onClick={() => setMobileMenuOpen(false)} className="text-sm font-medium text-zinc-400 hover:text-white">Log in</Link>
-                  <Link
-                    href="/auth/signup"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="mt-2 text-center rounded-full bg-white px-4 py-2 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:-translate-y-[2px]"
+              ))}
+              <div className="pt-4 flex flex-col gap-3">
+                {onDemo && (
+                  <button
+                    onClick={() => { onDemo(); setMobileMenuOpen(false); }}
+                    className="text-left font-headline uppercase text-[11px] tracking-widest text-white/40 hover:text-[#00F0FF] transition-colors"
                   >
-                    Start Free
+                    Watch Demo
+                  </button>
+                )}
+                {isLogged ? (
+                  <Link
+                    href="/dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="mt-2 text-center bg-[#00F0FF] text-[#003338] px-5 py-3 font-headline font-bold uppercase tracking-widest text-[12px] hover:bg-[#34FF8C] transition-all"
+                  >
+                    Dashboard
                   </Link>
-                </>
-              )}
+                ) : (
+                  <>
+                    <Link
+                      href="/auth/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="font-headline uppercase text-[11px] tracking-widest text-white/40 hover:text-white transition-colors py-2"
+                    >
+                      Log In
+                    </Link>
+                    <Link
+                      href="/auth/signup"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-center bg-[#00F0FF] text-[#003338] px-5 py-3 font-headline font-bold uppercase tracking-widest text-[12px] hover:bg-[#34FF8C] transition-all"
+                    >
+                      Start Free
+                    </Link>
+                  </>
+                )}
+              </div>
             </div>
           </motion.div>
         )}

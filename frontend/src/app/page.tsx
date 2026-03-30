@@ -29,9 +29,16 @@ import {
   Gift,
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { auth } from "@/lib/auth";
+import { Pricing, FinalCTA, FAQ } from "@/components/HomeSections";
+
+const HeroScene = dynamic(() => import("@/components/HeroScene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 // ─── Scroll Progress Bar ──────────────────────────────────────────────────────
 const ScrollProgress = () => {
@@ -381,13 +388,11 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
             </motion.p>
           ))}
           {visibleLines < DEMO_LINES.length && (
-            <span className="inline-block h-4 w-2 animate-pulse bg-emerald-400 translate-y-0.5" />
+            <span className="inline-block h-4 w-2 animate-pulse bg-[#00F0FF] translate-y-0.5" />
           )}
         </div>
         <div className="flex items-center justify-between border-t border-white/5 bg-zinc-900/40 px-6 py-4">
-          <p className="text-xs text-zinc-500">
-            Backport Gateway · 3-step setup
-          </p>
+          <p className="text-xs text-zinc-500">Backport Gateway · 3-step setup</p>
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
@@ -395,19 +400,10 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
             >
               ✕ Close Demo
             </button>
-            {!isLogged && (
-              <Link
-                href="/auth/login"
-                onClick={onClose}
-                className="rounded-lg border border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-300 hover:text-white hover:border-zinc-500 transition-colors hidden sm:block"
-              >
-                Log In
-              </Link>
-            )}
             <Link
               href={isLogged ? "/dashboard" : "/auth/signup"}
               onClick={onClose}
-              className="rounded-lg bg-emerald-500 px-4 py-1.5 text-xs font-semibold text-black hover:bg-emerald-400 transition-colors"
+              className="rounded-lg bg-[#00F0FF] px-4 py-1.5 text-xs font-semibold text-[#003338] hover:bg-[#34FF8C] transition-colors"
             >
               {isLogged ? "Dashboard →" : "Sign Up Free →"}
             </Link>
@@ -418,141 +414,7 @@ const DemoModal = ({ onClose }: { onClose: () => void }) => {
   );
 };
 
-// (Header is imported from @/components/Header)
-
-// ─── Hero ─────────────────────────────────────────────────────────────────────
-const Hero = ({ onDemo }: { onDemo: () => void }) => {
-  const [isLogged, setIsLogged] = useState(false);
-  useEffect(() => { setIsLogged(auth.isLoggedIn()); }, []);
-
-  return (
-    <section className="relative pt-28 pb-16 md:pt-36 md:pb-28 overflow-hidden">
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f2e_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f2e_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_80%_60%_at_50%_0%,#000_70%,transparent_100%)]" />
-
-      <div className="mx-auto max-w-7xl px-6 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-16 items-center">
-          {/* Left — Text */}
-          <div>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm text-emerald-400 mb-8"
-            >
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              Backport 1.0 is now live
-            </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-5xl font-bold tracking-tight text-white md:text-6xl lg:text-7xl leading-[1.08]"
-          >
-            Shield your
-            <br />
-            {/* Fallback space + text in case JS is disabled or fails */}
-            <span className="inline-block min-w-[200px]">
-              <TypewriterText />
-            </span>
-            <br />
-            <span className="text-white">in 30 seconds.</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-6 max-w-lg text-lg text-zinc-400 leading-relaxed"
-          >
-            Protect APIs with Rate Limiting, WAF & Cache — Reduce latency, prevent
-            abuse, and save costs. Zero code changes required.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mt-10 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 sm:gap-6"
-          >
-            <Link
-              href={isLogged ? "/dashboard" : "/auth/signup"}
-              className="group flex h-12 items-center justify-center gap-2 rounded-full bg-white px-8 text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
-            >
-              {isLogged ? "Go to Dashboard" : "Start Free"}
-              <ArrowRight
-                suppressHydrationWarning
-                className="h-4 w-4 group-hover:translate-x-1 transition-transform"
-              />
-            </Link>
-            <button
-              onClick={() => {
-                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-                onDemo(); // Optional: still open terminal immediately if desired, or just scroll
-              }}
-              className="flex h-12 items-center justify-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/50 px-8 text-sm font-semibold text-white hover:bg-zinc-800 hover:border-zinc-600 transition-all"
-            >
-              <TerminalSquare suppressHydrationWarning className="h-4 w-4" />{" "}
-              Watch Demo
-            </button>
-          </motion.div>
-
-          {/* Quick Install CLI */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-10 max-w-md hidden sm:block"
-          >
-            <p className="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-wider">Quick Install</p>
-            <div className="flex items-center justify-between bg-[#000000] border border-zinc-800 rounded-lg p-1 pl-4">
-              <code className="text-sm font-mono text-emerald-400">npx backport-io init</code>
-              <button 
-                onClick={() => {
-                  navigator.clipboard.writeText("npx backport-io init");
-                  alert("Copied to clipboard!");
-                }}
-                className="p-2 hover:bg-zinc-800 rounded-md transition-colors text-zinc-400 hover:text-white"
-                title="Copy to clipboard"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Trust Strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-8 flex flex-wrap items-center justify-center sm:justify-start gap-3 text-xs text-zinc-500 mb-8 lg:mb-0"
-          >
-            <HeroStarButton />
-            <span className="flex items-center rounded-md bg-emerald-500/10 px-3 py-1.5 font-medium text-emerald-400">
-              ⭐ MIT Licensed • Open Source
-            </span>
-          </motion.div>
-        </div>
-
-        {/* Right — Live Metrics Card */}
-        <div className="hidden lg:flex justify-center">
-          <LiveMetricsCard />
-        </div>
-      </div>
-    </div>
-
-    {/* Background glow */}
-    <div className="pointer-events-none absolute top-0 right-0 -z-10">
-      <motion.div
-        animate={{ scale: [1, 1.1, 1], opacity: [0.06, 0.1, 0.06] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-        className="h-[700px] w-[700px] rounded-full bg-emerald-500 blur-[140px]"
-      />
-    </div>
-  </section>
-  );
-};
-
-// HeroStarButton: separate function component so useGitHubStars hook is valid
+// ─── HeroStarButton ───────────────────────────────────────────────────────────
 function HeroStarButton() {
   const stars = useGitHubStars();
   return (
@@ -560,247 +422,203 @@ function HeroStarButton() {
       href="https://github.com/Qureshi-1/Backport-io"
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-1.5 rounded-md border border-zinc-800 bg-zinc-900 px-2 py-1 text-zinc-300 transition-colors hover:border-zinc-700 hover:bg-zinc-800"
+      className="flex items-center gap-1.5 border border-[#3b494b]/40 bg-[#1b1b1b] px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-white/60 hover:text-[#00F0FF] hover:border-[#00F0FF]/30 transition-colors"
     >
-      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current">
+      <svg viewBox="0 0 24 24" className="h-3 w-3 fill-current">
         <path d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.161 22 16.416 22 12c0-5.523-4.477-10-10-10z" />
       </svg>
-      Star on GitHub{stars !== null ? ` (${stars})` : ''}
+      ★ GitHub{stars !== null ? ` (${stars})` : ''}
     </a>
   );
 }
 
-// ─── Tech Stack ───────────────────────────────────────────────────────────────
-const TechStack = () => (
-  <div className="border-y border-white/5 bg-black/30 py-10">
-    <div className="mx-auto max-w-7xl px-6">
-      <p className="mb-2 text-center text-xs font-semibold uppercase tracking-widest text-zinc-600">
-        Powered by Open Source
-      </p>
-      <p className="mb-8 text-center text-xs text-zinc-700">
-        100% MIT licensed · no vendor lock-in
-      </p>
-      <div className="flex flex-wrap justify-center gap-10 opacity-60 sm:gap-20">
-        {[
-          { icon: Server, label: "FastAPI" },
-          { icon: Layers, label: "Next.js" },
-          { icon: TerminalSquare, label: "Python" },
-          { icon: Sparkles, label: "Antigravity" },
-          { icon: Database, label: "Docker" },
-        ].map(({ icon: Icon, label }) => (
-          <div
-            key={label}
-            className="flex cursor-default items-center gap-3 text-lg font-medium text-zinc-400 transition-colors hover:text-white"
-          >
-            <Icon suppressHydrationWarning className="h-5 w-5" /> {label}
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-);
+// ─── Hero ─────────────────────────────────────────────────────────────────────
+const Hero = ({ onDemo }: { onDemo: () => void }) => {
+  const [isLogged, setIsLogged] = useState(false);
+  useEffect(() => { setIsLogged(auth.isLoggedIn()); }, []);
 
-// ─── Video Demo ───────────────────────────────────────────────────────────────
-const VideoDemo = () => (
-  <section className="bg-zinc-950 py-24 border-b border-white/5 overflow-hidden">
-    <div className="mx-auto max-w-5xl px-6 text-center">
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mb-12"
-      >
-        <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 mb-4">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Step-by-Step Guide
-        </span>
-        <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">How to use Backport</h2>
-        <p className="text-zinc-400 max-w-2xl mx-auto">Watch this quick walkthrough to see how to connect your backend, provision API keys, and enable enterprise security in seconds.</p>
-      </motion.div>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        whileInView={{ opacity: 1, scale: 1 }}
-        viewport={{ once: true }}
-        className="relative mx-auto max-w-4xl overflow-hidden rounded-2xl border border-white/10 shadow-2xl bg-black"
-      >
-        <img 
-          src="/tutorial-video.webp" 
-          alt="Backport Tutorial Walkthrough" 
-          className="w-full h-auto aspect-video object-cover"
-        />
-      </motion.div>
-    </div>
-  </section>
-);
+  return (
+    <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 overflow-hidden bg-[#0e0e0e]">
+      <div className="absolute inset-0 bg-cyber-grid opacity-60" />
+      <div className="absolute inset-0 scanline-bg opacity-25 pointer-events-none" />
+      <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#00F0FF]/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#34FF8C]/5 blur-[100px] rounded-full pointer-events-none" />
 
-// ─── Problem → Solution ────────────────────────────────────────────────────────
-const ProblemSolution = () => (
-  <section className="bg-black py-28">
-    <div className="mx-auto max-w-7xl px-6">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        className="mb-16 text-center"
-      >
-        <h2 className="mb-4 text-3xl font-bold text-white sm:text-5xl">
-          Your backend deserves a shield.
-        </h2>
-        <p className="mx-auto max-w-xl text-zinc-400">
-          Without Backport, every public API is one bad request away from a
-          crisis.
-        </p>
-      </motion.div>
-      <div className="grid gap-8 md:grid-cols-2">
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-8"
-        >
-          <div className="mb-6 flex items-center gap-2 font-semibold text-rose-400">
-            <XCircle suppressHydrationWarning className="h-5 w-5" /> Without
-            Backport
-          </div>
-          <ul className="space-y-4">
-            {[
-              "Bots hammer your API with thousands of requests per second",
-              "Same database query runs 1000× unnecessarily on hot paths",
-              "SQL injection slips right past your bare endpoint",
-              "Duplicate payments processed when user retries a payment",
-              "Zero visibility into traffic hitting your raw server",
-            ].map((p) => (
-              <li
-                key={p}
-                className="flex items-start gap-3 text-sm text-zinc-400"
+      <div className="mx-auto max-w-7xl px-6 relative z-10 w-full">
+        <div className="grid lg:grid-cols-12 gap-12 items-center">
+          <div className="lg:col-span-7 flex flex-col space-y-8">
+            <div className="space-y-2">
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="font-headline text-[10px] uppercase tracking-[0.3rem] text-[#34FF8C] font-bold block"
               >
-                <AlertTriangle
-                  suppressHydrationWarning
-                  className="mt-0.5 h-4 w-4 flex-shrink-0 text-rose-500"
-                />{" "}
-                {p}
-              </li>
-            ))}
-          </ul>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          className="rounded-2xl border border-emerald-500/20 bg-emerald-500/5 p-8"
-        >
-          <div className="mb-6 flex items-center gap-2 font-semibold text-emerald-400">
-            <ShieldCheck suppressHydrationWarning className="h-5 w-5" /> With
-            Backport
-          </div>
-          <ul className="space-y-4">
-            {[
-              "Rate limiter drops abusers before they touch your code",
-              "LRU cache serves repeated responses in microseconds",
-              "WAF intercepts malicious payloads at the gateway layer",
-              "Idempotency keys ensure each operation runs exactly once",
-              "Real-time dashboard shows every request, hit, and block",
-            ].map((p) => (
-              <li
-                key={p}
-                className="flex items-start gap-3 text-sm text-zinc-300"
+                SYSTEM_STATUS: OPTIMIZED // V4.0.2-STABLE
+              </motion.span>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.1 }}
+                className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-none text-[#e2e2e2]"
               >
-                <CheckCircle2
-                  suppressHydrationWarning
-                  className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-400"
-                />{" "}
-                {p}
-              </li>
-            ))}
-          </ul>
+                Shield your{" "}
+                <br />
+                <span className="text-[#00F0FF] text-glow-cyan inline-block min-w-[200px]">
+                  <TypewriterText />
+                </span>
+                <br />
+                in 30 seconds
+              </motion.h1>
+            </div>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="font-body text-[#b9cacb] max-w-lg text-lg leading-relaxed"
+            >
+              Zero-config API Gateway: Rate limiting, Caching, WAF, and Idempotency.
+              Deploy at the edge and scale to infinity. No code changes required.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-5 items-start sm:items-center"
+            >
+              {/* Primary CTA — V7 rectangular */}
+              <Link
+                href={isLogged ? "/dashboard" : "/auth/signup"}
+                className="group inline-flex items-center gap-2 bg-[#00F0FF] text-[#003338] px-10 py-4 font-headline font-extrabold uppercase tracking-widest text-base hover:bg-[#34FF8C] transition-all duration-300 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(52,255,140,0.4)] active:scale-95"
+              >
+                {isLogged ? "Go to Dashboard" : "Start for Free"}
+                <ArrowRight suppressHydrationWarning className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+              </Link>
+
+              {/* Terminal install box */}
+              <div className="bg-[#0a0a0a] border border-[#3b494b]/30 p-3 font-mono text-sm group cursor-pointer hover:border-[#00F0FF]/30 transition-colors">
+                <div className="flex items-center space-x-3 mb-2">
+                  <div className="flex space-x-1">
+                    <div className="w-2 h-2 bg-[#ffb4ab]/60" />
+                    <div className="w-2 h-2 bg-[#34FF8C]/60" />
+                    <div className="w-2 h-2 bg-[#00F0FF]/60" />
+                  </div>
+                  <span className="text-[#849495] text-[10px] uppercase tracking-widest">terminal_session</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <code className="text-[#00dbe9]">npx backport-io init</code>
+                  <button
+                    onClick={() => navigator.clipboard.writeText("npx backport-io init")}
+                    className="text-[#849495] hover:text-[#00F0FF] transition-colors"
+                    title="Copy"
+                  >
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                  </button>
+                  <span className="inline-block w-2 h-4 bg-[#00F0FF] ml-1 animate-pulse" />
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Trust strip */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex flex-wrap gap-3"
+            >
+              <HeroStarButton />
+              <span className="flex items-center border border-[#34FF8C]/20 bg-[#34FF8C]/5 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#34FF8C]">
+                ⭐ MIT Licensed • Open Source
+              </span>
+              <button
+                onClick={() => { document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' }); onDemo(); }}
+                className="flex items-center gap-1.5 border border-[#849495]/20 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#849495] hover:text-[#00F0FF] hover:border-[#00F0FF]/30 transition-colors"
+              >
+                <TerminalSquare suppressHydrationWarning className="h-3 w-3" /> Watch Demo
+              </button>
+            </motion.div>
+          </div>
+
+          {/* Right — 3D Interactive Scene */}
+          <div className="lg:col-span-5 relative hidden lg:block h-[560px]">
+            {/* Glow backdrop */}
+            <div className="absolute inset-0 bg-[#00F0FF]/3 blur-[120px] rounded-full pointer-events-none" />
+            {/* R3F Canvas */}
+            <HeroScene />
+            {/* Overlay metric tags */}
+            <div className="absolute top-8 right-4 bg-[#0a0a0a]/90 border border-[#00F0FF]/20 backdrop-blur-sm px-4 py-2 z-10">
+              <div className="text-[9px] font-headline uppercase tracking-[0.25rem] text-[#00F0FF]/60">NODE_01</div>
+              <div className="text-[11px] font-headline font-bold text-[#00F0FF]">LATENCY: 12ms</div>
+            </div>
+            <div className="absolute bottom-16 left-2 bg-[#0a0a0a]/90 border border-[#34FF8C]/20 backdrop-blur-sm px-4 py-2 z-10">
+              <div className="text-[9px] font-headline uppercase tracking-[0.25rem] text-[#34FF8C]/60">UPTIME</div>
+              <div className="text-[11px] font-headline font-bold text-[#34FF8C]">99.99%</div>
+            </div>
+            <div className="absolute bottom-4 right-0 z-10">
+              <LiveMetricsCard />
+            </div>
+          </div>
+        </div>
+
+        {/* Stats bar */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.7 }}
+          className="w-full mt-24 border-y border-[#3b494b]/15 bg-[#0a0a0a]/50 py-10 grid grid-cols-2 lg:grid-cols-4 gap-8"
+        >
+          {[
+            { value: "100M+", label: "Requests / Day", color: "text-[#00F0FF]" },
+            { value: "50+", label: "Edge Locations", color: "text-[#00F0FF]" },
+            { value: "<1ms", label: "P99 Overhead", color: "text-[#34FF8C]" },
+            { value: "∞", label: "Auto Scaling", color: "text-[#e2e2e2]" },
+          ].map((stat) => (
+            <div key={stat.label} className="space-y-1">
+              <h4 className={`text-3xl font-headline font-bold ${stat.color}`}>{stat.value}</h4>
+              <p className="text-[10px] font-headline uppercase tracking-widest text-[#849495]">{stat.label}</p>
+            </div>
+          ))}
         </motion.div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // ─── Features ─────────────────────────────────────────────────────────────────
 const Features = () => {
-  const feats = [
-    {
-      title: "Zero-Knowledge Proxying",
-      description:
-        "Routes traffic without stripping headers or modifying payloads. Fully transparent.",
-      icon: Activity,
-    },
-    {
-      title: "Intelligent WAF",
-      description:
-        "Block SQLi, XSS attacks at gateway level — before your code runs",
-      icon: ShieldCheck,
-      disclaimer: "Note: Backport provides baseline gateway-level protection. Always validate and sanitize inputs at your application layer as defense-in-depth.",
-    },
-    {
-      title: "Sliding Window Rate Limit",
-      description:
-        "Block abuse before it hits your server — default 100 req/min per IP",
-      icon: Lock,
-    },
-    {
-      title: "LRU Caching",
-      description:
-        "90% less DB load on repeated requests",
-      icon: Zap,
-    },
-    {
-      title: "POST Idempotency",
-      description:
-        "Prevent duplicate payments and double-processing automatically",
-      icon: Layers,
-    },
-    {
-      title: "Real-time Dashboard",
-      description:
-        "Live metrics for total requests, cache hits, and blocked threats. Zero setup.",
-      icon: Server,
-    },
+  const cards = [
+    { icon: ShieldCheck, title: "WAF Engine", desc: "L7 dynamic shielding. SQLi, XSS, Path Traversal blocked in real-time.", col: "md:col-span-2", accent: "#00F0FF" },
+    { icon: Zap, title: "Smart Cache", desc: "LRU cache. Sub-ms responses. 99.9% hit rate.", col: "md:col-span-1", accent: "#34FF8C" },
+    { icon: Lock, title: "Rate Limiting", desc: "Sliding window throttling per IP, per API key.", col: "md:col-span-1", accent: "#00dbe9" },
+    { icon: Database, title: "Idempotency", desc: "Replay protection for financial & stateful APIs.", col: "md:col-span-1", accent: "#00F0FF" },
+    { icon: Server, title: "Multi-Env Deploy", desc: "Docker. Render. Fly. Railway. Any cloud.", col: "md:col-span-2", accent: "#34FF8C" },
   ];
   return (
-    <section id="features" className="py-24 relative">
+    <section id="features" className="py-24 relative bg-[#0e0e0e] border-y border-[#3b494b]/10">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-16 max-w-3xl">
-          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl">
-            Everything you need. <br />
-            Nothing you don't.
-          </h2>
-          <p className="mt-4 text-zinc-400">
-            One gateway. Zero config. All the infrastructure you've been putting
-            off.
-          </p>
+        <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+          <div className="max-w-xl space-y-3">
+            <span className="text-[#34FF8C] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold">PROTOCOL GENESIS</span>
+            <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">High Frequency <span className="text-[#00F0FF]">Protection</span></h2>
+            <p className="text-[#b9cacb] leading-relaxed">Our engine intercepts traffic at the network layer before it touches your app.</p>
+          </div>
+          <Link href="/docs" className="text-[#00F0FF] font-headline uppercase text-[11px] tracking-[0.2rem] border-b border-[#00F0FF] pb-1 hover:text-[#34FF8C] hover:border-[#34FF8C] transition-colors whitespace-nowrap">Explore Docs</Link>
         </div>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {feats.map((f, i) => (
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {cards.map((card, i) => (
             <motion.div
-              key={f.title}
-              initial={{ opacity: 0, y: 20 }}
+              key={card.title}
+              initial={{ opacity: 0, y: 24 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-80px" }}
+              viewport={{ once: true }}
               transition={{ delay: i * 0.07 }}
-              className="group relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/40 p-8 transition-colors hover:bg-zinc-900/80"
+              className={`${card.col} bg-[#0e0e0e] border border-[#3b494b]/15 p-10 flex flex-col justify-between min-h-[220px] monolith-card hover:border-[#00F0FF]/20 transition-colors group`}
             >
-              <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/10 to-transparent opacity-0 transition-opacity group-hover:opacity-100" />
-              <div className="relative z-10">
-                <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl border border-white/5 bg-zinc-800 text-emerald-400 transition-colors group-hover:border-emerald-500/30 group-hover:bg-emerald-500/20">
-                  <f.icon className="h-6 w-6" />
-                </div>
-                <h3 className="mb-2 text-lg font-semibold text-white">
-                  {f.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-zinc-400">
-                  {f.description}
-                </p>
-                {/* @ts-ignore */}
-                {f.disclaimer && (
-                  <p className="mt-4 text-xs italic text-zinc-500 leading-relaxed">
-                    {/* @ts-ignore */}
-                    {f.disclaimer}
-                  </p>
-                )}
+              <card.icon suppressHydrationWarning className="w-10 h-10 mb-6" style={{ color: card.accent }} />
+              <div>
+                <h3 className="text-xl font-headline font-bold uppercase text-white mb-3">{card.title}</h3>
+                <p className="text-sm text-[#b9cacb] leading-relaxed">{card.desc}</p>
               </div>
             </motion.div>
           ))}
@@ -988,317 +806,143 @@ const WAFDemo = () => {
 // ─── Pricing ─────────────────────────────────────────────────────────────────
 const Pricing = () => {
   const [isYearly, setIsYearly] = useState(true);
+  const plans = [
+    {
+      name: "STEALTH",
+      sub: "Free forever",
+      price: "$0",
+      period: "",
+      desc: "For indie devs and students. No credit card required.",
+      features: ["50,000 Requests / month", "Basic WAF", "1 API Gateway", "Redis Cache", "Community support"],
+      cta: "Deploy Now",
+      href: "/auth/signup",
+      accent: "#00F0FF",
+      hot: false,
+    },
+    {
+      name: "CLOUD PRO",
+      sub: isYearly ? "Billed $468/yr · Save $117" : "Billed monthly",
+      price: isYearly ? "$39" : "$49",
+      period: "/mo",
+      desc: "For teams shipping at scale.",
+      features: ["1,000,000 Requests / month", "AI-enhanced WAF", "Up to 10 Gateways", "Distributed Redis", "Priority support"],
+      cta: "Get Cloud Pro",
+      href: "/auth/signup?plan=cloud_pro",
+      accent: "#34FF8C",
+      hot: true,
+    },
+    {
+      name: "ENTERPRISE",
+      sub: "Custom terms",
+      price: "Custom",
+      period: "",
+      desc: "Dedicated VPC. Unlimited gateways.",
+      features: ["Unlimited volume", "Custom rate limits", "Unlimited gateways", "Dedicated VPC", "24/7 phone support"],
+      cta: "Contact Sales",
+      href: "mailto:support@backportio.com",
+      accent: "#849495",
+      hot: false,
+    },
+  ];
 
   return (
-    <section id="pricing" className="border-t border-white/5 bg-zinc-950 py-24">
+    <section id="pricing" className="py-24 bg-[#0e0e0e] border-t border-[#3b494b]/10">
       <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-12 text-center">
-          <h2 className="mb-3 text-3xl font-bold text-white sm:text-5xl">
-            Simple pricing
-          </h2>
-          <p className="text-zinc-400">Start free. Scale when you need to.</p>
+        {/* Header */}
+        <div className="mb-16">
+          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">PRICING MATRIX</span>
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">Access <span className="text-[#34FF8C]">Tiers</span></h2>
+            {/* Toggle */}
+            <div className="flex items-center gap-4">
+              <span className={`font-headline text-[11px] uppercase tracking-widest ${!isYearly ? 'text-white' : 'text-[#849495]'}`}>Monthly</span>
+              <button
+                onClick={() => setIsYearly(!isYearly)}
+                className={`relative w-14 h-7 transition-colors ${isYearly ? 'bg-[#34FF8C]' : 'bg-[#353535]'}`}
+              >
+                <span className={`absolute top-1 w-5 h-5 bg-[#0e0e0e] transition-all ${isYearly ? 'left-8' : 'left-1'}`} />
+              </button>
+              <span className={`font-headline text-[11px] uppercase tracking-widest ${isYearly ? 'text-[#34FF8C]' : 'text-[#849495]'}`}>
+                Yearly <span className="text-[#34FF8C] text-[9px] ml-1">-20%</span>
+              </span>
+            </div>
+          </div>
         </div>
 
-        {/* Toggle */}
-        <div className="mb-16 flex justify-center">
-          <div className="relative flex items-center rounded-full border border-zinc-800 bg-zinc-900 p-1">
-            <button
-              onClick={() => setIsYearly(false)}
-              className={`relative z-10 w-32 py-2 text-sm font-semibold transition-colors ${
-                !isYearly ? "text-black" : "text-zinc-400 hover:text-white"
+        {/* Plans Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#3b494b]/15">
+          {plans.map((plan, i) => (
+            <motion.div
+              key={plan.name}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className={`relative flex flex-col p-10 bg-[#0e0e0e] ${
+                plan.hot ? 'bg-[#111111]' : ''
               }`}
             >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsYearly(true)}
-              className={`relative z-10 flex w-32 items-center justify-center gap-1.5 py-2 text-sm font-semibold transition-colors ${
-                isYearly ? "text-black" : "text-zinc-400 hover:text-white"
-              }`}
-            >
-              Yearly{" "}
-              <span
-                className={`rounded-md px-1.5 py-0.5 text-[10px] ${
-                  isYearly
-                    ? "bg-black/10 text-black"
-                    : "bg-emerald-500/10 text-emerald-400"
+              {plan.hot && (
+                <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#34FF8C] shadow-[0_0_10px_#34FF8C]" />
+              )}
+              <div className="mb-8">
+                <div className="text-[10px] font-headline uppercase tracking-[0.3rem] mb-1" style={{ color: plan.accent }}>{plan.name}</div>
+                <div className="text-[10px] font-headline uppercase tracking-widest text-[#849495]">{plan.sub}</div>
+              </div>
+              <div className="mb-8">
+                <span className="font-headline text-5xl font-bold text-white">{plan.price}</span>
+                <span className="font-headline text-sm text-[#849495] ml-1">{plan.period}</span>
+              </div>
+              <p className="text-sm text-[#849495] mb-8 border-b border-[#3b494b]/20 pb-8">{plan.desc}</p>
+              <ul className="space-y-3 mb-10 flex-1">
+                {plan.features.map((f) => (
+                  <li key={f} className="flex items-center gap-3 text-sm text-[#b9cacb]">
+                    <CheckCircle2 suppressHydrationWarning className="h-4 w-4 flex-shrink-0" style={{ color: plan.accent }} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link
+                href={plan.href}
+                className={`block w-full py-4 text-center font-headline text-[11px] uppercase tracking-[0.2rem] font-bold transition-all ${
+                  plan.hot
+                    ? 'bg-[#34FF8C] text-[#0e0e0e] hover:bg-[#00F0FF]'
+                    : 'border border-[#3b494b]/30 text-[#e2e2e2] hover:border-[#00F0FF]/40 hover:text-[#00F0FF]'
                 }`}
               >
-                -20%
-              </span>
-            </button>
-            <div
-              className={`absolute bottom-1 top-1 w-32 rounded-full bg-white transition-transform duration-300 ease-in-out`}
-              style={{ transform: `translateX(${isYearly ? "100%" : "0"})` }}
-            />
-          </div>
-        </div>
-
-        <div className="mx-auto grid gap-[30px] md:grid-cols-2 lg:grid-cols-4">
-          {/* Free */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
-            <h3 className="mb-2 text-xl font-semibold text-white">Hobby</h3>
-            <div className="mb-4 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">Free</span>
-              <span className="text-sm text-zinc-500">/forever</span>
-            </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
-              Perfect for side projects or early stage applications.
-            </p>
-            <ul className="mb-8 space-y-3">
-              {[
-                "10,000 Requests / month",
-                "Community driven WAF",
-                "Basic WAF patterns",
-                "In-memory Cache",
-                "Community support",
-              ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-3 text-sm text-zinc-300"
-                >
-                  <CheckCircle2
-                    suppressHydrationWarning
-                    className="h-4 w-4 flex-shrink-0 text-emerald-500"
-                  />{" "}
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/auth/signup?plan=hobby"
-              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
-            >
-              Start for Free
-            </Link>
-          </div>
-
-          {/* Plus */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-900/40 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
-            <h3 className="mb-2 text-xl font-semibold text-white">Plus</h3>
-            <div className="mb-4 flex items-baseline gap-2 transition-all">
-              <span className="text-3xl font-bold text-white">
-                 {isYearly ? "$15" : "$18"}
-              </span>
-              <span className="text-sm text-zinc-500">/month</span>
-            </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
-              {isYearly
-                ? "Billed $180 annually. Save $36."
-                : "Perfect for indie hackers."}
-            </p>
-            <ul className="mb-8 space-y-3">
-              {[
-                "250,000 Requests / month",
-                "Standard WAF rules",
-                "Up to 3 API Gateways",
-                "Managed Hosting",
-                "Email support",
-              ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-3 text-sm text-zinc-300"
-                >
-                  <CheckCircle2
-                    suppressHydrationWarning
-                    className="h-4 w-4 flex-shrink-0 text-emerald-400"
-                  />{" "}
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/auth/signup?plan=plus"
-              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
-            >
-              Get Plus
-            </Link>
-          </div>
-
-          {/* Pro */}
-          <div className="relative rounded-3xl border border-emerald-500/50 bg-black p-8 lg:p-6 shadow-[0_0_60px_-20px_rgba(16,185,129,0.4)] flex flex-col">
-            <div className="absolute right-6 top-0 -translate-y-1/2">
-              <span className="rounded-full bg-emerald-500 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-black">
-                Most Popular
-              </span>
-            </div>
-            <h3 className="mb-2 text-xl font-semibold text-white">Cloud Pro</h3>
-            <div className="mb-4 flex items-baseline gap-2 transition-all">
-              <span className="text-3xl font-bold text-white">
-                 {isYearly ? "$39" : "$49"}
-              </span>
-              <span className="text-sm text-zinc-500">/month</span>
-            </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
-              {isYearly
-                 ? "Billed $468 annually. Save $117."
-                : "For teams handling traffic."}
-            </p>
-            <ul className="mb-8 space-y-3">
-              {[
-                "1,000,000 Requests / month",
-                "AI-enhanced WAF rules",
-                "Up to 10 API Gateways",
-                "Distributed Redis",
-                "Priority support",
-              ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-3 text-sm text-zinc-300"
-                >
-                  <CheckCircle2
-                    suppressHydrationWarning
-                    className="h-4 w-4 flex-shrink-0 text-emerald-400"
-                  />{" "}
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <Link
-              href="/auth/signup?plan=cloud_pro"
-              className="mt-auto block w-full rounded-xl bg-emerald-500 py-2.5 text-center text-sm font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px] hover:bg-emerald-400"
-            >
-              Get Cloud Pro
-            </Link>
-          </div>
-
-          {/* Enterprise */}
-          <div className="rounded-3xl border border-white/10 bg-zinc-900/30 p-8 backdrop-blur-sm lg:p-6 flex flex-col">
-            <h3 className="mb-2 text-xl font-semibold text-white">
-              Enterprise
-            </h3>
-            <div className="mb-4 flex items-baseline gap-2">
-              <span className="text-3xl font-bold text-white">Custom</span>
-            </div>
-            <p className="mb-6 border-b border-white/10 pb-6 text-sm text-zinc-500 min-h-[60px]">
-              For massive scale and dedicated infrastructure.
-            </p>
-            <ul className="mb-8 space-y-3">
-              {[
-                "Custom Volume Limits",
-                "Custom Rate Limits",
-                "Unlimited Gateways",
-                "Dedicated VPC Deployment",
-                "24/7 Phone Support",
-              ].map((f) => (
-                <li
-                  key={f}
-                  className="flex items-center gap-3 text-sm text-zinc-300"
-                >
-                  <CheckCircle2
-                    suppressHydrationWarning
-                    className="h-4 w-4 flex-shrink-0 text-zinc-600"
-                  />{" "}
-                  {f}
-                </li>
-              ))}
-            </ul>
-            <a
-              href="mailto:support@backportio.com"
-              className="mt-auto block w-full rounded-xl bg-white/10 py-2.5 text-center text-sm font-semibold text-white transition-colors hover:bg-white/20"
-            >
-              Contact Sales
-            </a>
-          </div>
+                {plan.cta}
+              </Link>
+            </motion.div>
+          ))}
         </div>
 
         {/* Refer & Earn Banner */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          whileHover={{ scale: 1.01 }}
-          className="group relative mt-16 mx-auto max-w-4xl overflow-hidden rounded-[2.5rem] border border-emerald-500/20 bg-emerald-500/[0.03] p-8 backdrop-blur-md sm:flex sm:items-center sm:justify-between sm:px-10 transition-all hover:border-emerald-500/40"
+          className="mt-8 border border-[#34FF8C]/15 bg-[#34FF8C]/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6"
         >
-          {/* Background Glows */}
-          <div className="absolute -left-16 -top-16 h-32 w-32 bg-emerald-500/10 blur-3xl transition-opacity group-hover:opacity-100 opacity-50" />
-          <div className="absolute -right-16 -bottom-16 h-32 w-32 bg-emerald-500/10 blur-3xl transition-opacity group-hover:opacity-100 opacity-50" />
-          
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6">
-            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 border border-emerald-500/20 group-hover:scale-110 transition-transform duration-500">
-              <Gift className="h-7 w-7 text-emerald-400" />
+          <div className="flex items-center gap-6">
+            <div className="w-12 h-12 border border-[#34FF8C]/30 flex items-center justify-center">
+              <Gift suppressHydrationWarning className="w-6 h-6 text-[#34FF8C]" />
             </div>
             <div>
-              <h3 className="text-xl font-bold text-white tracking-tight">
-                Refer & Earn
-              </h3>
-              <p className="mt-1.5 text-zinc-400 max-w-lg leading-relaxed">
-                Are you a college student or indie developer? Invite your friends
-                and{" "}
-                <span className="text-emerald-400 font-semibold underline decoration-emerald-500/30 underline-offset-4">
-                  get 1 Month of Cloud Pro FREE
-                </span>{" "}
-                for every successful referral.
-              </p>
+              <h3 className="font-headline font-bold text-white uppercase tracking-wider">Refer &amp; Earn</h3>
+              <p className="text-sm text-[#849495] mt-1">Invite friends. Get 1 month Cloud Pro FREE per referral.</p>
             </div>
           </div>
-          
-          <div className="relative z-10 mt-8 sm:mt-0 flex-shrink-0">
-            <Link
-              href="/auth/signup?next=/dashboard/billing"
-              className="group/btn relative inline-flex items-center gap-2 overflow-hidden rounded-full bg-emerald-500 px-8 py-3.5 text-sm font-bold text-black transition-all hover:bg-emerald-400 hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:-translate-y-0.5 active:translate-y-0"
-            >
-              <span className="relative z-10">Get my Referral Link</span>
-              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover/btn:translate-x-1" />
-              <div className="absolute inset-0 -z-10 bg-gradient-to-r from-emerald-400 to-emerald-500 opacity-0 transition-opacity group-hover/btn:opacity-100" />
-            </Link>
-          </div>
+          <Link
+            href="/auth/signup?next=/dashboard/billing"
+            className="flex items-center gap-2 bg-[#34FF8C] text-[#0e0e0e] px-8 py-3 font-headline uppercase text-[11px] tracking-[0.2rem] font-bold hover:bg-[#00F0FF] transition-colors whitespace-nowrap"
+          >
+            Get Referral Link <ArrowRight suppressHydrationWarning className="h-4 w-4" />
+          </Link>
         </motion.div>
       </div>
     </section>
   );
 };
-
-// ─── Final CTA ────────────────────────────────────────────────────────────────
-const FinalCTA = ({ onDemo }: { onDemo: () => void }) => {
-  const [isLogged, setIsLogged] = useState(false);
-  useEffect(() => { setIsLogged(auth.isLoggedIn()); }, []);
-
-  return (
-    <section className="relative overflow-hidden bg-black py-32">
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[300px] w-[700px] rounded-full bg-emerald-500/10 blur-[120px]" />
-      </div>
-      <div className="relative z-10 mx-auto max-w-3xl px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <h2 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            Your backend is one gateway <br />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">
-              away from production-ready.
-            </span>
-          </h2>
-        <p className="mb-10 text-lg text-zinc-400">
-          Join developers shipping with confidence. Free to start. No credit
-          card required.
-        </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row mt-8">
-            <Link
-              href={isLogged ? "/dashboard" : "/auth/signup"}
-              className="group flex h-14 items-center gap-2 rounded-full bg-white px-10 text-base font-semibold text-black transition-all shadow-[0_0_15px_rgba(0,255,135,0.3)] hover:shadow-[0_0_30px_rgba(0,255,135,0.6)] hover:-translate-y-[2px]"
-            >
-              {isLogged ? "Take me to Dashboard" : "Start Free — No credit card required"}
-            </Link>
-            <button
-              onClick={() => {
-                document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' });
-                onDemo();
-              }}
-              className="flex h-14 items-center gap-2 rounded-full border border-zinc-700 px-8 text-base font-semibold text-white transition-colors hover:bg-zinc-900"
-            >
-              <TerminalSquare suppressHydrationWarning className="h-4 w-4" /> See
-              the Demo
-            </button>
-          </div>
-        </motion.div>
-      </div>
-    </section>
-  );
-};
-
 // (Footer is imported from @/components/Footer)
 
 // ─── Floating Badge ───────────────────────────────────────────────────────────
@@ -1632,9 +1276,6 @@ export default function LandingPage() {
       <Header onDemo={() => setShowDemo(true)} />
       <main>
         <Hero onDemo={() => setShowDemo(true)} />
-        <TechStack />
-        <VideoDemo />
-        <ProblemSolution />
         <Features />
         <CompetitorCompare />
         <ArchitectureDiagram />
