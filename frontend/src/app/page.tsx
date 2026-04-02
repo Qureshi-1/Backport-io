@@ -421,14 +421,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.18),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(52,255,140,0.16),transparent_26%),linear-gradient(90deg,rgba(14,14,14,0.98)_0%,rgba(14,14,14,0.82)_48%,rgba(14,14,14,0.58)_100%)] z-0 pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-12 lg:gap-20 pt-16">
           
-          <div className="relative overflow-hidden border border-[#3b494b]/20 bg-[#0a0a0a]/82 p-8 shadow-[0_24px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-10 lg:p-12">
-            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00F0FF]/80 to-transparent" />
-            <div className="absolute -left-16 top-16 h-40 w-40 rounded-full bg-[#00F0FF]/10 blur-3xl" />
-            <div className="absolute bottom-10 right-0 h-32 w-32 rounded-full bg-[#34FF8C]/10 blur-3xl" />
-
-            <div className="relative flex flex-col gap-8">
+          <div className="flex-1 space-y-12 max-w-4xl">
+            <div className="relative flex flex-col gap-10">
             <div className="space-y-5">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -443,7 +439,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="font-headline text-5xl font-bold leading-[0.94] tracking-[-0.06em] text-[#f3f7f7] sm:text-6xl lg:text-[6.4rem]"
+                className="font-headline text-5xl font-bold leading-[0.9] tracking-[-0.06em] text-[#f3f7f7] sm:text-7xl lg:text-[7.2rem]"
               >
                 Turn every{" "}
                 <span className="text-[#00F0FF] text-glow-cyan">
@@ -475,7 +471,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.28, duration: 0.8 }}
-              className="grid gap-4 border border-white/10 bg-white/[0.03] p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_auto]"
+              className="grid gap-4 border border-white/10 bg-[#0a0a0a]/40 backdrop-blur-xl p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_auto] monolith-card shadow-2xl"
             >
               <div className="min-w-0 space-y-2">
                 <div className="flex items-center gap-2 font-headline text-[10px] uppercase tracking-[0.28rem] text-[#849495]">
@@ -525,7 +521,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
                   if (el) el.innerText = 'COPIED TO CLIPBOARD';
                   setTimeout(() => { if (el) el.innerText = 'CLICK TO COPY INSTALL SCRIPT'; }, 2000);
                 }}
-                className="w-full sm:w-auto bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 px-8 py-5 font-mono text-xs group cursor-pointer hover:border-[#00F0FF]/60 transition-all relative overflow-hidden monolith-card shadow-2xl"
+                className="w-full sm:w-auto bg-[#0a0a0a]/60 backdrop-blur-2xl border border-white/10 px-8 py-5 font-mono text-xs group cursor-pointer hover:border-[#00F0FF]/60 transition-all relative overflow-hidden monolith-card shadow-2xl"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00F0FF]/80 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 opacity-20" />
                 <div className="flex flex-col gap-2 relative z-10">

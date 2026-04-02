@@ -50,7 +50,7 @@ export default function Header({ onDemo }: { onDemo?: () => void }) {
             <Link
               key={item.label}
               href={item.href}
-              className="font-headline tracking-[0.4em] uppercase text-[10px] font-black text-white/40 hover:text-[#00F0FF] transition-all duration-300 relative group"
+              className="font-headline tracking-[0.4em] uppercase text-[10px] font-black text-zinc-500 hover:text-white transition-all duration-300 relative group"
             >
               <span className="relative z-10">{item.label}</span>
               <span className="absolute -bottom-1 left-0 w-0 h-px bg-[#00F0FF] group-hover:w-full transition-all duration-300 shadow-[0_0_10px_#00F0FF]" />
@@ -71,7 +71,7 @@ export default function Header({ onDemo }: { onDemo?: () => void }) {
           {isLogged ? (
             <Link
               href="/dashboard"
-              className="bg-white text-black px-8 py-3.5 font-headline font-black uppercase tracking-[0.3em] text-[11px] hover:bg-[#00F0FF] hover:shadow-[0_0_40px_rgba(0,240,255,0.6)] transition-all duration-500 active:scale-95"
+              className="px-8 py-3.5 font-headline font-black uppercase tracking-[0.3em] text-[11px] bg-white text-black hover:bg-[#00F0FF] shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_40px_rgba(0,240,255,0.6)] transition-all duration-500 active:scale-95 border border-white/20"
             >
               TERMINAL
             </Link>
