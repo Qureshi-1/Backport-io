@@ -11,3 +11,4 @@ cli/dist/
 backport.config.json
 *.pyc
 .DS_Store
+nul

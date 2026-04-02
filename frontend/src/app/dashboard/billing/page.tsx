@@ -40,7 +40,7 @@ const PLANS = [
   {
     id: "pro",
     name: "Cloud Pro",
-     price: "$49",
+     price: "$39",
     period: "/month",
     desc: "For teams handling traffic.",
     features: [
@@ -138,7 +138,7 @@ export default function BillingPage() {
           });
           if (verify.status === "success") setPlan(planId);
         },
-        theme: { color: "#10b981" },
+        theme: { color: "#00F0FF" },
       };
 
       const rzp = new (window as any).Razorpay(options);
@@ -166,16 +166,16 @@ export default function BillingPage() {
 
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-white mb-2">Billing & Plans</h1>
-          <p className="text-zinc-400">Manage your subscription.</p>
+          <h1 className="text-3xl font-headline tracking-widest text-[#e2e2e2] mb-2 uppercase font-bold drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]">Billing & Plans</h1>
+          <p className="text-[#849495] font-mono text-sm uppercase tracking-widest">Manage your subscription.</p>
         </div>
         
         {isReferred && plan !== "pro" && (
-          <div className="bg-emerald-500/10 border border-emerald-500/20 px-4 py-2 rounded-2xl flex items-center gap-3">
-            <Gift className="w-5 h-5 text-emerald-400" />
+          <div className="bg-[#34FF8C]/10 border border-[#34FF8C]/30 px-4 py-2 rounded-none flex items-center gap-3">
+            <Gift className="w-5 h-5 text-[#34FF8C]" />
             <div>
-              <p className="text-xs font-bold text-emerald-400">REFERRAL BONUS ACTIVE</p>
-              <p className="text-[10px] text-emerald-500/70 uppercase font-mono">60% One-time discount applied</p>
+              <p className="text-xs font-bold font-headline tracking-widest text-[#34FF8C]">REFERRAL BONUS ACTIVE</p>
+              <p className="text-[10px] text-[#34FF8C]/70 uppercase font-mono">60% One-time discount applied</p>
             </div>
           </div>
         )}
@@ -189,28 +189,28 @@ export default function BillingPage() {
           return (
             <div
               key={p.id}
-              className={`relative flex flex-col rounded-2xl border p-6 transition-all
-                ${isCurrent ? "border-emerald-500 shadow-lg shadow-emerald-900/20" : "border-zinc-800"}
-                ${p.highlight ? "bg-zinc-900/80" : "bg-zinc-900/40"}
+              className={`relative flex flex-col rounded-none border p-8 transition-all
+                ${isCurrent ? "border-[#00F0FF] shadow-[0_0_30px_rgba(0,240,255,0.15)]" : "border-[#3b494b]/50"}
+                ${p.highlight ? "bg-[#0e0e0e]/90" : "bg-[#111111]"}
               `}
             >
               {/* Badge */}
               {p.badge && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-black text-[10px] font-bold px-3 py-0.5 rounded-full">
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00F0FF] text-[#003338] font-headline text-[10px] font-bold px-3 py-1 uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.4)]">
                   {p.badge}
                 </div>
               )}
               {isCurrent && (
-                <div className="absolute top-0 right-0 bg-emerald-500 text-black text-[10px] font-bold px-2 py-0.5 rounded-bl-lg rounded-tr-xl">
+                <div className="absolute top-0 right-0 bg-[#00F0FF] text-[#003338] text-[10px] font-headline tracking-widest uppercase font-bold px-3 py-1">
                   CURRENT
                 </div>
               )}
 
-              <h3 className="text-base font-bold text-white mb-1">{p.name}</h3>
-              <p className="text-zinc-500 text-xs mb-4">{p.desc}</p>
+              <h3 className="text-xl font-headline tracking-widest text-[#00F0FF] mb-1 font-bold uppercase">{p.name}</h3>
+              <p className="text-[#849495] font-mono text-xs mb-4">{p.desc}</p>
 
               <div className="mb-5">
-                <span className={`text-3xl font-bold ${p.muted ? "text-zinc-300" : "text-white"}`}>
+                <span className={`text-4xl font-headline font-bold ${p.muted ? "text-[#b9cacb]" : "text-[#e2e2e2]"}`}>
                   {p.price}
                 </span>
                 {p.period && (
@@ -222,9 +222,9 @@ export default function BillingPage() {
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 text-xs text-zinc-300">
                     {p.muted ? (
-                      <Circle className="h-3.5 w-3.5 text-zinc-600 mt-0.5 flex-shrink-0" />
+                      <Circle className="h-3.5 w-3.5 text-[#3b494b] mt-0.5 flex-shrink-0" />
                     ) : (
-                      <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500 mt-0.5 flex-shrink-0" />
+                      <CheckCircle2 className="h-3.5 w-3.5 text-[#34FF8C] mt-0.5 flex-shrink-0" />
                     )}
                     {f}
                   </li>
@@ -236,7 +236,7 @@ export default function BillingPage() {
                 <button
                   onClick={() => handleUpgrade(p.id)}
                   disabled={processingPlan === p.id}
-                  className="w-full bg-emerald-500 hover:bg-emerald-400 text-black text-sm font-semibold py-2.5 rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50"
+                  className="w-full bg-[#00F0FF] hover:bg-[#34FF8C] text-[#003338] text-[11px] font-headline tracking-widest font-bold py-4 uppercase transition-all hover:shadow-[0_0_20px_rgba(52,255,140,0.3)] disabled:opacity-50 flex justify-center items-center gap-2"
                 >
                   {processingPlan === p.id && <Loader2 className="h-4 w-4 animate-spin" />}
                   {processingPlan === p.id ? "Processing..." : p.cta}
@@ -244,19 +244,19 @@ export default function BillingPage() {
               ) : p.id === "enterprise" ? (
                 <a
                   href="mailto:support@backport.dev"
-                  className="w-full border border-zinc-700 hover:border-zinc-500 text-white text-sm font-medium py-2.5 rounded-xl text-center transition-colors block"
+                  className="w-full border border-[#3b494b] hover:border-[#00F0FF] text-[#b9cacb] hover:text-[#00F0FF] text-[11px] font-headline tracking-widest font-bold py-4 text-center transition-all block uppercase"
                 >
                   {p.cta}
                 </a>
               ) : isCurrent ? (
-                <div className="w-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium py-2.5 rounded-xl text-center">
+                <div className="w-full bg-[#00F0FF]/10 border border-[#00F0FF]/30 text-[#00F0FF] text-[11px] font-headline tracking-widest font-bold py-4 text-center uppercase">
                   ✓ Active Plan
                 </div>
               ) : (
                 <button
                   onClick={() => handleUpgrade(p.id)}
                   disabled={processingPlan === p.id}
-                  className="w-full border border-zinc-700 flex justify-center items-center gap-2 hover:border-zinc-500 text-white text-sm font-medium py-2.5 rounded-xl transition-colors disabled:opacity-50"
+                  className="w-full border border-[#3b494b] hover:border-[#00F0FF] text-[#b9cacb] hover:text-[#00F0FF] hover:shadow-[0_0_15px_rgba(0,240,255,0.15)] text-[11px] font-headline tracking-widest font-bold py-4 text-center transition-all uppercase flex justify-center items-center gap-2 disabled:opacity-50"
                 >
                   {processingPlan === p.id && <Loader2 className="h-4 w-4 animate-spin" />}
                   {processingPlan === p.id ? "Processing..." : p.cta}

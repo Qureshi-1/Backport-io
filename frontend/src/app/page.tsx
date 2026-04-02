@@ -411,126 +411,91 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 overflow-hidden bg-[#0e0e0e]">
-      <div className="absolute inset-0 bg-cyber-grid opacity-60" />
-      <div className="absolute inset-0 scanline-bg opacity-25 pointer-events-none" />
-      <div className="absolute top-1/4 left-1/3 w-96 h-96 bg-[#00F0FF]/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-64 h-64 bg-[#34FF8C]/5 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute inset-0 z-0 opacity-70">
+        <HeroScene />
+      </div>
+      <div className="absolute inset-0 bg-cyber-grid opacity-60 z-0 pointer-events-none" />
+      <div className="absolute inset-0 scanline-bg opacity-30 z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] via-[#0e0e0e]/80 to-transparent z-0 pointer-events-none" />
 
-      <div className="mx-auto max-w-7xl px-6 relative z-10 w-full">
-        <div className="grid lg:grid-cols-12 gap-12 items-center">
-          <div className="lg:col-span-7 flex flex-col space-y-8">
-            <div className="space-y-2">
-              <motion.span
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="font-headline text-[10px] uppercase tracking-[0.3rem] text-[#34FF8C] font-bold block"
-              >
-                SYSTEM_STATUS: OPTIMIZED // V4.0.2-STABLE
-              </motion.span>
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-none text-[#e2e2e2]"
-              >
-                Shield your{" "}
-                <br />
-                <span className="text-[#00F0FF] text-glow-cyan inline-block min-w-[200px]">
-                  <TypewriterText />
-                </span>
-                <br />
-                in 30 seconds
-              </motion.h1>
-            </div>
-
-            <motion.p
+      <div className="mx-auto max-w-7xl px-6 relative z-10 w-full flex">
+        <div className="max-w-2xl flex flex-col space-y-8 bg-[#0e0e0e]/50 p-8 md:p-12 rounded-[2rem] backdrop-blur-md border border-[#3b494b]/30 shadow-[0_0_50px_rgba(0,240,255,0.05)] mt-12 lg:mt-0">
+          <div className="space-y-2">
+            <motion.span
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="font-headline text-[10px] uppercase tracking-[0.3rem] text-[#34FF8C] font-bold block"
+            >
+              SYSTEM_STATUS: OPTIMIZED // V4.0.2-STABLE
+            </motion.span>
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className="font-body text-[#b9cacb] max-w-lg text-lg leading-relaxed"
+              transition={{ delay: 0.1 }}
+              className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-none text-[#e2e2e2]"
             >
-              Zero-config API Gateway: Rate limiting, Caching, WAF, and Idempotency.
-              Deploy at the edge and scale to infinity. No code changes required.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="flex flex-col sm:flex-row gap-5 items-start sm:items-center"
-            >
-              {/* Primary CTA — V7 rectangular */}
-              <Link
-                href={isLogged ? "/dashboard" : "/auth/signup"}
-                className="group inline-flex items-center gap-2 bg-[#00F0FF] text-[#003338] px-10 py-4 font-headline font-extrabold uppercase tracking-widest text-base hover:bg-[#34FF8C] transition-all duration-300 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(52,255,140,0.4)] active:scale-95"
-              >
-                {isLogged ? "Go to Dashboard" : "Start for Free"}
-                <ArrowRight suppressHydrationWarning className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-              </Link>
-
-              {/* Terminal install box */}
-              <div className="bg-[#0a0a0a] border border-[#3b494b]/30 p-3 font-mono text-sm group cursor-pointer hover:border-[#00F0FF]/30 transition-colors">
-                <div className="flex items-center space-x-3 mb-2">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-[#ffb4ab]/60" />
-                    <div className="w-2 h-2 bg-[#34FF8C]/60" />
-                    <div className="w-2 h-2 bg-[#00F0FF]/60" />
-                  </div>
-                  <span className="text-[#849495] text-[10px] uppercase tracking-widest">terminal_session</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <code className="text-[#00dbe9]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
-                  <button 
-                    onClick={() => navigator.clipboard.writeText("curl -sSL https://backport-io.vercel.app/install.sh | bash")}
-                    className="ml-3 text-zinc-500 hover:text-white transition-colors p-1"
-                    title="Copy"
-                  >
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                  </button>
-                  <span className="inline-block w-2 h-4 bg-[#00F0FF] ml-1 animate-pulse" />
-                </div>
-              </div>
-            </motion.div>
-
-            {/* Trust strip */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap gap-3"
-            >
-              <HeroStarButton />
-              <span className="flex items-center border border-[#34FF8C]/20 bg-[#34FF8C]/5 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#34FF8C]">
-                ⭐ MIT Licensed • Open Source
+              Shield your{" "}
+              <br />
+              <span className="text-[#00F0FF] text-glow-cyan inline-block min-w-[200px]">
+                <TypewriterText />
               </span>
-              <button
-                onClick={() => { document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth' }); onDemo(); }}
-                className="flex items-center gap-1.5 border border-[#849495]/20 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#849495] hover:text-[#00F0FF] hover:border-[#00F0FF]/30 transition-colors"
-              >
-                <TerminalSquare suppressHydrationWarning className="h-3 w-3" /> Watch Demo
-              </button>
-            </motion.div>
+              <br />
+              in 30 seconds
+            </motion.h1>
           </div>
 
-          {/* Right — 3D Interactive Scene */}
-          <div className="lg:col-span-5 relative hidden lg:block h-[560px]">
-            {/* Glow backdrop */}
-            <div className="absolute inset-0 bg-[#00F0FF]/3 blur-[120px] rounded-full pointer-events-none" />
-            {/* R3F Canvas */}
-            <HeroScene />
-            {/* Overlay metric tags */}
-            <div className="absolute top-8 right-4 bg-[#0a0a0a]/90 border border-[#00F0FF]/20 backdrop-blur-sm px-4 py-2 z-10">
-              <div className="text-[9px] font-headline uppercase tracking-[0.25rem] text-[#00F0FF]/60">NODE_01</div>
-              <div className="text-[11px] font-headline font-bold text-[#00F0FF]">LATENCY: 12ms</div>
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="font-body text-[#b9cacb] max-w-lg text-lg leading-relaxed"
+          >
+            Zero-config API Gateway: Rate limiting, Caching, WAF, and Idempotency.
+            Deploy at the edge and scale to infinity. No code changes required.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="flex flex-col sm:flex-row gap-5 items-start sm:items-center"
+          >
+            {/* Primary CTA — V7 rectangular */}
+            <Link
+              href={isLogged ? "/dashboard" : "/auth/signup"}
+              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#00F0FF] text-[#003338] px-10 py-4 font-headline font-extrabold uppercase tracking-widest text-base hover:bg-[#34FF8C] transition-all duration-300 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(52,255,140,0.4)] active:scale-95"
+            >
+              {isLogged ? "Dashboard" : "Start for Free"}
+              <ArrowRight suppressHydrationWarning className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            </Link>
+
+            {/* Terminal install box */}
+            <div className="w-full sm:w-auto bg-[#0a0a0a]/80 border border-[#3b494b]/30 p-4 font-mono text-xs group cursor-pointer hover:border-[#00F0FF]/30 transition-colors">
+              <div className="flex items-center gap-2">
+                <code className="text-[#00dbe9]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
+                <button 
+                  onClick={() => navigator.clipboard.writeText("curl -sSL https://backport-io.vercel.app/install.sh | bash")}
+                  className="ml-3 text-[#3b494b] hover:text-white transition-colors"
+                  title="Copy"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                </button>
+              </div>
             </div>
-            <div className="absolute bottom-16 left-2 bg-[#0a0a0a]/90 border border-[#34FF8C]/20 backdrop-blur-sm px-4 py-2 z-10">
-              <div className="text-[9px] font-headline uppercase tracking-[0.25rem] text-[#34FF8C]/60">UPTIME</div>
-              <div className="text-[11px] font-headline font-bold text-[#34FF8C]">99.99%</div>
-            </div>
-            <div className="absolute bottom-4 right-0 z-10">
-              <LiveMetricsCard />
-            </div>
-          </div>
+          </motion.div>
+
+          {/* Trust strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex flex-wrap gap-3 pt-2"
+          >
+            <HeroStarButton />
+            <span className="flex items-center border border-[#34FF8C]/20 bg-[#34FF8C]/5 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#34FF8C]">
+              ⭐ MIT Licensed • Open Source
+            </span>
+          </motion.div>
         </div>
 
         {/* Stats bar */}

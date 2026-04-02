@@ -39,7 +39,7 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
     if req.plan_id not in ["plus", "pro"]:
         raise HTTPException(status_code=400, detail="Invalid plan selected")
 
-    base_amount = 1500 if req.plan_id == "plus" else 3900 # INR 1500 or 3900
+    base_amount = 18 if req.plan_id == "plus" else 39 # USD 18 or 39
     
     # If user was referred, give 60% discount (Pay only 40%)
     final_amount = base_amount
@@ -54,7 +54,7 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
         try:
             order_data = {
                 "amount": amount_paise,
-                "currency": "INR",
+                "currency": "USD",
                 "receipt": f"rcpt_{user.id}",
                 "notes": {
                     "user_id": str(user.id),
@@ -77,7 +77,7 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
     return {
         "order_id": f"mock_{secrets.token_hex(6)}",
         "amount": amount_paise,
-        "currency": "INR",
+        "currency": "USD",
         "key_id": RAZORPAY_KEY_ID or "mock_key",
         "mock": True,
         "discount_applied": is_discounted,

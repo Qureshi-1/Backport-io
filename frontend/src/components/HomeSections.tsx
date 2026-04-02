@@ -38,7 +38,7 @@ export const Pricing = () => {
     },
     {
       name: "CLOUD PRO",
-      sub: isYearly ? "Billed $468/yr · Save $117" : "Billed monthly",
+      sub: isYearly ? "Billed $468/yr" : "Billed monthly",
       price: isYearly ? "$39" : "$49",
       period: "/mo",
       desc: "For teams shipping at scale.",
