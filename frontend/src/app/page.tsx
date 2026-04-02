@@ -419,13 +419,14 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
       <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] via-[#0e0e0e]/80 to-transparent z-0 pointer-events-none" />
 
       <div className="mx-auto max-w-7xl px-6 relative z-10 w-full flex">
-        <div className="max-w-2xl flex flex-col space-y-8 bg-[#0e0e0e]/50 p-8 md:p-12 rounded-[2rem] backdrop-blur-md border border-[#3b494b]/30 shadow-[0_0_50px_rgba(0,240,255,0.05)] mt-12 lg:mt-0">
+        <div className="max-w-2xl flex flex-col space-y-8 bg-transparent p-0 md:p-0 rounded-none border-none shadow-none mt-12 lg:mt-0">
           <div className="space-y-2">
             <motion.span
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-headline text-[10px] uppercase tracking-[0.3rem] text-[#34FF8C] font-bold block"
+              className="font-headline text-[11px] uppercase tracking-[0.4rem] text-[#34FF8C] font-bold block mb-4"
             >
+              <span className="inline-block w-2 h-2 bg-[#34FF8C] animate-pulse mr-2 rounded-full" />
               SYSTEM_STATUS: OPTIMIZED // V4.0.2-STABLE
             </motion.span>
             <motion.h1

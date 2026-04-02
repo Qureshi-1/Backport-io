@@ -189,11 +189,13 @@ export default function BillingPage() {
           return (
             <div
               key={p.id}
-              className={`relative flex flex-col rounded-none border p-8 transition-all
-                ${isCurrent ? "border-[#00F0FF] shadow-[0_0_30px_rgba(0,240,255,0.15)]" : "border-[#3b494b]/50"}
-                ${p.highlight ? "bg-[#0e0e0e]/90" : "bg-[#111111]"}
+              className={`relative flex flex-col rounded-none border p-8 transition-all group overflow-hidden
+                ${isCurrent ? "border-[#00F0FF] bg-[#111111]/80 backdrop-blur-md shadow-[0_0_30px_rgba(0,240,255,0.15)]" : "border-[#3b494b]/30 bg-[#0e0e0e] hover:border-[#00F0FF]/40"}
               `}
             >
+              {isCurrent && (
+                <div className="absolute -right-20 -top-20 w-40 h-40 bg-[#00F0FF] rounded-full opacity-10 blur-3xl" />
+              )}
               {/* Badge */}
               {p.badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00F0FF] text-[#003338] font-headline text-[10px] font-bold px-3 py-1 uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.4)]">

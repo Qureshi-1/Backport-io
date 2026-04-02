@@ -128,16 +128,21 @@ export const Pricing = () => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
-              className={`relative flex flex-col p-10 ${
-                plan.hot ? "bg-[#111111]" : "bg-[#0e0e0e]"
-              }`}
+              className={`relative flex flex-col p-10 border border-[#3b494b]/20 hover:border-[#00F0FF]/40 transition-all group overflow-hidden ${
+                plan.hot ? "bg-[#111111]/90" : "bg-[#0e0e0e]/80"
+              } backdrop-blur-md`}
             >
+              {/* Subtle background glow */}
+              <div 
+                className="absolute -right-20 -top-20 w-40 h-40 rounded-full opacity-0 group-hover:opacity-10 transition-opacity blur-3xl"
+                style={{ backgroundColor: plan.accent }}
+              />
               {plan.hot && (
                 <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#34FF8C] shadow-[0_0_10px_#34FF8C]" />
               )}
               <div className="mb-8">
                 <div
-                  className="text-[10px] font-headline uppercase tracking-[0.3rem] mb-1"
+                  className="text-[10px] font-headline uppercase tracking-[0.3rem] mb-1 drop-shadow-[0_0_8px_rgba(0,240,255,0.4)]"
                   style={{ color: plan.accent }}
                 >
                   {plan.name}
@@ -147,7 +152,7 @@ export const Pricing = () => {
                 </div>
               </div>
               <div className="mb-8">
-                <span className="font-headline text-5xl font-bold text-white">
+                <span className="font-headline text-5xl font-bold text-white tracking-tighter">
                   {plan.price}
                 </span>
                 <span className="font-headline text-sm text-[#849495] ml-1">
@@ -171,13 +176,16 @@ export const Pricing = () => {
               </ul>
               <Link
                 href={plan.href}
-                className={`block w-full py-4 text-center font-headline text-[11px] uppercase tracking-[0.2rem] font-bold transition-all ${
+                className={`block w-full py-5 text-center font-headline text-[11px] uppercase tracking-[0.3rem] font-bold transition-all relative overflow-hidden group/btn ${
                   plan.hot
-                    ? "bg-[#34FF8C] text-[#0e0e0e] hover:bg-[#00F0FF]"
-                    : "border border-[#3b494b]/30 text-[#e2e2e2] hover:border-[#00F0FF]/40 hover:text-[#00F0FF]"
+                    ? "bg-[#34FF8C] text-[#0e0e0e] hover:bg-[#00F0FF] shadow-[0_0_20px_rgba(52,255,140,0.3)]"
+                    : "border border-[#3b494b]/40 text-[#e2e2e2] hover:border-[#00F0FF] hover:text-[#00F0FF] hover:shadow-[0_0_15px_rgba(0,240,255,0.1)]"
                 }`}
               >
-                {plan.cta}
+                <span className="relative z-10">{plan.cta}</span>
+                {plan.hot && (
+                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-700" />
+                )}
               </Link>
             </motion.div>
           ))}
