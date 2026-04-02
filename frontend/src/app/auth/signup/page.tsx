@@ -4,21 +4,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { fetchApi } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import toast from "react-hot-toast";
-import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import SignupCard from "@/components/SignupCard";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-
-const HeroScene = dynamic(() => import("@/components/HeroScene"), {
-  ssr: false,
-  loading: () => null,
-});
-
-const LiveMetricsCard = dynamic(() => import("@/components/HomeSections").then(mod => mod.LiveMetricsCard), {
-  ssr: false,
-  loading: () => null,
-});
 
 function SignupContent() {
   const router = useRouter();
@@ -65,14 +54,11 @@ function SignupContent() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0e0e0e] text-[#f3f7f7] selection:bg-[#34FF8C] selection:text-[#003338] relative overflow-hidden">
-      {/* Background Ambience */}
-      <div className="fixed inset-0 z-0 opacity-40">
-        <HeroScene />
-      </div>
-      <div className="fixed inset-0 bg-cyber-grid opacity-30 z-0 pointer-events-none" />
-      <div className="fixed inset-0 scanline-bg opacity-10 z-0 pointer-events-none" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_90%,rgba(52,255,140,0.08),transparent_48%),radial-gradient(circle_at_80%_10%,rgba(0,240,255,0.06),transparent_42%)] z-0 pointer-events-none" />
+    <main className="min-h-screen bg-[#080C10] text-[#f3f7f7] selection:bg-[#2CE8C3] selection:text-black relative overflow-hidden">
+      {/* Zen-Pro Background Elements */}
+      <div className="fixed inset-0 bg-dot-grid opacity-[0.2] z-0 pointer-events-none" />
+      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-radial-blue opacity-20 z-0 pointer-events-none" />
+      <div className="fixed bottom-0 left-0 w-[500px] h-[500px] bg-radial-mint opacity-10 z-0 pointer-events-none" />
 
       <Header />
 
@@ -87,22 +73,30 @@ function SignupContent() {
             className="hidden lg:flex flex-col space-y-10"
           >
             <div className="space-y-6">
-              <span className="inline-flex items-center gap-3 px-4 py-2 bg-[#111111]/90 backdrop-blur-xl border border-[#34FF8C]/30 text-[#34FF8C] text-[10px] font-headline tracking-[0.4em] font-black uppercase shadow-[0_0_30px_rgba(52,255,140,0.12)]">
-                <div className="h-2 w-2 rounded-full bg-[#34FF8C] animate-pulse" />
-                NEW_NODE_INITIALIZATION
+              <span className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-[#2CE8C3] text-[10px] font-headline tracking-[0.4em] font-black uppercase rounded-full shadow-2xl shadow-[#2CE8C3]/10">
+                <div className="h-2 w-2 rounded-full bg-[#2CE8C3] animate-pulse" />
+                Initialization_Sequence
               </span>
               <h1 className="font-headline text-7xl font-black tracking-tight leading-[0.85] text-white">
-                Initialize your <br />
-                <span className="text-[#34FF8C] text-glow-green drop-shadow-[0_0_40px_rgba(52,255,140,0.4)]">Security Rails</span>
+                Deploy your final <br />
+                <span className="text-[#2CE8C3] text-glow-mint">Security Rails.</span>
               </h1>
-              <p className="font-body text-[#b9cacb] max-w-md text-lg leading-relaxed opacity-80">
-                Join 5.8k+ developers globally using Backport to protect their APIs at the speed of light. Zero-config deployment in minutes.
+              <p className="font-body text-[#A2BDDB] max-w-md text-lg leading-relaxed opacity-80">
+                Join 5.8k+ developers protecting their APIs at the speed of light. Secure your edge clusters with zero-config deployment.
               </p>
             </div>
 
-            {/* Visual Consistency */}
-            <div className="relative grayscale-[0.3] opacity-60 scale-90 -translate-x-12 rotate-[2deg] pointer-events-none translate-y-8">
-              <LiveMetricsCard />
+            {/* Visual Consistency Stats */}
+            <div className="flex gap-12 pt-8">
+               {[
+                 { label: "Requests/sec", val: "42.1k", color: "#6BA9FF" },
+                 { label: "Avg_Latency", val: "14ms", color: "#2CE8C3" }
+               ].map(stat => (
+                 <div key={stat.label} className="space-y-1">
+                    <div className="font-headline text-[10px] uppercase tracking-widest text-zinc-600 font-black">{stat.label}</div>
+                    <div className="text-3xl font-black" style={{ color: stat.color }}>{stat.val}</div>
+                 </div>
+               ))}
             </div>
           </motion.div>
 
@@ -133,7 +127,7 @@ function SignupContent() {
 
 export default function SignupPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0e0e0e]" />}>
+    <Suspense fallback={<div className="min-h-screen bg-[#080C10]" />}>
       <SignupContent />
     </Suspense>
   );
