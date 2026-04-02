@@ -1,6 +1,7 @@
 "use client";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
+import { motion, AnimatePresence } from "framer-motion";
 import { 
   CheckCircle2, Circle, X, Download, Server, Activity, 
   Clock, BarChart3, ShieldAlert, Zap, ArrowUpRight, Globe, ShieldCheck
@@ -40,7 +41,7 @@ export default function DashboardOverview() {
   return (
     <div className="space-y-8 pb-12">
       {/* Header Section */}
-      <div className="flex items-end justify-between bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] relative overflow-hidden group">
+      <div className="flex flex-col md:flex-row items-start md:items-end justify-between bg-white/[0.02] border border-white/5 p-8 rounded-[2rem] relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-radial-mint opacity-10 -z-10 group-hover:opacity-20 transition-opacity" />
         <div className="space-y-2">
            <div className="flex items-center gap-3">
@@ -53,8 +54,8 @@ export default function DashboardOverview() {
            </div>
            <p className="text-[#A2BDDB] text-xs font-semibold uppercase tracking-[0.3em] opacity-60">System Operational // All Clusters Syncing</p>
         </div>
-        <div className="flex gap-4">
-           <div className="bg-black/40 border border-white/5 px-6 py-3 rounded-2xl flex flex-col items-end">
+        <div className="flex gap-4 mt-6 md:mt-0">
+           <div className="bg-black/40 border border-white/5 px-6 py-3 rounded-2xl flex flex-col items-start md:items-end">
               <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Protocol Version</span>
               <span className="text-white font-mono text-sm">v0.4.1_ESTABLISHED</span>
            </div>
@@ -250,5 +251,3 @@ function LogTable({ logs }: { logs: any[] }) {
     </table>
   );
 }
-
-function motion(props: any) { return <div {...props} />; } // Simplified refactoring for speed
