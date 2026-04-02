@@ -429,17 +429,17 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="inline-flex items-center gap-3 border border-[#34FF8C]/20 bg-[#34FF8C]/8 px-4 py-2 font-headline text-[10px] font-bold uppercase tracking-[0.35rem] text-[#34FF8C]"
+                className="inline-flex items-center gap-3 border border-[#34FF8C]/20 bg-[#34FF8C]/10 px-4 py-2 font-headline text-[10px] font-bold uppercase tracking-[0.35rem] text-[#34FF8C] mx-auto lg:mx-0"
               >
                 <div className="h-2 w-2 rounded-full bg-[#34FF8C] pulse-glow" />
-                System status: optimized // v4.1.0-stable
+                SYSTEM_STATUS: NOMINAL // CORE_SYNC_OK
               </motion.div>
               
               <motion.h1
                 initial={{ opacity: 0, y: 40 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-                className="font-headline text-5xl font-bold leading-[0.9] tracking-[-0.06em] text-[#f3f7f7] sm:text-7xl lg:text-[7.2rem]"
+                className="font-headline text-[3rem] sm:text-[4.5rem] lg:text-[7.2rem] font-black leading-[0.9] tracking-[-0.06em] text-[#f3f7f7] text-center lg:text-left"
               >
                 Turn every{" "}
                 <span className="text-[#00F0FF] text-glow-cyan">
@@ -459,7 +459,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="max-w-2xl font-body text-lg leading-relaxed text-[#b9cacb] sm:text-xl"
+              className="max-w-2xl font-body text-base sm:text-xl leading-relaxed text-[#b9cacb] text-center lg:text-left mx-auto lg:mx-0 opacity-80"
             >
               Backport turns rate limiting, cache orchestration, WAF filtering, and
               idempotency into one cinematic edge control plane. Point traffic at the
@@ -559,12 +559,12 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
 
         {/* Right Layer — Live Telemetry Panel */}
         <motion.div
-            initial={{ opacity: 0, scale: 0.9, x: 80 }}
+            initial={{ opacity: 0, scale: 0.9, x: 40 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            className="hidden lg:block w-full lg:w-[480px] perspective-2000"
+            className="w-full lg:w-[480px] perspective-2000 scale-75 sm:scale-90 lg:scale-100"
           >
-            <div className="absolute -inset-32 bg-[#00F0FF]/15 blur-[140px] rounded-full pointer-events-none opacity-40 animate-pulse" />
+            <div className="absolute -inset-32 bg-[#00F0FF]/10 blur-[130px] rounded-full pointer-events-none opacity-30 animate-pulse" />
             <div className="relative transform-gpu transition-all duration-700 hover:rotate-y-[-8deg] hover:rotate-x-[4deg]">
               <LiveMetricsCard />
             </div>

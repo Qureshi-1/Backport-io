@@ -130,10 +130,10 @@ export default function Header({ onDemo }: { onDemo?: () => void }) {
                   <Link
                     href={item.href}
                     onClick={() => setMobileMenuOpen(false)}
-                    className="font-headline uppercase text-5xl font-black tracking-tighter text-white hover:text-[#00F0FF] transition-colors py-4 flex items-center justify-between"
+                    className="font-headline uppercase text-4xl font-black tracking-tighter text-zinc-400 hover:text-[#00F0FF] transition-colors py-6 flex items-center justify-between border-b border-white/5"
                   >
                     {item.label}
-                    <Terminal className="w-8 h-8 opacity-20" />
+                    <Terminal className="w-6 h-6 opacity-40" />
                   </Link>
                 </motion.div>
               ))}
