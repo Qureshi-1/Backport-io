@@ -357,14 +357,14 @@ export default function SDKPage() {
           {/* Code */}
           <div className="relative">
             <button
-              onClick={() => copyToClipboard(sdks[selectedLang as keyof typeof sdks][activeTab as keyof typeof sdks[string]])}
+              onClick={() => copyToClipboard(sdks[selectedLang as keyof typeof sdks][activeTab as "basic" | "advance"])}
               className="absolute top-4 right-4 p-2 rounded-lg bg-zinc-800 text-zinc-400 hover:text-white transition-colors z-10"
             >
               {copied ? <CheckCircle2 className="w-5 h-5 text-emerald-400" /> : <Copy className="w-5 h-5" />}
             </button>
             <pre className="p-6 overflow-x-auto">
               <code className="text-sm text-zinc-300 font-mono whitespace-pre">
-                {sdks[selectedLang as keyof typeof sdks][activeTab as keyof typeof sdks[string]]}
+                {sdks[selectedLang as keyof typeof sdks][activeTab as "basic" | "advance"]}
               </code>
             </pre>
           </div>
