@@ -410,111 +410,196 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
   useEffect(() => { setIsLogged(auth.isLoggedIn()); }, []);
 
   return (
-    <section className="relative min-h-screen flex flex-col justify-center pt-24 pb-16 overflow-hidden bg-[#0e0e0e]">
-      <div className="absolute inset-0 z-0 opacity-70">
+    <section className="relative min-h-screen overflow-hidden bg-[#0e0e0e] pt-28 pb-16">
+      <div className="absolute inset-0 z-0 opacity-80">
         <HeroScene />
       </div>
       <div className="absolute inset-0 bg-cyber-grid opacity-60 z-0 pointer-events-none" />
       <div className="absolute inset-0 scanline-bg opacity-30 z-0 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0e0e0e] via-[#0e0e0e]/80 to-transparent z-0 pointer-events-none" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(0,240,255,0.18),transparent_32%),radial-gradient(circle_at_80%_20%,rgba(52,255,140,0.16),transparent_26%),linear-gradient(90deg,rgba(14,14,14,0.98)_0%,rgba(14,14,14,0.82)_48%,rgba(14,14,14,0.58)_100%)] z-0 pointer-events-none" />
 
-      <div className="mx-auto max-w-7xl px-6 relative z-10 w-full flex">
-        <div className="max-w-2xl flex flex-col space-y-8 bg-transparent p-0 md:p-0 rounded-none border-none shadow-none mt-12 lg:mt-0">
-          <div className="space-y-2">
-            <motion.span
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-headline text-[11px] uppercase tracking-[0.4rem] text-[#34FF8C] font-bold block mb-4"
-            >
-              <span className="inline-block w-2 h-2 bg-[#34FF8C] animate-pulse mr-2 rounded-full" />
-              SYSTEM_STATUS: OPTIMIZED // V4.0.2-STABLE
-            </motion.span>
-            <motion.h1
+      <div className="relative z-10 mx-auto max-w-7xl px-6 lg:px-8">
+        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,0.92fr)] lg:gap-12">
+          
+          <div className="relative overflow-hidden border border-[#3b494b]/20 bg-[#0a0a0a]/82 p-8 shadow-[0_24px_120px_rgba(0,0,0,0.45)] backdrop-blur-xl sm:p-10 lg:p-12">
+            <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#00F0FF]/80 to-transparent" />
+            <div className="absolute -left-16 top-16 h-40 w-40 rounded-full bg-[#00F0FF]/10 blur-3xl" />
+            <div className="absolute bottom-10 right-0 h-32 w-32 rounded-full bg-[#34FF8C]/10 blur-3xl" />
+
+            <div className="relative flex flex-col gap-8">
+            <div className="space-y-5">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="inline-flex items-center gap-3 border border-[#34FF8C]/20 bg-[#34FF8C]/8 px-4 py-2 font-headline text-[10px] font-bold uppercase tracking-[0.35rem] text-[#34FF8C]"
+              >
+                <div className="h-2 w-2 rounded-full bg-[#34FF8C] pulse-glow" />
+                System status: optimized // v4.1.0-stable
+              </motion.div>
+              
+              <motion.h1
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+                className="font-headline text-5xl font-bold leading-[0.94] tracking-[-0.06em] text-[#f3f7f7] sm:text-6xl lg:text-[6.4rem]"
+              >
+                Turn every{" "}
+                <span className="text-[#00F0FF] text-glow-cyan">
+                  API edge
+                </span>
+                <br />
+                into a live{" "}
+                <span className="inline-block min-w-[210px] text-[#34FF8C] text-glow-green">
+                  <TypewriterText />
+                </span>
+                <br />
+                shield in 30 seconds
+              </motion.h1>
+            </div>
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-              className="font-headline text-5xl md:text-7xl lg:text-8xl font-bold tracking-tighter leading-none text-[#e2e2e2]"
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="max-w-2xl font-body text-lg leading-relaxed text-[#b9cacb] sm:text-xl"
             >
-              Shield your{" "}
-              <br />
-              <span className="text-[#00F0FF] text-glow-cyan inline-block min-w-[200px]">
-                <TypewriterText />
-              </span>
-              <br />
-              in 30 seconds
-            </motion.h1>
+              Backport turns rate limiting, cache orchestration, WAF filtering, and
+              idempotency into one cinematic edge control plane. Point traffic at the
+              gateway, ship policies live, and keep product velocity high without
+              slowing the stack.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.28, duration: 0.8 }}
+              className="grid gap-4 border border-white/10 bg-white/[0.03] p-4 sm:p-5 md:grid-cols-[minmax(0,1fr)_auto]"
+            >
+              <div className="min-w-0 space-y-2">
+                <div className="flex items-center gap-2 font-headline text-[10px] uppercase tracking-[0.28rem] text-[#849495]">
+                  <TerminalSquare suppressHydrationWarning className="h-3.5 w-3.5 text-[#00F0FF]" />
+                  One-command edge deploy
+                </div>
+                <code className="block overflow-x-auto whitespace-nowrap font-mono text-sm text-[#00F0FF] sm:text-[15px]">
+                  {HERO_COMMAND}
+                </code>
+                <p className="font-body text-sm text-[#849495]">
+                  No SDK. No middleware swap. No rewrite sprint before launch.
+                </p>
+              </div>
+
+              <button
+                onClick={() => navigator.clipboard.writeText(HERO_COMMAND)}
+                className="inline-flex h-12 items-center justify-center gap-2 border border-[#00F0FF]/25 bg-[#00F0FF]/8 px-5 font-headline text-[10px] uppercase tracking-[0.28rem] text-[#dffeff] transition-colors hover:border-[#00F0FF]/50 hover:bg-[#00F0FF]/14"
+                title="Copy install command"
+              >
+                Copy
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+              </button>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="flex flex-col gap-4 sm:flex-row"
+            >
+              <Link
+                href={isLogged ? "/dashboard" : "/auth/signup"}
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#00F0FF] text-[#003338] px-14 py-6 font-headline font-black uppercase tracking-[0.25em] text-xl transition-all duration-500 shadow-[0_0_50px_rgba(0,240,255,0.5)] hover:bg-[#34FF8C] hover:shadow-[0_0_60px_rgba(52,255,140,0.7)] hover:-translate-y-1 active:scale-95"
+              >
+                {isLogged ? "DASHBOARD" : "GET STARTED"}
+                <ArrowRight suppressHydrationWarning className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+              </Link>
+
+              {/* Install Script — Award Winning Interaction */}
+              <div 
+                onClick={() => {
+                  navigator.clipboard.writeText("curl -sSL https://backport-io.vercel.app/install.sh | bash");
+                  const el = document.getElementById('copy-hint');
+                  if (el) el.innerText = 'COPIED TO CLIPBOARD';
+                  setTimeout(() => { if (el) el.innerText = 'CLICK TO COPY INSTALL SCRIPT'; }, 2000);
+                }}
+                className="w-full sm:w-auto bg-[#0a0a0a]/95 backdrop-blur-3xl border border-white/10 px-8 py-5 font-mono text-xs group cursor-pointer hover:border-[#00F0FF]/60 transition-all relative overflow-hidden monolith-card shadow-2xl"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#00F0FF]/80 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 opacity-20" />
+                <div className="flex flex-col gap-2 relative z-10">
+                  <span id="copy-hint" className="text-[8px] text-[#00F0FF] tracking-[0.4em] font-black uppercase opacity-70 group-hover:opacity-100 transition-opacity">CLICK TO COPY INSTALL SCRIPT</span>
+                  <div className="flex items-center gap-4">
+                    <span className="text-[#34FF8C] font-black animate-pulse">$</span>
+                    <code className="text-white font-medium opacity-100">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Verification Strip */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              className="flex items-center gap-6 pt-6"
+            >
+              <HeroStarButton />
+              <div className="h-px w-10 bg-white/10" />
+              <div className="flex items-center gap-3">
+                <div className="flex -space-x-3">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} className="h-8 w-8 rounded-full border-2 border-[#0e0e0e] bg-zinc-900 border-zinc-800 flex items-center justify-center text-[8px] font-black text-white overflow-hidden shadow-xl">
+                      <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=${i+10}`} alt="User" className="w-full h-full object-cover" />
+                    </div>
+                  ))}
+                </div>
+                <span className="text-[10px] font-headline uppercase tracking-[0.3em] text-zinc-500 font-black">ACTIVE ON 5.8K+ ENDPOINTS</span>
+              </div>
+            </motion.div>
           </div>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="font-body text-[#b9cacb] max-w-lg text-lg leading-relaxed"
-          >
-            Zero-config API Gateway: Rate limiting, Caching, WAF, and Idempotency.
-            Deploy at the edge and scale to infinity. No code changes required.
-          </motion.p>
-
+          {/* Right Layer — Live Telemetry Panel */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-5 items-start sm:items-center"
+            initial={{ opacity: 0, scale: 0.9, x: 80 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ delay: 0.4, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+            className="hidden lg:block w-full lg:w-[480px] perspective-2000"
           >
-            {/* Primary CTA — V7 rectangular */}
-            <Link
-              href={isLogged ? "/dashboard" : "/auth/signup"}
-              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#00F0FF] text-[#003338] px-10 py-4 font-headline font-extrabold uppercase tracking-widest text-base hover:bg-[#34FF8C] transition-all duration-300 shadow-[0_0_30px_rgba(0,240,255,0.3)] hover:shadow-[0_0_40px_rgba(52,255,140,0.4)] active:scale-95"
-            >
-              {isLogged ? "Dashboard" : "Start for Free"}
-              <ArrowRight suppressHydrationWarning className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-
-            {/* Terminal install box */}
-            <div className="w-full sm:w-auto bg-[#0a0a0a]/80 border border-[#3b494b]/30 p-4 font-mono text-xs group cursor-pointer hover:border-[#00F0FF]/30 transition-colors">
-              <div className="flex items-center gap-2">
-                <code className="text-[#00dbe9]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
-                <button 
-                  onClick={() => navigator.clipboard.writeText("curl -sSL https://backport-io.vercel.app/install.sh | bash")}
-                  className="ml-3 text-[#3b494b] hover:text-white transition-colors"
-                  title="Copy"
-                >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                </button>
-              </div>
+            <div className="absolute -inset-32 bg-[#00F0FF]/15 blur-[140px] rounded-full pointer-events-none opacity-40 animate-pulse" />
+            <div className="relative transform-gpu transition-all duration-700 hover:rotate-y-[-8deg] hover:rotate-x-[4deg]">
+              <LiveMetricsCard />
             </div>
-          </motion.div>
-
-          {/* Trust strip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-wrap gap-3 pt-2"
-          >
-            <HeroStarButton />
-            <span className="flex items-center border border-[#34FF8C]/20 bg-[#34FF8C]/5 px-3 py-1.5 font-headline uppercase text-[10px] tracking-widest text-[#34FF8C]">
-              ⭐ MIT Licensed • Open Source
-            </span>
-          </motion.div>
+            
+            {/* Tech Specs */}
+            <div className="absolute -bottom-12 left-0 font-mono text-[10px] text-zinc-600 tracking-[0.6em] uppercase flex flex-col gap-1 pointer-events-none">
+              <span>LATENCY_SYNC: OK (0.2MS)</span>
+              <span>WAF_CORE: ARMED_V4</span>
+            </div>
+          </div>
         </div>
 
-        {/* Stats bar */}
+        {/* Global Infrastructure Display */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.7 }}
-          className="w-full mt-24 border-y border-[#3b494b]/15 bg-[#0a0a0a]/50 py-10 grid grid-cols-2 lg:grid-cols-4 gap-8"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 1 }}
+          viewport={{ once: true }}
+          className="w-full mt-36 border border-white/5 bg-gradient-to-r from-white/[0.03] to-transparent backdrop-blur-3xl py-16 px-12 grid grid-cols-2 lg:grid-cols-4 gap-12 relative overflow-hidden monolith-card shadow-2xl"
         >
+          {/* Edge Scanline */}
+          <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-transparent via-[#00F0FF]/60 to-transparent shadow-[0_0_30px_rgba(0,240,255,0.5)] animate-scan-fast" />
+
           {[
-            { value: "100M+", label: "Requests / Day", color: "text-[#00F0FF]" },
-            { value: "50+", label: "Edge Locations", color: "text-[#00F0FF]" },
-            { value: "<1ms", label: "P99 Overhead", color: "text-[#34FF8C]" },
-            { value: "∞", label: "Auto Scaling", color: "text-[#e2e2e2]" },
-          ].map((stat) => (
-            <div key={stat.label} className="space-y-1">
-              <h4 className={`text-3xl font-headline font-bold ${stat.color}`}>{stat.value}</h4>
-              <p className="text-[10px] font-headline uppercase tracking-widest text-[#849495]">{stat.label}</p>
+            { value: "100M+", label: "THROUGHPUT / DAY", color: "text-white" },
+            { value: "50+", label: "GLOBAL EDGE POPS", color: "text-[#00F0FF]" },
+            { value: "<1ms", label: "OVERHEAD LATENCY", color: "text-[#34FF8C]" },
+            { value: "99.9%", label: "UPTIME ACCURACY", color: "text-zinc-600" },
+          ].map((stat, idx) => (
+            <div key={stat.label} className={`space-y-4 ${idx !== 0 ? "lg:border-l lg:border-white/5 lg:pl-12" : ""}`}>
+              <h4 className={`text-6xl md:text-7xl font-headline font-black tracking-tighter ${stat.color} drop-shadow-[0_0_20px_rgba(255,255,255,0.08)]`}>
+                {stat.value}
+              </h4>
+              <p className="text-[10px] font-headline uppercase tracking-[0.5em] text-zinc-500 font-black">{stat.label}</p>
             </div>
           ))}
         </motion.div>
@@ -674,6 +759,7 @@ const HowItWorks = () => {
     </section>
   );
 };
+
 // ─── WAF Live Demo ────────────────────────────────────────────────────────────
 const WAFDemo = () => {
   const [input, setInput] = useState("SELECT * FROM users WHERE id=1");
@@ -778,230 +864,33 @@ const WAFDemo = () => {
               className="w-full bg-[#00F0FF] hover:bg-[#34FF8C] disabled:opacity-50 text-[#003338] font-headline font-bold uppercase tracking-widest py-4 transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.2)]"
             >
               {testing ? (
-                <><span className="h-4 w-4 border-2 border-[#003338]/30 border-t-[#003338] rounded-full animate-spin" /> Analyzing_</>
+                <>Scanning System... <div className="h-3 w-3 border-2 border-[#003338] border-t-transparent animate-spin rounded-full" /></>
               ) : (
-                <><Shield className="h-4 w-4" /> Analyze with WAF</>
+                <>Run Security Check <ArrowRight className="w-4 h-4" /></>
               )}
             </button>
 
-            {/* Result */}
-            {result && (
-              <div
-                className={`waf-result-anim border p-5 font-mono text-sm bg-[#0e0e0e] ${
-                  result.blocked
-                    ? "border-[#ff4444]/40 text-[#ff4444]"
-                    : "border-[#34FF8C]/40 text-[#34FF8C]"
-                }`}
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  {result.blocked ? (
-                    <XCircle className="h-4 w-4 flex-shrink-0" />
-                  ) : (
-                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-                  )}
-                  <span className="font-bold">HTTP {result.code} — {result.blocked ? "BLOCKED" : "ALLOWED"}</span>
-                </div>
-                <p className="text-xs opacity-80 ml-6">{result.reason}</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-
-// Pricing is imported from HomeSections
-// (Footer is imported from @/components/Footer)
-
-// ─── Floating Badge ───────────────────────────────────────────────────────────
-const Badge = () => null;
-
-// ─── Competitor Compare ───────────────────────────────────────────────────────
-// ─── Competitor Compare ───────────────────────────────────────────────────────
-const CompetitorCompare = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          animate('.comp-row-anim', {
-            translateX: [-20, 0],
-            opacity: [0, 1],
-            delay: stagger(80),
-            ease: "outExpo",
-            duration: 800
-          });
-          if (sectionRef.current) observer.unobserve(sectionRef.current);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const rows = [
-    {
-      feature: "Setup Time",
-      backport: "30 seconds",
-      kong: "Hours",
-      cloudflare: "Minutes",
-      bpWin: true,
-    },
-    {
-      feature: "Zero Code Changes",
-      backport: "YES",
-      kong: "NO",
-      cloudflare: "NO",
-      bpWin: true,
-    },
-    {
-      feature: "Built-in Idempotency",
-      backport: "YES",
-      kong: "Plugin needed",
-      cloudflare: "NO",
-      bpWin: true,
-    },
-    {
-      feature: "Open Source",
-      backport: "MIT",
-      kong: "Enterprise $",
-      cloudflare: "NO",
-      bpWin: true,
-    },
-    {
-      feature: "Setup Complexity",
-      backport: "Low",
-      kong: "High",
-      cloudflare: "Medium",
-      bpWin: true,
-    },
-    {
-      feature: "Starting Price",
-      backport: "FREE",
-      kong: "$250/month",
-      cloudflare: "$200/month",
-      bpWin: true,
-    },
-  ];
-
-  return (
-    <section ref={sectionRef} className="bg-[#0e0e0e] py-24 border-y border-[#3b494b]/10 relative">
-      <div className="absolute inset-0 scanline-bg opacity-[0.03] pointer-events-none" />
-      <div className="mx-auto max-w-5xl px-6 relative z-10">
-        <div className="mb-14 text-center">
-          <span className="text-[#34FF8C] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">MARKET ANALYSIS</span>
-          <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">
-            Why <span className="text-[#34FF8C]">Backport?</span>
-          </h2>
-          <p className="mt-4 text-[#849495] font-body">Compare with industry alternatives.</p>
-        </div>
-        <div className="overflow-x-auto border border-[#3b494b]/30 bg-[#0a0a0a]">
-          <table className="w-full text-left text-sm text-[#b9cacb]">
-            <thead className="border-b border-[#3b494b]/30 bg-[#1b1b1b]/50 text-[10px] uppercase tracking-widest text-[#849495] font-headline">
-              <tr>
-                <th className="px-6 py-5 font-bold">Feature</th>
-                <th className="px-6 py-5 font-bold text-[#00F0FF]">Backport</th>
-                <th className="px-6 py-5 font-bold">Kong</th>
-                <th className="px-6 py-5 font-bold">Cloudflare</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#3b494b]/10">
-              {rows.map((r, i) => (
-                <tr key={r.feature} className="comp-row-anim opacity-0 transition-colors hover:bg-[#1b1b1b]/30 group">
-                  <td className="whitespace-nowrap px-6 py-5 font-headline text-xs uppercase tracking-wider text-[#e2e2e2]">
-                    {r.feature}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-5 font-bold text-[#34FF8C] text-glow-green">
-                    <div className="flex items-center gap-2">
-                       {r.bpWin && <CheckCircle2 className="h-4 w-4" />} {r.backport}
+            {/* Results */}
+            <AnimatePresence>
+              {result && (
+                <motion.div 
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  className={`waf-result-anim p-5 border-l-4 ${result.blocked ? "bg-rose-500/10 border-rose-500" : "bg-emerald-500/10 border-emerald-500"}`}
+                >
+                  <div className="flex items-start gap-4">
+                    {result.blocked ? <XCircle className="w-6 h-6 text-rose-500 shrink-0" /> : <CheckCircle2 className="w-6 h-6 text-emerald-500 shrink-0" />}
+                    <div>
+                      <h4 className={`font-headline font-black uppercase text-sm ${result.blocked ? "text-rose-400" : "text-emerald-400"}`}>
+                        {result.blocked ? `THREAT DETECTED [CODE ${result.code}]` : "CLEAN REQUEST [FORWARDING]"}
+                      </h4>
+                      <p className="text-xs text-[#b9cacb] mt-1 font-mono tracking-tight">{result.reason}</p>
                     </div>
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-5 text-[#849495]">
-                    {r.kong}
-                  </td>
-                  <td className="whitespace-nowrap px-6 py-5 text-[#849495]">
-                    {r.cloudflare}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ─── Architecture Diagram ───────────────────────────────────────────────────
-const ArchitectureDiagram = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          animate('.arch-node-anim', {
-            scale: [0.9, 1],
-            opacity: [0, 1],
-            delay: stagger(150),
-            ease: "outElastic(1, .8)"
-          });
-          if (sectionRef.current) observer.unobserve(sectionRef.current);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={sectionRef} className="bg-[#0e0e0e] py-24 hidden sm:block border-b border-[#3b494b]/10 relative">
-      <div className="absolute inset-0 scanline-bg opacity-[0.03] pointer-events-none" />
-      <div className="mx-auto max-w-5xl px-6 relative z-10">
-        <div className="mb-20 text-center">
-          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">SYSTEM INFRASTRUCTURE</span>
-          <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">
-            Data <span className="text-[#00F0FF]">Flow Architecture</span>
-          </h2>
-        </div>
-
-        <div className="flex flex-col md:flex-row items-center justify-center gap-8">
-          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-48 h-32 border border-[#3b494b]/30 bg-[#111111] relative">
-            <span className="text-[#e2e2e2] font-headline text-xs uppercase tracking-widest relative z-10">Your Client</span>
-            <span className="text-[10px] text-[#849495] font-mono mt-2 relative z-10">MOBILE / WEB / CLI</span>
-          </div>
-
-          <div className="arch-node-anim opacity-0 hidden md:flex items-center text-[#00F0FF]">
-            <div className="h-px w-12 bg-[#00F0FF]/30"></div>
-            <ArrowRight className="h-4 w-4 -ml-1" />
-          </div>
-
-          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-72 py-8 border-2 border-[#00F0FF] bg-[#0e0e0e] shadow-[0_0_40px_rgba(0,240,255,0.1)] z-10 relative">
-            <div className="absolute -top-3 bg-[#00F0FF] px-2 py-0.5 text-[9px] font-bold text-[#003338] uppercase tracking-widest">
-              BACKPORT GATEWAY
-            </div>
-            <div className="space-y-3 text-center">
-              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">Rate Limiting</p>
-              <div className="h-4 w-px bg-[#3b494b]/30 mx-auto" />
-              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">WAF & Cache</p>
-              <div className="h-4 w-px bg-[#3b494b]/30 mx-auto" />
-              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">Idempotency</p>
-            </div>
-          </div>
-
-          <div className="arch-node-anim opacity-0 hidden md:flex items-center text-[#34FF8C]">
-            <div className="h-px w-12 bg-[#34FF8C]/30"></div>
-            <ArrowRight className="h-4 w-4 -ml-1" />
-          </div>
-
-          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-48 h-32 border border-[#3b494b]/30 bg-[#111111] relative">
-            <span className="text-[#e2e2e2] font-headline text-xs uppercase tracking-widest relative z-10">Your Backend</span>
-            <span className="text-[10px] text-[#849495] font-mono mt-2 relative z-10">EXPRESS / FASTAPI / ETC</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -1009,163 +898,48 @@ const ArchitectureDiagram = () => {
   );
 };
 
-// ─── Code Example ───────────────────────────────────────────────────────────
-const CodeExample = () => {
-  const sectionRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          animate('.code-example-anim', {
-            translateY: [20, 0],
-            opacity: [0, 1],
-            ease: "outExpo",
-            duration: 1000
-          });
-          if (sectionRef.current) observer.unobserve(sectionRef.current);
-        }
-      },
-      { threshold: 0.1 }
-    );
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  return (
-    <section ref={sectionRef} id="demo" className="bg-[#0e0e0e] py-24 border-b border-[#3b494b]/10 relative">
-      <div className="mx-auto max-w-4xl px-4 sm:px-6 relative z-10">
-        <div className="code-example-anim opacity-0 mb-12 border border-[#34FF8C]/20 bg-[#34FF8C]/5 p-10 text-center flex flex-col items-center justify-center">
-          <h3 className="font-headline font-bold text-[#34FF8C] uppercase tracking-widest text-lg mb-4">⚡ Quick Deployment Sequence</h3>
-          <p className="text-[#b9cacb] font-body max-w-lg text-sm">Deploy Gateway → Configure Target → Zero Infrastructure Headaches.</p>
-        </div>
-
-        <div className="code-example-anim opacity-0 border border-[#3b494b]/30 bg-[#0a0a0a] shadow-2xl">
-          <div className="flex items-center gap-2 border-b border-[#3b494b]/30 bg-[#1b1b1b]/50 px-4 py-3">
-            <div className="flex space-x-1.5">
-              <div className="h-2 w-2 bg-[#ffb4ab]/60" />
-              <div className="h-2 w-2 bg-[#34FF8C]/60" />
-              <div className="h-2 w-2 bg-[#00F0FF]/60" />
-            </div>
-            <span className="ml-2 font-headline text-[10px] text-[#849495] uppercase tracking-[0.2rem]">deployment_verify.sh</span>
-          </div>
-          <div className="p-6 md:p-8 overflow-x-auto bg-[#0e0e0e]">
-            <pre className="font-mono text-xs sm:text-sm leading-relaxed text-[#b9cacb]">
-<code className="text-[#849495]"># Step 1: Sign up and get your API Key</code>
-<br />
-<code className="text-[#849495]"># Step 2: Global installation</code>
-<br />
-<code className="text-[#00F0FF]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
-<br />
-<br />
-<code className="text-[#849495]"># Step 3: Route traffic protected</code>
-<br />
-<code className="text-[#34FF8C]">backport-io</code> proxy --target http://localhost:3000
-<br />
-<br />
-<code className="text-[#34FF8C] font-bold"># DONE. PROTECTION ACTIVE.</code>
-            </pre>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// ─── Testimonials ─────────────────────────────────────────────────────────────
-const Testimonials = () => {
-  const reviews = [
-    {
-      quote: "Cut our API abuse by 94% in the first week. WAF setup was smoother than I expected — no config files, no YAML hell.",
-      author: "Beta Tester #1",
-      initials: "BT",
-      role: "Backend Engineer — API Security Project",
-      stars: 5,
-    },
-    {
-      quote: "Finally, rate limiting without writing middleware. The idempotency key feature alone saved us from a 3AM duplicate payment incident.",
-      author: "Beta Tester #2",
-      initials: "BT",
-      role: "Indie Developer — Shipped 4 SaaS products",
-      stars: 5,
-    },
-    {
-      quote: "We tested it on our Express.js app. Pointed the URL, got an API key, and it just worked. No DevOps. No complexity.",
-      author: "Beta Tester #3",
-      initials: "BT",
-      role: "Full Stack Developer — E-commerce Platform",
-      stars: 5,
-    },
-  ];
-
-  return (
-    <section className="bg-black py-24">
-      <div className="mx-auto max-w-7xl px-6">
-        <div className="mb-14 text-center">
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">Loved by developers</h2>
-          <p className="mt-3 text-zinc-400">Feedback from our early beta testers</p>
-        </div>
-        <div className="grid gap-6 md:grid-cols-3">
-          {reviews.map((r, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1 }}
-              className="rounded-2xl border border-white/10 bg-zinc-900/40 p-6 flex flex-col"
-            >
-              <div className="flex gap-1 mb-4">
-                {Array.from({ length: r.stars }).map((_, si) => (
-                  <span key={si} className="text-amber-400 text-sm">★</span>
-                ))}
-              </div>
-              <p className="mb-6 flex-1 text-sm text-zinc-300 leading-relaxed">&ldquo;{r.quote}&rdquo;</p>
-              <div className="flex items-center gap-3">
-                <div className="h-9 w-9 flex-shrink-0 rounded-full bg-emerald-500/20 flex items-center justify-center font-bold text-emerald-400 text-sm">
-                  {r.initials}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-white">{r.author}</p>
-                  <p className="text-xs text-zinc-500">{r.role}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
-
-// FAQ is imported from HomeSections
-
-// ─── Root ─────────────────────────────────────────────────────────────────────
-export default function LandingPage() {
+// ─── Main Page ──────────────────────────────────────────────────────────────
+export default function Home() {
   const [showDemo, setShowDemo] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href')!);
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
+        }
+      });
+    });
+  }, []);
+
+  if (!mounted) return null;
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <main className="min-h-screen bg-[#0e0e0e] text-[#f3f7f7] selection:bg-[#00F0FF] selection:text-[#003338]">
       <ScrollProgress />
       <MouseGlow />
+      <Header />
+      
       <AnimatePresence>
         {showDemo && <DemoModal onClose={() => setShowDemo(false)} />}
       </AnimatePresence>
-      <Header onDemo={() => setShowDemo(true)} />
-      <main>
+
+      <article className="relative">
         <Hero onDemo={() => setShowDemo(true)} />
         <Features />
-        <CompetitorCompare />
-        <ArchitectureDiagram />
-        <HowItWorks />
         <WAFDemo />
-        <CodeExample />
-        {/* <Testimonials /> */}
+        <HowItWorks />
         <Pricing />
-        <FinalCTA onDemo={() => setShowDemo(true)} />
         <FAQ />
-      </main>
+        <FinalCTA />
+      </article>
+
       <Footer />
-    </div>
+    </main>
   );
 }
