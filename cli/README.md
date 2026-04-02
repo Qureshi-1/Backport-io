@@ -7,8 +7,18 @@
 
 ## Quick Start
 
+1. **Install the CLI globally:**
 ```bash
-npx backport-io init
+curl -sSL https://backport-io.vercel.app/install.sh | bash
+```
+Windows users (PowerShell):
+```powershell
+iwr -useb https://backport-io.vercel.app/install.ps1 | iex
+```
+
+2. **Initialize in your project:**
+```bash
+backport init
 ```
 
 This interactive wizard will:
@@ -21,27 +31,27 @@ This interactive wizard will:
 
 | Command | Description |
 |---------|-------------|
-| `npx backport-io init` | Initialize Backport in your project |
-| `npx backport-io test` | Test gateway connection & validate API key |
-| `npx backport-io status` | Check gateway health & show stats |
-| `npx backport-io proxy GET /api/users` | Send a proxied request through the gateway |
-| `npx backport-io whoami` | Show current configuration |
+| `backport init` | Initialize Backport in your project |
+| `backport test` | Test gateway connection & validate API key |
+| `backport status` | Check gateway health & show stats |
+| `backport proxy GET /api/users` | Send a proxied request through the gateway |
+| `backport whoami` | Show current configuration |
 
 ## Usage Examples
 
 ### Send a GET request through the gateway
 ```bash
-npx backport-io proxy GET /api/users
+backport proxy GET /api/users
 ```
 
 ### Send a POST request with JSON body
 ```bash
-npx backport-io proxy POST /api/checkout -d '{"amount": 5000}'
+backport proxy POST /api/checkout -d '{"amount": 5000}'
 ```
 
 ### Send a request with custom headers
 ```bash
-npx backport-io proxy POST /api/pay -d '{"amount": 100}' -H "Idempotency-Key:txn_123"
+backport proxy POST /api/pay -d '{"amount": 100}' -H "Idempotency-Key:txn_123"
 ```
 
 ## What Backport Does

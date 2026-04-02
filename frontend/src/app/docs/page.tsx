@@ -220,7 +220,7 @@ export default function DocsPage() {
               <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-[#00F0FF]/20 to-transparent" />
               <div className="space-y-2 text-[#e2e2e2]/80">
                 {[
-                  { n: "01", color: "text-[#34FF8C]", prefix: "$", text: "npx backport-io init" },
+                  { n: "01", color: "text-[#34FF8C]", prefix: "$", text: "curl -sSL https://backport-io.vercel.app/install.sh | bash" },
                   { n: "02", color: "text-[#3b494b]", prefix: "#", text: "[SYSTEM] Fetching backport-cli binary..." },
                   { n: "03", color: "text-[#3b494b]", prefix: "#", text: "[SYSTEM] Integrity check: OK" },
                   { n: "04", color: "text-[#34FF8C]", prefix: "$", text: 'backport init --node-name "CORE_PROX_01"' },

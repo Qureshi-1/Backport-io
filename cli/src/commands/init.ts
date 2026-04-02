@@ -129,15 +129,15 @@ export async function initProject(): Promise<void> {
         "\n" +
         chalk.white("  1. ") +
         chalk.dim("Test connection:  ") +
-        chalk.cyan("npx backport-io test") +
+        chalk.cyan("npx @qureshi-1/backport test") +
         "\n" +
         chalk.white("  2. ") +
         chalk.dim("Send a request:   ") +
-        chalk.cyan("npx backport-io proxy GET /api/users") +
+        chalk.cyan("npx @qureshi-1/backport proxy GET /api/users") +
         "\n" +
         chalk.white("  3. ") +
         chalk.dim("Check status:     ") +
-        chalk.cyan("npx backport-io status") +
+        chalk.cyan("npx @qureshi-1/backport status") +
         "\n\n" +
         chalk.dim("Your gateway URL: ") +
         chalk.underline.cyan(`${GATEWAY_URL}/proxy/`) +

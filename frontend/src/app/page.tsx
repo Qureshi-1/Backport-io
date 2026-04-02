@@ -30,10 +30,13 @@ import {
 } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import dynamic from "next/dynamic";
+// @ts-ignore
+import { animate, createTimeline, stagger } from "animejs";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { auth } from "@/lib/auth";
-import { Pricing, FinalCTA, FAQ } from "@/components/HomeSections";
+
+import { FinalCTA, Pricing, FAQ } from "@/components/HomeSections";
 
 const HeroScene = dynamic(() => import("@/components/HeroScene"), {
   ssr: false,
@@ -135,122 +138,91 @@ const LiveMetricsCard = () => {
   const [reqs, setReqs] = useState(14282);
   const [hits, setHits] = useState(11340);
   const [blocked, setBlocked] = useState(412);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [log, setLog] = useState([
-    { method: "GET", path: "/api/products", ms: 0.4, type: "cache" },
-    { method: "POST", path: "/api/orders", ms: 12, type: "forward" },
-    { method: "GET", path: "/api/users/me", ms: 0.3, type: "cache" },
-    { method: "POST", path: "/api/login", ms: 0.1, type: "waf" },
+    { method: "GET", path: "/api/products", ms: 0.4, type: "cache", id: 1 },
+    { method: "POST", path: "/api/orders", ms: 12, type: "forward", id: 2 },
+    { method: "GET", path: "/api/users", ms: 0.3, type: "cache", id: 3 },
+    { method: "POST", path: "/api/auth", ms: 0.1, type: "waf", id: 4 },
   ]);
 
   useEffect(() => {
+    if (cardRef.current) {
+      animate(cardRef.current, {
+        translateY: [-10, 10],
+        duration: 4000,
+        direction: 'alternate',
+        loop: true,
+        easing: 'easeInOutSine'
+      });
+    }
+
     const iv = setInterval(() => {
-      const burst = Math.floor(Math.random() * 8) + 1; // Add 1 to 8 requests per half-second
-      
+      const burst = Math.floor(Math.random() * 8) + 1;
       const isWaf = Math.random() < 0.1;
       const isCached = !isWaf && Math.random() < 0.7;
       const method = METHODS[Math.floor(Math.random() * METHODS.length)];
       const path = PATHS[Math.floor(Math.random() * PATHS.length)];
-      const ms = isWaf
-        ? 0.1
-        : isCached
-          ? +(Math.random() * 0.5 + 0.1).toFixed(1)
-          : +(Math.random() * 18 + 4).toFixed(0);
-      const entry = {
-        method,
-        path,
-        ms,
-        type: isWaf ? "waf" : isCached ? "cache" : "forward",
-      };
+      const ms = isWaf ? 0.1 : isCached ? +(Math.random() * 0.5 + 0.1).toFixed(1) : +(Math.random() * 18 + 4).toFixed(0);
+      
+      const entryIdx = Math.floor(Math.random() * 1000); 
+      const entry = { method, path, ms, type: isWaf ? "waf" : isCached ? "cache" : "forward", id: entryIdx };
       
       setReqs((r) => r + burst);
       setHits((h) => h + (isCached ? burst : 0));
       setBlocked((b) => b + (isWaf ? 1 : 0));
       setLog((prev) => [entry, ...prev].slice(0, 4));
-    }, 400); // Super fast 400ms updates
+    }, 400);
     return () => clearInterval(iv);
   }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ delay: 0.5, duration: 0.6, type: "spring", stiffness: 120 }}
-      className="relative w-full max-w-sm mx-auto"
-    >
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="rounded-2xl border border-white/10 bg-zinc-900/80 backdrop-blur-xl shadow-2xl overflow-hidden"
-      >
-        <div className="flex items-center justify-between border-b border-white/5 bg-zinc-900/60 px-4 py-3">
+    <div ref={cardRef} className="relative w-full max-w-sm mx-auto">
+      <div className="border border-[#3b494b]/30 bg-[#0a0a0a]/90 backdrop-blur-xl shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+        <div className="flex items-center justify-between border-b border-[#3b494b]/30 bg-[#1b1b1b]/80 px-4 py-3">
           <div className="flex items-center gap-2">
-            <div className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs font-semibold text-white">
-              Backport Gateway
+            <div className="h-1.5 w-1.5 bg-[#00F0FF] animate-pulse shadow-[0_0_8px_#00F0FF]" />
+            <span className="font-headline text-[10px] font-bold text-[#e2e2e2] uppercase tracking-[0.2rem]">
+              GATEWAY_NODE_ALPHA
             </span>
           </div>
-          <span className="text-xs text-zinc-500">live</span>
+          <span className="font-headline text-[9px] text-[#00F0FF] uppercase tracking-widest animate-pulse">LIVE_FEED</span>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/5 border-b border-white/5">
+        <div className="grid grid-cols-3 divide-x divide-[#3b494b]/30 border-b border-[#3b494b]/30">
           {[
-            {
-              label: "Requests",
-              value: reqs.toLocaleString(),
-              color: "text-white",
-            },
-            {
-              label: "Cached",
-              value: hits.toLocaleString(),
-              color: "text-emerald-400",
-            },
-            {
-              label: "Blocked",
-              value: String(blocked),
-              color: "text-rose-400",
-            },
+            { label: "REQUESTS", value: reqs.toLocaleString(), color: "text-[#e2e2e2]" },
+            { label: "CACHED", value: hits.toLocaleString(), color: "text-[#34FF8C]" },
+            { label: "BLOCKED", value: String(blocked), color: "text-[#ffb4ab]" },
           ].map((s) => (
-            <div key={s.label} className="px-3 py-3 text-center">
-              <p className={`text-lg font-bold tabular-nums ${s.color}`}>
+            <div key={s.label} className="px-2 py-3 text-center bg-[#0e0e0e]/50">
+              <p className={`text-sm font-headline font-bold tabular-nums ${s.color}`}>
                 {s.value}
               </p>
-              <p className="text-[10px] text-zinc-500">{s.label}</p>
+              <p className="text-[8px] font-headline text-[#849495] tracking-widest mt-0.5">{s.label}</p>
             </div>
           ))}
         </div>
-        <div className="p-3 space-y-1.5 min-h-[130px]">
-          <AnimatePresence initial={false}>
-            {log.map((entry, i) => (
-              <motion.div
-                key={`${entry.path}-${i}`}
-                initial={{ opacity: 0, x: -8 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0 }}
-                className="flex items-center gap-2 rounded-lg bg-zinc-800/50 px-2.5 py-1.5"
-              >
-                <span
-                  className={`text-[10px] font-mono font-bold ${entry.method === "GET" ? "text-cyan-400" : "text-purple-400"}`}
-                >
-                  {entry.method}
-                </span>
-                <span className="flex-1 truncate text-[10px] font-mono text-zinc-400">
-                  {entry.path}
-                </span>
-                <span
-                  className={`text-[10px] font-mono ${entry.type === "waf" ? "text-rose-400" : entry.type === "cache" ? "text-emerald-400" : "text-zinc-400"}`}
-                >
-                  {entry.type === "waf"
-                    ? "🛡 blocked"
-                    : entry.type === "cache"
-                      ? `⚡${entry.ms}ms`
-                      : `${entry.ms}ms`}
-                </span>
-              </motion.div>
-            ))}
-          </AnimatePresence>
+        <div className="p-3 space-y-1.5 min-h-[140px] bg-[#0a0a0a]">
+          {log.map((entry, i) => (
+            <div
+              key={`${entry.path}-${i}`}
+              className="flex items-center gap-2 border border-[#3b494b]/10 bg-[#111111]/80 px-3 py-2"
+            >
+              <span className={`text-[9px] font-mono font-bold w-8 ${entry.method === "GET" ? "text-[#00F0FF]" : "text-[#34FF8C]"}`}>
+                {entry.method}
+              </span>
+              <span className="flex-1 truncate text-[9px] font-mono text-[#849495]">
+                {entry.path}
+              </span>
+              <span className={`text-[9px] font-mono font-bold ${entry.type === "waf" ? "text-[#ffb4ab]" : entry.type === "cache" ? "text-[#34FF8C]" : "text-[#e2e2e2]"}`}>
+                {entry.type === "waf" ? "BLOCKED" : `${entry.ms}ms`}
+              </span>
+            </div>
+          ))}
         </div>
-      </motion.div>
+      </div>
       <div className="absolute -inset-4 -z-10 bg-emerald-500/10 blur-2xl rounded-full" />
-    </motion.div>
+    </div>
   );
 };
 
@@ -507,10 +479,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
                   <span className="text-[#849495] text-[10px] uppercase tracking-widest">terminal_session</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <code className="text-[#00dbe9]">npx backport-io init</code>
-                  <button
-                    onClick={() => navigator.clipboard.writeText("npx backport-io init")}
-                    className="text-[#849495] hover:text-[#00F0FF] transition-colors"
+                  <code className="text-[#00dbe9]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
+                  <button 
+                    onClick={() => navigator.clipboard.writeText("curl -sSL https://backport-io.vercel.app/install.sh | bash")}
+                    className="ml-3 text-zinc-500 hover:text-white transition-colors p-1"
                     title="Copy"
                   >
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
@@ -587,6 +559,37 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
 
 // ─── Features ─────────────────────────────────────────────────────────────────
 const Features = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const tl = createTimeline({
+            defaults: {
+              ease: "spring(1, 80, 10, 0)",
+              duration: 1200,
+            }
+          });
+          
+          tl.add('.feature-card-anim', {
+            translateY: [40, 0],
+            opacity: [0, 1],
+            delay: stagger(150),
+          });
+          
+          if (sectionRef.current) {
+            observer.unobserve(sectionRef.current);
+          }
+        }
+      },
+      { threshold: 0.1 }
+    );
+    
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const cards = [
     { icon: ShieldCheck, title: "WAF Engine", desc: "L7 dynamic shielding. SQLi, XSS, Path Traversal blocked in real-time.", col: "md:col-span-2", accent: "#00F0FF" },
     { icon: Zap, title: "Smart Cache", desc: "LRU cache. Sub-ms responses. 99.9% hit rate.", col: "md:col-span-1", accent: "#34FF8C" },
@@ -594,8 +597,9 @@ const Features = () => {
     { icon: Database, title: "Idempotency", desc: "Replay protection for financial & stateful APIs.", col: "md:col-span-1", accent: "#00F0FF" },
     { icon: Server, title: "Multi-Env Deploy", desc: "Docker. Render. Fly. Railway. Any cloud.", col: "md:col-span-2", accent: "#34FF8C" },
   ];
+  
   return (
-    <section id="features" className="py-24 relative bg-[#0e0e0e] border-y border-[#3b494b]/10">
+    <section ref={sectionRef} id="features" className="py-24 relative bg-[#0e0e0e] border-y border-[#3b494b]/10">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
           <div className="max-w-xl space-y-3">
@@ -607,20 +611,16 @@ const Features = () => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {cards.map((card, i) => (
-            <motion.div
+            <div
               key={card.title}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.07 }}
-              className={`${card.col} bg-[#0e0e0e] border border-[#3b494b]/15 p-10 flex flex-col justify-between min-h-[220px] monolith-card hover:border-[#00F0FF]/20 transition-colors group`}
+              className={`feature-card-anim opacity-0 ${card.col} bg-[#0e0e0e] border border-[#3b494b]/15 p-10 flex flex-col justify-between min-h-[220px] monolith-card hover:border-[#00F0FF]/20 transition-colors group`}
             >
               <card.icon suppressHydrationWarning className="w-10 h-10 mb-6" style={{ color: card.accent }} />
               <div>
                 <h3 className="text-xl font-headline font-bold uppercase text-white mb-3">{card.title}</h3>
                 <p className="text-sm text-[#b9cacb] leading-relaxed">{card.desc}</p>
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
       </div>
@@ -629,60 +629,103 @@ const Features = () => {
 };
 
 // ─── How it Works ─────────────────────────────────────────────────────────────
-const HowItWorks = () => (
-  <section
-    id="how-it-works"
-    className="border-y border-white/5 bg-zinc-950 py-24"
-  >
-    <div className="mx-auto max-w-7xl px-6 text-center">
-      <h2 className="mb-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
-        Up and running in 3 steps.
-      </h2>
-      <p className="mx-auto mb-16 max-w-lg text-zinc-400">
-        No SDK. No code changes. Just point your traffic through Backport.
-      </p>
-      <div className="relative grid gap-8 md:grid-cols-3">
-        <div className="absolute top-8 left-[33%] right-[33%] hidden h-px bg-gradient-to-r from-emerald-500/0 via-emerald-500/40 to-emerald-500/0 md:block" />
-        {[
-          {
-            n: "1",
-            title: "Multi-Environment",
-            body: "Run the Docker image anywhere — Render, Fly, Railway, AWS. Takes under 30 seconds.",
-          },
-          {
-            n: "2",
-            title: "Set Target URL",
-            body: "In the dashboard, enter your backend's internal URL. Backport proxies all traffic through.",
-          },
-          {
-            n: "3",
-            title: "Watch it Work",
-            body: "Real-time metrics flow in. Cache hits rise. Threats blocked. Your backend stays clean.",
-          },
-        ].map((s) => (
-          <motion.div
-            key={s.n}
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="flex flex-col items-center"
-          >
-            <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-full border border-emerald-500/30 bg-emerald-500/10 text-xl font-bold text-emerald-400">
-              {s.n}
+const HowItWorks = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+  
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          const tl = createTimeline({
+            defaults: {
+              ease: "spring(1, 80, 10, 0)",
+              duration: 1200,
+            }
+          });
+          
+          tl.add('.hiw-step', {
+            translateY: [30, 0],
+            opacity: [0, 1],
+            delay: stagger(200),
+          });
+          
+          if (sectionRef.current) {
+            observer.unobserve(sectionRef.current);
+          }
+        }
+      },
+      { threshold: 0.2 }
+    );
+    
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} id="how-it-works" className="py-24 relative bg-[#0a0a0a]">
+      <div className="mx-auto max-w-7xl px-6">
+        <div className="text-center md:max-w-2xl mx-auto mb-16 space-y-3">
+          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold">INSTALLATION</span>
+          <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">Up in <span className="text-[#34FF8C]">3 Steps</span></h2>
+          <p className="text-[#b9cacb] leading-relaxed">No SDK. No code changes. Just point your traffic through Backport.</p>
+        </div>
+        
+        <div className="relative grid gap-8 md:grid-cols-3">
+          <div className="absolute top-8 left-[33%] right-[33%] hidden h-px bg-gradient-to-r from-transparent via-[#34FF8C]/30 to-transparent md:block" />
+          {[
+            {
+              n: "01",
+              title: "Multi-Environment",
+              body: "Run the Docker image anywhere — Render, Fly, Railway, AWS. Takes under 30 seconds.",
+              accent: "#00F0FF"
+            },
+            {
+              n: "02",
+              title: "Set Target URL",
+              body: "In the dashboard, enter your backend's internal URL. Backport proxies all traffic through.",
+              accent: "#34FF8C"
+            },
+            {
+              n: "03",
+              title: "Watch it Work",
+              body: "Real-time metrics flow in. Cache hits rise. Threats blocked. Your backend stays clean.",
+              accent: "#00dbe9"
+            },
+          ].map((s) => (
+            <div key={s.n} className="hiw-step opacity-0 flex flex-col items-center group">
+              <div 
+                className="mb-6 flex h-16 w-16 items-center justify-center border bg-[#0e0e0e] font-headline text-xl font-bold transition-colors duration-500"
+                style={{ borderColor: `${s.accent}40`, color: s.accent }}
+              >
+                {s.n}
+              </div>
+              <h3 className="mb-2 text-xl font-headline font-bold uppercase text-white">{s.title}</h3>
+              <p className="text-sm text-[#b9cacb] text-center leading-relaxed max-w-sm">{s.body}</p>
             </div>
-            <h3 className="mb-2 text-lg font-semibold text-white">{s.title}</h3>
-            <p className="text-sm text-zinc-400">{s.body}</p>
-          </motion.div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 // ─── WAF Live Demo ────────────────────────────────────────────────────────────
 const WAFDemo = () => {
   const [input, setInput] = useState("SELECT * FROM users WHERE id=1");
   const [result, setResult] = useState<null | { blocked: boolean; reason: string; code: number }>(null);
   const [testing, setTesting] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (result && containerRef.current) {
+      animate('.waf-result-anim', {
+        opacity: [0, 1],
+        translateY: [20, 0],
+        scale: [0.95, 1],
+        duration: 800,
+        ease: "outElastic(1, .6)"
+      });
+    }
+  }, [result]);
 
   const presets = [
     { label: "SQL Injection", value: "'; DROP TABLE users;--" },
@@ -694,6 +737,8 @@ const WAFDemo = () => {
   const checkWAF = () => {
     setTesting(true);
     setResult(null);
+    
+    // Animate scanning process
     setTimeout(() => {
       const sqlPatterns = /('|--|;|DROP|SELECT|INSERT|UPDATE|DELETE|UNION|exec|script)/i;
       const xssPatterns = /(<script|<img|onerror|onload|javascript:|alert\()/i;
@@ -713,33 +758,36 @@ const WAFDemo = () => {
   };
 
   return (
-    <section className="bg-zinc-950 py-24 border-y border-white/5">
-      <div className="mx-auto max-w-4xl px-6">
+    <section className="bg-[#0e0e0e] py-24 border-y border-[#3b494b]/10 relative">
+      <div className="absolute inset-0 scanline-bg opacity-10 pointer-events-none" />
+      <div className="mx-auto max-w-4xl px-6 relative z-10">
         <div className="mb-10 text-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-medium text-emerald-400 mb-4">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" /> Live WAF Demo
+          <span className="inline-flex items-center gap-2 border border-[#00F0FF]/30 bg-[#00F0FF]/5 px-3 py-1 text-[10px] font-headline uppercase tracking-widest text-[#00F0FF] mb-4">
+            <span className="h-1.5 w-1.5 bg-[#00F0FF] animate-pulse" /> Live WAF Demo
           </span>
-          <h2 className="text-3xl font-bold text-white sm:text-4xl">See the WAF in action</h2>
-          <p className="mt-3 text-zinc-400">Type any request payload. Backport's WAF engine analyzes it in real-time.</p>
+          <h2 className="text-3xl md:text-5xl font-headline font-bold uppercase text-[#e2e2e2]">See the engine <span className="text-[#00F0FF]">in action</span></h2>
+          <p className="mt-3 text-[#b9cacb] font-body">Type any request payload. Backport's WAF engine analyzes it in real-time.</p>
         </div>
 
-        <div className="rounded-2xl border border-white/10 bg-black overflow-hidden shadow-2xl">
+        <div ref={containerRef} className="border border-[#3b494b]/30 bg-[#0a0a0a] shadow-[0_0_30px_rgba(0,240,255,0.05)] relative overflow-hidden group hover:border-[#00F0FF]/30 transition-colors duration-500">
           {/* Terminal header */}
-          <div className="flex items-center gap-2 border-b border-white/10 bg-zinc-900/60 px-4 py-3">
-            <div className="h-3 w-3 rounded-full bg-red-500" />
-            <div className="h-3 w-3 rounded-full bg-yellow-500" />
-            <div className="h-3 w-3 rounded-full bg-emerald-500" />
-            <span className="ml-2 text-xs text-zinc-500 font-mono">backport-waf-engine v1.0</span>
+          <div className="flex items-center gap-2 border-b border-[#3b494b]/30 bg-[#1b1b1b]/50 px-4 py-3">
+            <div className="flex space-x-1.5">
+              <div className="h-2 w-2 bg-[#ffb4ab]/60" />
+              <div className="h-2 w-2 bg-[#34FF8C]/60" />
+              <div className="h-2 w-2 bg-[#00F0FF]/60" />
+            </div>
+            <span className="ml-2 text-[10px] text-[#849495] font-headline uppercase tracking-widest">backport-waf-engine v4.0.2</span>
           </div>
 
-          <div className="p-6 space-y-4">
+          <div className="p-6 md:p-8 space-y-6">
             {/* Preset buttons */}
             <div className="flex flex-wrap gap-2">
               {presets.map((p) => (
                 <button
                   key={p.label}
                   onClick={() => { setInput(p.value); setResult(null); }}
-                  className="text-xs px-3 py-1.5 rounded-full border border-zinc-700 text-zinc-400 hover:border-emerald-500/50 hover:text-emerald-400 transition-colors font-mono"
+                  className="text-[10px] px-3 py-1.5 border border-[#3b494b] bg-transparent text-[#b9cacb] hover:border-[#00F0FF]/50 hover:text-[#00F0FF] transition-colors font-headline uppercase tracking-wider"
                 >
                   {p.label}
                 </button>
@@ -748,11 +796,11 @@ const WAFDemo = () => {
 
             {/* Input */}
             <div className="relative">
-              <label className="block text-xs text-zinc-500 mb-2 font-mono">REQUEST_PAYLOAD</label>
+              <label className="block text-[10px] text-[#849495] mb-2 font-headline uppercase tracking-widest">REQUEST_PAYLOAD</label>
               <input
                 value={input}
                 onChange={(e) => { setInput(e.target.value); setResult(null); }}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-xl px-4 py-3 font-mono text-sm text-white focus:outline-none focus:border-emerald-500 transition-colors"
+                className="w-full bg-[#1b1b1b] border border-[#3b494b]/50 px-4 py-4 font-mono text-sm text-[#e2e2e2] focus:outline-none focus:border-[#00F0FF] transition-colors rounded-none"
                 placeholder="Enter a request payload to test..."
               />
             </div>
@@ -761,195 +809,74 @@ const WAFDemo = () => {
             <button
               onClick={checkWAF}
               disabled={testing || !input.trim()}
-              className="w-full bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-black font-bold py-3 rounded-xl transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-[#00F0FF] hover:bg-[#34FF8C] disabled:opacity-50 text-[#003338] font-headline font-bold uppercase tracking-widest py-4 transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(0,240,255,0.2)]"
             >
               {testing ? (
-                <><span className="h-4 w-4 border-2 border-black/30 border-t-black rounded-full animate-spin" /> Analyzing...</>
+                <><span className="h-4 w-4 border-2 border-[#003338]/30 border-t-[#003338] rounded-full animate-spin" /> Analyzing_</>
               ) : (
                 <><Shield className="h-4 w-4" /> Analyze with WAF</>
               )}
             </button>
 
             {/* Result */}
-            <AnimatePresence>
-              {result && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  className={`rounded-xl border p-4 font-mono text-sm ${
-                    result.blocked
-                      ? "border-red-500/30 bg-red-500/10 text-red-400"
-                      : "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
-                  }`}
-                >
-                  <div className="flex items-center gap-2 mb-1">
-                    {result.blocked ? (
-                      <XCircle className="h-4 w-4 flex-shrink-0" />
-                    ) : (
-                      <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-                    )}
-                    <span className="font-bold">HTTP {result.code} — {result.blocked ? "BLOCKED" : "ALLOWED"}</span>
-                  </div>
-                  <p className="text-xs opacity-80 ml-6">{result.reason}</p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-
-// ─── Pricing ─────────────────────────────────────────────────────────────────
-const Pricing = () => {
-  const [isYearly, setIsYearly] = useState(true);
-  const plans = [
-    {
-      name: "STEALTH",
-      sub: "Free forever",
-      price: "$0",
-      period: "",
-      desc: "For indie devs and students. No credit card required.",
-      features: ["50,000 Requests / month", "Basic WAF", "1 API Gateway", "Redis Cache", "Community support"],
-      cta: "Deploy Now",
-      href: "/auth/signup",
-      accent: "#00F0FF",
-      hot: false,
-    },
-    {
-      name: "CLOUD PRO",
-      sub: isYearly ? "Billed $468/yr · Save $117" : "Billed monthly",
-      price: isYearly ? "$39" : "$49",
-      period: "/mo",
-      desc: "For teams shipping at scale.",
-      features: ["1,000,000 Requests / month", "AI-enhanced WAF", "Up to 10 Gateways", "Distributed Redis", "Priority support"],
-      cta: "Get Cloud Pro",
-      href: "/auth/signup?plan=cloud_pro",
-      accent: "#34FF8C",
-      hot: true,
-    },
-    {
-      name: "ENTERPRISE",
-      sub: "Custom terms",
-      price: "Custom",
-      period: "",
-      desc: "Dedicated VPC. Unlimited gateways.",
-      features: ["Unlimited volume", "Custom rate limits", "Unlimited gateways", "Dedicated VPC", "24/7 phone support"],
-      cta: "Contact Sales",
-      href: "mailto:support@backportio.com",
-      accent: "#849495",
-      hot: false,
-    },
-  ];
-
-  return (
-    <section id="pricing" className="py-24 bg-[#0e0e0e] border-t border-[#3b494b]/10">
-      <div className="mx-auto max-w-7xl px-6">
-        {/* Header */}
-        <div className="mb-16">
-          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">PRICING MATRIX</span>
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <h2 className="font-headline text-4xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">Access <span className="text-[#34FF8C]">Tiers</span></h2>
-            {/* Toggle */}
-            <div className="flex items-center gap-4">
-              <span className={`font-headline text-[11px] uppercase tracking-widest ${!isYearly ? 'text-white' : 'text-[#849495]'}`}>Monthly</span>
-              <button
-                onClick={() => setIsYearly(!isYearly)}
-                className={`relative w-14 h-7 transition-colors ${isYearly ? 'bg-[#34FF8C]' : 'bg-[#353535]'}`}
-              >
-                <span className={`absolute top-1 w-5 h-5 bg-[#0e0e0e] transition-all ${isYearly ? 'left-8' : 'left-1'}`} />
-              </button>
-              <span className={`font-headline text-[11px] uppercase tracking-widest ${isYearly ? 'text-[#34FF8C]' : 'text-[#849495]'}`}>
-                Yearly <span className="text-[#34FF8C] text-[9px] ml-1">-20%</span>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Plans Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-[#3b494b]/15">
-          {plans.map((plan, i) => (
-            <motion.div
-              key={plan.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className={`relative flex flex-col p-10 bg-[#0e0e0e] ${
-                plan.hot ? 'bg-[#111111]' : ''
-              }`}
-            >
-              {plan.hot && (
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#34FF8C] shadow-[0_0_10px_#34FF8C]" />
-              )}
-              <div className="mb-8">
-                <div className="text-[10px] font-headline uppercase tracking-[0.3rem] mb-1" style={{ color: plan.accent }}>{plan.name}</div>
-                <div className="text-[10px] font-headline uppercase tracking-widest text-[#849495]">{plan.sub}</div>
-              </div>
-              <div className="mb-8">
-                <span className="font-headline text-5xl font-bold text-white">{plan.price}</span>
-                <span className="font-headline text-sm text-[#849495] ml-1">{plan.period}</span>
-              </div>
-              <p className="text-sm text-[#849495] mb-8 border-b border-[#3b494b]/20 pb-8">{plan.desc}</p>
-              <ul className="space-y-3 mb-10 flex-1">
-                {plan.features.map((f) => (
-                  <li key={f} className="flex items-center gap-3 text-sm text-[#b9cacb]">
-                    <CheckCircle2 suppressHydrationWarning className="h-4 w-4 flex-shrink-0" style={{ color: plan.accent }} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link
-                href={plan.href}
-                className={`block w-full py-4 text-center font-headline text-[11px] uppercase tracking-[0.2rem] font-bold transition-all ${
-                  plan.hot
-                    ? 'bg-[#34FF8C] text-[#0e0e0e] hover:bg-[#00F0FF]'
-                    : 'border border-[#3b494b]/30 text-[#e2e2e2] hover:border-[#00F0FF]/40 hover:text-[#00F0FF]'
+            {result && (
+              <div
+                className={`waf-result-anim border p-5 font-mono text-sm bg-[#0e0e0e] ${
+                  result.blocked
+                    ? "border-[#ff4444]/40 text-[#ff4444]"
+                    : "border-[#34FF8C]/40 text-[#34FF8C]"
                 }`}
               >
-                {plan.cta}
-              </Link>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Refer & Earn Banner */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="mt-8 border border-[#34FF8C]/15 bg-[#34FF8C]/5 p-8 flex flex-col md:flex-row items-center justify-between gap-6"
-        >
-          <div className="flex items-center gap-6">
-            <div className="w-12 h-12 border border-[#34FF8C]/30 flex items-center justify-center">
-              <Gift suppressHydrationWarning className="w-6 h-6 text-[#34FF8C]" />
-            </div>
-            <div>
-              <h3 className="font-headline font-bold text-white uppercase tracking-wider">Refer &amp; Earn</h3>
-              <p className="text-sm text-[#849495] mt-1">Invite friends. Get 1 month Cloud Pro FREE per referral.</p>
-            </div>
+                <div className="flex items-center gap-2 mb-2">
+                  {result.blocked ? (
+                    <XCircle className="h-4 w-4 flex-shrink-0" />
+                  ) : (
+                    <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+                  )}
+                  <span className="font-bold">HTTP {result.code} — {result.blocked ? "BLOCKED" : "ALLOWED"}</span>
+                </div>
+                <p className="text-xs opacity-80 ml-6">{result.reason}</p>
+              </div>
+            )}
           </div>
-          <Link
-            href="/auth/signup?next=/dashboard/billing"
-            className="flex items-center gap-2 bg-[#34FF8C] text-[#0e0e0e] px-8 py-3 font-headline uppercase text-[11px] tracking-[0.2rem] font-bold hover:bg-[#00F0FF] transition-colors whitespace-nowrap"
-          >
-            Get Referral Link <ArrowRight suppressHydrationWarning className="h-4 w-4" />
-          </Link>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
 };
+
+
+// Pricing is imported from HomeSections
 // (Footer is imported from @/components/Footer)
 
 // ─── Floating Badge ───────────────────────────────────────────────────────────
 const Badge = () => null;
 
 // ─── Competitor Compare ───────────────────────────────────────────────────────
+// ─── Competitor Compare ───────────────────────────────────────────────────────
 const CompetitorCompare = () => {
+  const sectionRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          animate('.comp-row-anim', {
+            translateX: [-20, 0],
+            opacity: [0, 1],
+            delay: stagger(80),
+            ease: "outExpo",
+            duration: 800
+          });
+          if (sectionRef.current) observer.unobserve(sectionRef.current);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
   const rows = [
     {
       feature: "Setup Time",
@@ -996,39 +923,41 @@ const CompetitorCompare = () => {
   ];
 
   return (
-    <section className="bg-zinc-950 py-24">
-      <div className="mx-auto max-w-5xl px-6">
+    <section ref={sectionRef} className="bg-[#0e0e0e] py-24 border-y border-[#3b494b]/10 relative">
+      <div className="absolute inset-0 scanline-bg opacity-[0.03] pointer-events-none" />
+      <div className="mx-auto max-w-5xl px-6 relative z-10">
         <div className="mb-14 text-center">
-          <h2 className="mb-3 text-3xl font-bold text-white sm:text-4xl">
-            Why Backport?
+          <span className="text-[#34FF8C] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">MARKET ANALYSIS</span>
+          <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">
+            Why <span className="text-[#34FF8C]">Backport?</span>
           </h2>
-          <p className="text-zinc-400">
-            Compare with the industry alternatives
-          </p>
+          <p className="mt-4 text-[#849495] font-body">Compare with industry alternatives.</p>
         </div>
-        <div className="overflow-x-auto rounded-2xl border border-white/10 bg-black">
-          <table className="w-full text-left text-sm text-zinc-400">
-            <thead className="border-b border-white/10 bg-zinc-900/50 text-xs uppercase tracking-widest text-zinc-500">
+        <div className="overflow-x-auto border border-[#3b494b]/30 bg-[#0a0a0a]">
+          <table className="w-full text-left text-sm text-[#b9cacb]">
+            <thead className="border-b border-[#3b494b]/30 bg-[#1b1b1b]/50 text-[10px] uppercase tracking-widest text-[#849495] font-headline">
               <tr>
-                <th className="px-6 py-4 font-semibold">Feature</th>
-                <th className="px-6 py-4 font-semibold text-emerald-400">Backport</th>
-                <th className="px-6 py-4 font-semibold">Kong</th>
-                <th className="px-6 py-4 font-semibold">Cloudflare</th>
+                <th className="px-6 py-5 font-bold">Feature</th>
+                <th className="px-6 py-5 font-bold text-[#00F0FF]">Backport</th>
+                <th className="px-6 py-5 font-bold">Kong</th>
+                <th className="px-6 py-5 font-bold">Cloudflare</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-white/5">
+            <tbody className="divide-y divide-[#3b494b]/10">
               {rows.map((r, i) => (
-                <tr key={r.feature} className="transition-colors hover:bg-zinc-900/30">
-                  <td className="whitespace-nowrap px-6 py-4 font-medium text-zinc-300">
+                <tr key={r.feature} className="comp-row-anim opacity-0 transition-colors hover:bg-[#1b1b1b]/30 group">
+                  <td className="whitespace-nowrap px-6 py-5 font-headline text-xs uppercase tracking-wider text-[#e2e2e2]">
                     {r.feature}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 font-semibold text-emerald-300 flex items-center gap-2">
-                    {r.bpWin && <CheckCircle2 className="h-4 w-4 text-emerald-500" />} {r.backport}
+                  <td className="whitespace-nowrap px-6 py-5 font-bold text-[#34FF8C] text-glow-green">
+                    <div className="flex items-center gap-2">
+                       {r.bpWin && <CheckCircle2 className="h-4 w-4" />} {r.backport}
+                    </div>
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-zinc-500">
+                  <td className="whitespace-nowrap px-6 py-5 text-[#849495]">
                     {r.kong}
                   </td>
-                  <td className="whitespace-nowrap px-6 py-4 text-zinc-500">
+                  <td className="whitespace-nowrap px-6 py-5 text-[#849495]">
                     {r.cloudflare}
                   </td>
                 </tr>
@@ -1042,97 +971,140 @@ const CompetitorCompare = () => {
 };
 
 // ─── Architecture Diagram ───────────────────────────────────────────────────
-const ArchitectureDiagram = () => (
-  <section className="bg-black py-24 hidden sm:block">
-    <div className="mx-auto max-w-5xl px-6">
-      <div className="mb-16 text-center">
-        <h2 className="text-3xl font-bold text-white sm:text-4xl mb-4">
-          How Backport Works
-        </h2>
-        <p className="text-zinc-400">
-          Zero code changes to your existing backend
-        </p>
-      </div>
+const ArchitectureDiagram = () => {
+  const sectionRef = useRef<HTMLElement>(null);
 
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4">
-        {/* Client */}
-        <div className="flex flex-col items-center justify-center w-48 h-32 rounded-2xl border border-emerald-500/20 bg-zinc-900 overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
-          <span className="text-white font-medium mb-2 relative z-10">Your Client</span>
-          <span className="text-xs text-zinc-500 font-mono relative z-10">Mobile / Web / CLI</span>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          animate('.arch-node-anim', {
+            scale: [0.9, 1],
+            opacity: [0, 1],
+            delay: stagger(150),
+            ease: "outElastic(1, .8)"
+          });
+          if (sectionRef.current) observer.unobserve(sectionRef.current);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} className="bg-[#0e0e0e] py-24 hidden sm:block border-b border-[#3b494b]/10 relative">
+      <div className="absolute inset-0 scanline-bg opacity-[0.03] pointer-events-none" />
+      <div className="mx-auto max-w-5xl px-6 relative z-10">
+        <div className="mb-20 text-center">
+          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block mb-3">SYSTEM INFRASTRUCTURE</span>
+          <h2 className="font-headline text-3xl md:text-5xl font-bold tracking-tighter uppercase text-[#e2e2e2]">
+            Data <span className="text-[#00F0FF]">Flow Architecture</span>
+          </h2>
         </div>
 
-        {/* Arrow */}
-        <div className="hidden md:flex items-center text-emerald-500 -mx-2">
-          <div className="h-px w-8 sm:w-16 bg-emerald-500/50"></div>
-          <ArrowRight className="h-5 w-5 -ml-1" />
-        </div>
-
-        {/* Gateway */}
-        <div className="flex flex-col items-center justify-center w-64 h-auto py-6 rounded-2xl border-2 border-emerald-500 bg-black shadow-[0_0_30px_rgba(0,255,135,0.15)] z-10 relative">
-          <div className="absolute -top-3 bg-black px-2 text-[10px] font-bold text-emerald-400 uppercase tracking-widest">
-            Backport Gateway
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8">
+          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-48 h-32 border border-[#3b494b]/30 bg-[#111111] relative">
+            <span className="text-[#e2e2e2] font-headline text-xs uppercase tracking-widest relative z-10">Your Client</span>
+            <span className="text-[10px] text-[#849495] font-mono mt-2 relative z-10">MOBILE / WEB / CLI</span>
           </div>
-          <p className="text-sm text-emerald-300 font-medium mb-2">Rate Limit</p>
-          <div className="text-emerald-500/30 mb-2">+</div>
-          <p className="text-sm text-emerald-300 font-medium mb-2">WAF & Cache</p>
-          <div className="text-emerald-500/30 mb-2">+</div>
-          <p className="text-sm text-emerald-300 font-medium">Idempotency</p>
-        </div>
 
-        {/* Arrow */}
-        <div className="hidden md:flex items-center text-zinc-500 -mx-2">
-          <div className="h-px w-8 sm:w-16 bg-white/20"></div>
-          <ArrowRight className="h-5 w-5 -ml-1 text-white/50" />
-        </div>
+          <div className="arch-node-anim opacity-0 hidden md:flex items-center text-[#00F0FF]">
+            <div className="h-px w-12 bg-[#00F0FF]/30"></div>
+            <ArrowRight className="h-4 w-4 -ml-1" />
+          </div>
 
-        {/* Backend */}
-        <div className="flex flex-col items-center justify-center w-48 h-32 rounded-2xl border border-emerald-500/20 bg-zinc-900 overflow-hidden relative">
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent" />
-          <span className="text-white font-medium mb-2 relative z-10">Your Backend</span>
-          <span className="text-xs text-zinc-500 font-mono relative z-10">Express / FastAPI / etc</span>
+          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-72 py-8 border-2 border-[#00F0FF] bg-[#0e0e0e] shadow-[0_0_40px_rgba(0,240,255,0.1)] z-10 relative">
+            <div className="absolute -top-3 bg-[#00F0FF] px-2 py-0.5 text-[9px] font-bold text-[#003338] uppercase tracking-widest">
+              BACKPORT GATEWAY
+            </div>
+            <div className="space-y-3 text-center">
+              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">Rate Limiting</p>
+              <div className="h-4 w-px bg-[#3b494b]/30 mx-auto" />
+              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">WAF & Cache</p>
+              <div className="h-4 w-px bg-[#3b494b]/30 mx-auto" />
+              <p className="text-[10px] text-[#00F0FF] font-headline tracking-widest uppercase">Idempotency</p>
+            </div>
+          </div>
+
+          <div className="arch-node-anim opacity-0 hidden md:flex items-center text-[#34FF8C]">
+            <div className="h-px w-12 bg-[#34FF8C]/30"></div>
+            <ArrowRight className="h-4 w-4 -ml-1" />
+          </div>
+
+          <div className="arch-node-anim opacity-0 flex flex-col items-center justify-center w-48 h-32 border border-[#3b494b]/30 bg-[#111111] relative">
+            <span className="text-[#e2e2e2] font-headline text-xs uppercase tracking-widest relative z-10">Your Backend</span>
+            <span className="text-[10px] text-[#849495] font-mono mt-2 relative z-10">EXPRESS / FASTAPI / ETC</span>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // ─── Code Example ───────────────────────────────────────────────────────────
-const CodeExample = () => (
-  <section id="demo" className="bg-black py-16 md:py-24 border-y border-white/5">
-    <div className="mx-auto max-w-4xl px-4 sm:px-6">
-      <div className="mb-12 rounded-2xl border-2 border-dashed border-emerald-500/20 bg-emerald-500/5 p-10 text-center flex flex-col items-center justify-center">
-        <h3 className="text-xl font-bold text-emerald-400 mb-2">⚡ Simple 3-Step Setup</h3>
-        <p className="text-zinc-400">Deploy Gateway → Add Target URL → Zero Code Changes in Backend.</p>
-      </div>
+const CodeExample = () => {
+  const sectionRef = useRef<HTMLElement>(null);
 
-      <div className="rounded-2xl border border-white/10 bg-zinc-950 overflow-hidden shadow-2xl">
-        <div className="flex items-center gap-2 border-b border-white/5 bg-zinc-900/80 px-4 py-3">
-          <div className="h-3 w-3 rounded-full bg-rose-500/80" />
-          <div className="h-3 w-3 rounded-full bg-yellow-500/80" />
-          <div className="h-3 w-3 rounded-full bg-emerald-500/80" />
-          <span className="ml-2 font-mono text-xs text-zinc-500">
-            quickstart.sh
-          </span>
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          animate('.code-example-anim', {
+            translateY: [20, 0],
+            opacity: [0, 1],
+            ease: "outExpo",
+            duration: 1000
+          });
+          if (sectionRef.current) observer.unobserve(sectionRef.current);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <section ref={sectionRef} id="demo" className="bg-[#0e0e0e] py-24 border-b border-[#3b494b]/10 relative">
+      <div className="mx-auto max-w-4xl px-4 sm:px-6 relative z-10">
+        <div className="code-example-anim opacity-0 mb-12 border border-[#34FF8C]/20 bg-[#34FF8C]/5 p-10 text-center flex flex-col items-center justify-center">
+          <h3 className="font-headline font-bold text-[#34FF8C] uppercase tracking-widest text-lg mb-4">⚡ Quick Deployment Sequence</h3>
+          <p className="text-[#b9cacb] font-body max-w-lg text-sm">Deploy Gateway → Configure Target → Zero Infrastructure Headaches.</p>
         </div>
-        <div className="p-4 sm:p-8 overflow-x-auto">
-          <pre className="font-mono text-xs sm:text-sm leading-relaxed text-zinc-300">
-<code className="text-zinc-500"># Step 1: Sign up and get API key</code>
+
+        <div className="code-example-anim opacity-0 border border-[#3b494b]/30 bg-[#0a0a0a] shadow-2xl">
+          <div className="flex items-center gap-2 border-b border-[#3b494b]/30 bg-[#1b1b1b]/50 px-4 py-3">
+            <div className="flex space-x-1.5">
+              <div className="h-2 w-2 bg-[#ffb4ab]/60" />
+              <div className="h-2 w-2 bg-[#34FF8C]/60" />
+              <div className="h-2 w-2 bg-[#00F0FF]/60" />
+            </div>
+            <span className="ml-2 font-headline text-[10px] text-[#849495] uppercase tracking-[0.2rem]">deployment_verify.sh</span>
+          </div>
+          <div className="p-6 md:p-8 overflow-x-auto bg-[#0e0e0e]">
+            <pre className="font-mono text-xs sm:text-sm leading-relaxed text-[#b9cacb]">
+<code className="text-[#849495]"># Step 1: Sign up and get your API Key</code>
 <br />
-<code className="text-zinc-500"># Step 2: Set your target backend URL in dashboard</code>
+<code className="text-[#849495]"># Step 2: Global installation</code>
 <br />
-<code className="text-zinc-500"># Step 3: Route traffic through Backport</code>
+<code className="text-[#00F0FF]">curl -sSL https://backport-io.vercel.app/install.sh | bash</code>
 <br />
-<code className="text-emerald-400">curl</code> -X GET https://backport-io.vercel.app/api/proxy/users \
-  -H <code className="text-emerald-300">"X-API-Key: bk_YOUR_API_KEY"</code>
 <br />
-<code className="text-emerald-500 font-bold"># That's it! Your backend is now protected.</code>
-          </pre>
+<code className="text-[#849495]"># Step 3: Route traffic protected</code>
+<br />
+<code className="text-[#34FF8C]">backport-io</code> proxy --target http://localhost:3000
+<br />
+<br />
+<code className="text-[#34FF8C] font-bold"># DONE. PROTECTION ACTIVE.</code>
+            </pre>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 // ─── Testimonials ─────────────────────────────────────────────────────────────
 const Testimonials = () => {
@@ -1200,67 +1172,7 @@ const Testimonials = () => {
   );
 };
 
-// ─── FAQ ──────────────────────────────────────────────────────────────────────
-const FAQ = () => {
-  const faqs = [
-    {
-      q: "Does Backport store my API request data?",
-      a: "No. Traffic is inspected in-memory only. Logs are opt-in.",
-    },
-    {
-      q: "What happens if Backport goes down?",
-      a: "Cloud instances have 99.9% uptime SLA and run in a highly available setup.",
-    },
-    {
-      q: "Can I migrate away easily?",
-      a: "Yes. Backport is a reverse proxy. Remove it and your backend works unchanged.",
-    },
-    {
-      q: "Is there a free tier?",
-      a: "Yes! Forever-free Hobby plan for up to 10,000 requests/month. No credit card required.",
-    },
-    {
-      q: "Does it work with my existing backend?",
-      a: "Yes. Works with Express, FastAPI, Django, Laravel, Rails, Go Gin — any HTTP backend. Zero code changes.",
-    },
-    {
-      q: "How does billing and overage work?",
-      a: "If you hit your plan's request limit, new requests will return HTTP 429 (Too Many Requests) until the next billing cycle. You can upgrade your plan anytime from the dashboard to avoid disruption.",
-    },
-    {
-      q: "Can I switch between plans easily?",
-      a: "Yes. Upgrades take effect immediately. Downgrades take effect at the start of your next billing cycle. Manage everything from the Billing section of your dashboard.",
-    },
-  ];
-
-  return (
-    <section className="bg-black py-24 border-t border-white/5">
-      <div className="mx-auto max-w-3xl px-6">
-        <h2 className="mb-12 text-center text-3xl font-bold text-white sm:text-4xl">
-          Frequently asked questions
-        </h2>
-        <div className="space-y-4">
-          {faqs.map((faq, i) => (
-            <details
-              key={i}
-              className="group rounded-2xl border border-white/10 bg-zinc-900/30 p-6 [&_summary::-webkit-details-marker]:hidden"
-            >
-              <summary className="flex cursor-pointer items-center justify-between text-lg font-medium text-white">
-                {faq.q}
-                <span className="ml-4 flex-shrink-0 text-emerald-500 transition-transform group-open:rotate-45">
-                  <X className="h-5 w-5 rotate-45" />
-                </span>
-              </summary>
-              <p className="mt-4 text-zinc-400 leading-relaxed">
-                {faq.a}
-              </p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-};
+// FAQ is imported from HomeSections
 
 // ─── Root ─────────────────────────────────────────────────────────────────────
 export default function LandingPage() {

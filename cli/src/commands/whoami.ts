@@ -11,7 +11,7 @@ export async function whoami(): Promise<void> {
       chalk.red("  ✖ No backport.config.json found.") +
         "\n" +
         chalk.dim("  Run ") +
-        chalk.cyan("npx backport-io init") +
+        chalk.cyan("npx @qureshi-1/backport init") +
         chalk.dim(" first.")
     );
     return;

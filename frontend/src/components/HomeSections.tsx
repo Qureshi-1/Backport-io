@@ -2,6 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+// @ts-ignore
+import { animate, stagger } from "animejs";
 import {
   CheckCircle2,
   ArrowRight,
@@ -217,29 +219,44 @@ export const Pricing = () => {
 /* ─── Final CTA ───────────────────────────────────────────────────────────── */
 export const FinalCTA = ({ onDemo }: { onDemo: () => void }) => {
   const [isLogged, setIsLogged] = useState(false);
+  const sectionRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     setIsLogged(auth.isLoggedIn());
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          animate('.final-cta-anim', {
+            translateY: [40, 0],
+            opacity: [0, 1],
+            ease: "outExpo",
+            duration: 1200,
+            delay: stagger(150)
+          });
+          if (sectionRef.current) observer.unobserve(sectionRef.current);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    if (sectionRef.current) observer.observe(sectionRef.current);
+    return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-[#0e0e0e] py-32 border-t border-[#3b494b]/10">
+    <section ref={sectionRef} className="relative overflow-hidden bg-[#0e0e0e] py-32 border-t border-[#3b494b]/10">
       {/* Background effects */}
       <div className="absolute inset-0 bg-cyber-grid opacity-40 pointer-events-none" />
       <div className="absolute inset-0 scanline-bg opacity-15 pointer-events-none" />
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[200px] bg-[#00F0FF]/5 blur-[100px] pointer-events-none" />
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          className="space-y-8"
-        >
-          <span className="text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block">
+        <div className="space-y-8">
+          <span className="final-cta-anim opacity-0 text-[#00F0FF] font-headline text-[10px] uppercase tracking-[0.3rem] font-bold block">
             INITIATE SEQUENCE
           </span>
           <h2
-            className="font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-[#e2e2e2] glitch-text"
+            className="final-cta-anim opacity-0 font-headline text-5xl md:text-7xl font-bold tracking-tighter leading-none text-[#e2e2e2] glitch-text"
             data-text="Your backend. Production-grade. In 30 seconds."
           >
             Your backend.
@@ -250,11 +267,11 @@ export const FinalCTA = ({ onDemo }: { onDemo: () => void }) => {
             <br />
             In 30 seconds.
           </h2>
-          <p className="font-body text-[#b9cacb] text-xl max-w-xl mx-auto">
+          <p className="final-cta-anim opacity-0 font-body text-[#b9cacb] text-xl max-w-xl mx-auto">
             Join developers shipping with confidence. Free to start. No credit
             card required.
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-5 mt-10">
+          <div className="final-cta-anim opacity-0 flex flex-col sm:flex-row items-center justify-center gap-5 mt-10">
             <Link
               href={isLogged ? "/dashboard" : "/auth/signup"}
               className="inline-flex items-center gap-3 bg-[#00F0FF] text-[#003338] px-12 py-5 font-headline font-extrabold uppercase tracking-widest text-base hover:bg-[#34FF8C] transition-all duration-300 shadow-[0_0_40px_rgba(0,240,255,0.25)] hover:shadow-[0_0_60px_rgba(52,255,140,0.35)] active:scale-95 group"
@@ -278,7 +295,7 @@ export const FinalCTA = ({ onDemo }: { onDemo: () => void }) => {
               Watch Demo
             </button>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   );
