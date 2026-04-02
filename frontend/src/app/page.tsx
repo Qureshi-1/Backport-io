@@ -262,7 +262,7 @@ export default function Home() {
             className="font-headline text-[3.5rem] sm:text-[5rem] lg:text-[6.5rem] font-black leading-[0.95] tracking-[-0.04em] text-white max-w-5xl mb-8"
           >
              Build your dream backend <br className="hidden md:block" /> 
-             with <span className="text-[#D9FF00] text-glow-lime">Edge Intelligence.</span>
+             with <span className="text-[#D9FF00] text-glow-lime"><TypewriterText />.</span>
           </motion.h1>
 
           <motion.p
@@ -274,6 +274,29 @@ export default function Home() {
             Deploy enterprise-grade rate limiting, caching, and WAF protection in minutes. 
             Zero code, zero infrastructure management, maximum global speed.
           </motion.p>
+          
+          {/* Terminal Command Animation Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+            className="mb-14 w-full max-w-lg mx-auto"
+          >
+             <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-center justify-between group overflow-hidden relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
+                <div className="flex items-center gap-4">
+                   <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center font-mono text-[#D9FF00] text-sm">
+                      $
+                   </div>
+                   <div className="font-mono text-sm text-zinc-300">
+                      <TerminalCommand />
+                   </div>
+                </div>
+                <button className="text-[10px] font-headline font-black uppercase tracking-widest text-zinc-500 hover:text-white transition-colors">
+                   Copy Command
+                </button>
+             </div>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
@@ -384,7 +407,7 @@ export default function Home() {
 // ─── HELPERS ────────────────────────────────────────────────────
 
 function TypewriterText() {
-  const words = ["Shield", "Network", "Protocol", "Gateway"];
+  const words = ["Edge Intelligence", "Infinite Speed", "Zero Infrastructure", "Total Security"];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -406,5 +429,33 @@ function TypewriterText() {
         {words[index]}
       </motion.span>
     </AnimatePresence>
+  );
+}
+
+function TerminalCommand() {
+  const command = "curl -sS https://backport.io/up | sh";
+  const [displayText, setDisplayText] = useState("");
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (index < command.length) {
+      const timeout = setTimeout(() => {
+        setDisplayText((prev) => prev + command[index]);
+        setIndex((prev) => prev + 1);
+      }, 50);
+      return () => clearTimeout(timeout);
+    } else {
+      setTimeout(() => {
+        setDisplayText("");
+        setIndex(0);
+      }, 5000);
+    }
+  }, [index]);
+
+  return (
+    <span className="relative">
+      {displayText}
+      <span className="terminal-cursor !h-4 !w-2 !bg-white ml-1" />
+    </span>
   );
 }
