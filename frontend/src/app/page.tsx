@@ -409,6 +409,8 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
   const [isLogged, setIsLogged] = useState(false);
   useEffect(() => { setIsLogged(auth.isLoggedIn()); }, []);
 
+  const HERO_COMMAND = "curl -sSL https://backport-io.vercel.app/install.sh | bash";
+
   return (
     <section className="relative min-h-screen overflow-hidden bg-[#0e0e0e] pt-28 pb-16">
       <div className="absolute inset-0 z-0 opacity-80">
@@ -509,10 +511,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
             >
               <Link
                 href={isLogged ? "/dashboard" : "/auth/signup"}
-                className="group w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#00F0FF] text-[#003338] px-14 py-6 font-headline font-black uppercase tracking-[0.25em] text-xl transition-all duration-500 shadow-[0_0_50px_rgba(0,240,255,0.5)] hover:bg-[#34FF8C] hover:shadow-[0_0_60px_rgba(52,255,140,0.7)] hover:-translate-y-1 active:scale-95"
+                className="group inline-flex min-h-[60px] items-center justify-center gap-3 bg-[#00F0FF] px-8 font-headline text-sm font-extrabold uppercase tracking-[0.28rem] text-[#003338] transition-all duration-300 hover:bg-[#34FF8C] hover:shadow-[0_0_40px_rgba(52,255,140,0.35)] active:scale-[0.98]"
               >
-                {isLogged ? "DASHBOARD" : "GET STARTED"}
-                <ArrowRight suppressHydrationWarning className="h-6 w-6 group-hover:translate-x-2 transition-transform duration-300" />
+                {isLogged ? "Open dashboard" : "Start free"}
+                <ArrowRight suppressHydrationWarning className="h-4 w-4 transition-transform group-hover:translate-x-1" />
               </Link>
 
               {/* Install Script — Award Winning Interaction */}
@@ -557,9 +559,10 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
               </div>
             </motion.div>
           </div>
+        </div>
 
-          {/* Right Layer — Live Telemetry Panel */}
-          <motion.div
+        {/* Right Layer — Live Telemetry Panel */}
+        <motion.div
             initial={{ opacity: 0, scale: 0.9, x: 80 }}
             animate={{ opacity: 1, scale: 1, x: 0 }}
             transition={{ delay: 0.4, duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
@@ -575,7 +578,7 @@ const Hero = ({ onDemo }: { onDemo: () => void }) => {
               <span>LATENCY_SYNC: OK (0.2MS)</span>
               <span>WAF_CORE: ARMED_V4</span>
             </div>
-          </div>
+          </motion.div>
         </div>
 
         {/* Global Infrastructure Display */}
@@ -907,7 +910,7 @@ export default function Home() {
     setMounted(true);
     // Smooth scroll for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
+      anchor.addEventListener('click', function (this: HTMLAnchorElement, e) {
         e.preventDefault();
         const target = document.querySelector(this.getAttribute('href')!);
         if (target) {
@@ -936,7 +939,7 @@ export default function Home() {
         <HowItWorks />
         <Pricing />
         <FAQ />
-        <FinalCTA />
+        <FinalCTA onDemo={() => setShowDemo(true)} />
       </article>
 
       <Footer />
