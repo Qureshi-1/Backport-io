@@ -1,0 +1,29 @@
+services:
+  ghostapi:
+    build: .
+    container_name: ghostapi-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      - GHOST_API_BASE_URL=${GHOST_API_BASE_URL:-https://api.ghostapp.io/v1}
+      - GHOST_EMAIL=${GHOST_EMAIL:-}
+      - GHOST_PASSWORD=${GHOST_PASSWORD:-}
+      - GHOST_LOG_LEVEL=${GHOST_LOG_LEVEL:-INFO}
+      - GHOST_LOG_FILE=/app/logs/ghostapi.log
+      - GHOST_VERIFY_SSL=true
+      - GHOST_REQUEST_TIMEOUT=30
+      - GHOST_MAX_RETRIES=3
+      - GHOST_RATE_LIMIT_RPS=10
+    volumes:
+      - ghostapi-logs:/app/logs
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/api/health', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  ghostapi-logs:
+    driver: local
