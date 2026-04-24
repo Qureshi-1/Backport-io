@@ -45,23 +45,24 @@ PROMO_CODES: dict[str, dict] = {
 _promo_lock = threading.Lock()
 
 
-def _is_promo_valid(code: str) -> tuple[bool, str]:
-    """Check if promo code exists and is valid. Returns (is_valid, error_message)."""
+def _is_promo_valid(code: str) -> tuple[bool, str, dict | None]:
+    """Check if promo code exists and is valid. Returns (is_valid, error_message, promo_dict_or_None).
+    Thread-safe: must be called while holding _promo_lock."""
     promo = PROMO_CODES.get(code.upper())
     if not promo:
-        return False, "Invalid promo code"
+        return False, "Invalid promo code", None
     if not promo["active"]:
-        return False, "This promo code is no longer active"
+        return False, "This promo code is no longer active", None
     if promo["used"] >= promo["max_uses"]:
-        return False, "This promo code has reached its usage limit"
+        return False, "This promo code has reached its usage limit", None
     if promo.get("expires_at"):
         try:
             expires = datetime.fromisoformat(promo["expires_at"].replace("Z", "+00:00"))
             if datetime.now(timezone.utc) > expires:
-                return False, "This promo code has expired"
+                return False, "This promo code has expired", None
         except Exception:
             pass
-    return True, ""
+    return True, "", promo
 
 
 def _cleanup_stale_orders():
@@ -116,12 +117,11 @@ def validate_promo(req: ValidatePromoReq, user: User = Depends(get_current_user)
     if not code:
         raise HTTPException(status_code=400, detail="Please enter a promo code")
 
-    is_valid, error_msg = _is_promo_valid(code)
-    if not is_valid:
-        raise HTTPException(status_code=404, detail=error_msg)
-
-    promo = PROMO_CODES[code]
-    remaining = promo["max_uses"] - promo["used"]
+    with _promo_lock:
+        is_valid, error_msg, promo = _is_promo_valid(code)
+        if not is_valid:
+            raise HTTPException(status_code=404, detail=error_msg)
+        remaining = promo["max_uses"] - promo["used"]
 
     return {
         "valid": True,
@@ -153,23 +153,16 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
     else:
         base_amount = 499
 
-    # ─── Apply promo code discount ────────────────────────────────────────────
+    # ─── Apply promo code discount (atomic: validate + increment in single lock) ─
     discount_percent = 0
     promo_code_used = None
     if req.promo_code:
         code = req.promo_code.strip().upper()
-        is_valid, error_msg = _is_promo_valid(code)
-        if not is_valid:
-            raise HTTPException(status_code=400, detail=f"Promo code error: {error_msg}")
-
-        promo = PROMO_CODES[code]
-        discount_percent = promo["discount_percent"]
-
-        # Increment usage count (thread-safe)
         with _promo_lock:
-            # Double-check after acquiring lock
-            if promo["used"] >= promo["max_uses"]:
-                raise HTTPException(status_code=400, detail="Promo code just reached its limit. Try again.")
+            is_valid, error_msg, promo = _is_promo_valid(code)
+            if not is_valid:
+                raise HTTPException(status_code=400, detail=f"Promo code error: {error_msg}")
+            discount_percent = promo["discount_percent"]
             promo["used"] += 1
 
         promo_code_used = code

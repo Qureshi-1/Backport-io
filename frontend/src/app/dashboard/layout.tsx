@@ -26,7 +26,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { fetchApi } from "@/lib/api";
 import { UserProvider, useUser } from "@/lib/user-context";
 
 // Build sidebar items from the same source as Navbar

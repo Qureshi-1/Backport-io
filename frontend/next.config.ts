@@ -34,13 +34,8 @@ const connectDomains = [
   "'self'",
   apiUrl,
   "https://api.razorpay.com",
-  // Allow any Render or Railway backend for self-hosting
-  "https://*.onrender.com",
-  "https://*.railway.app",
-  "wss://*.onrender.com",
-  "wss://*.railway.app",
 ];
-// Add user-specified extra domains
+// Add user-specified extra domains (for self-hosting, append comma-separated URLs)
 if (additionalConnectDomains) {
   connectDomains.push(...additionalConnectDomains.split(",").map(d => d.trim()).filter(Boolean));
 }
@@ -57,7 +52,7 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://checkout.razorpay.com",
+              "script-src 'self' 'unsafe-inline' https://checkout.razorpay.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://images.unsplash.com",
