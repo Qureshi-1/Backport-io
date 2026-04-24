@@ -1,0 +1,69 @@
+name: Good First Issue
+description: A beginner-friendly issue for new contributors looking to get started
+labels: ["good first issue", "help wanted"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Good First Issue
+
+        Thanks for your interest in contributing! Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) before starting work on this issue.
+
+        > **Please check [CONTRIBUTING.md](../../CONTRIBUTING.md) for guidelines on coding standards, commit messages, and the PR submission process before you begin.**
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      description: Which area of the project does this issue relate to?
+      options:
+        - Frontend
+        - Backend
+        - CLI
+        - Documentation
+        - Tests
+        - DevOps
+    validations:
+      required: true
+
+  - type: dropdown
+    id: difficulty
+    attributes:
+      label: Difficulty
+      description: How difficult is this issue?
+      options:
+        - Beginner
+        - Intermediate
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the issue or improvement.
+      placeholder: "Describe what needs to be done, why it matters, and any context that would help a new contributor understand the task..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: approach
+    attributes:
+      label: Suggested Approach
+      description: Optional guidance on how to approach this issue (useful for pointing contributors in the right direction).
+      placeholder: |
+        e.g.,
+        1. Look at the `src/components/` directory for similar examples.
+        2. Add a new component following the existing patterns.
+        3. Include unit tests in `__tests__/`.
+
+  - type: textarea
+    id: files
+    attributes:
+      label: Related Files
+      description: Optional list of files that are likely relevant to this issue.
+      placeholder: |
+        e.g.,
+        - `src/components/Button.tsx`
+        - `src/pages/Dashboard.tsx`

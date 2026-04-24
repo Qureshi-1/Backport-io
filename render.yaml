@@ -1,0 +1,50 @@
+services:
+  - type: web
+    name: backport-backend
+    runtime: python
+    region: ohio
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    disk:
+      name: backport-data
+      mountPath: /app/data
+      sizeGB: 1
+    envVars:
+      - key: ENVIRONMENT
+        value: "production"
+      - key: DB_PATH
+        value: "/app/data/backport.db"
+      - key: SECRET_KEY
+        generateValue: true
+      - key: OAUTH_STATE_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        value: "https://backport.in"
+      - key: CORS_ORIGINS
+        value: "https://backport.in"
+      # ADMIN_EMAIL — set this in Render Dashboard > Environment > Environment Variables
+      # Do NOT hardcode here. This is a sensitive value.
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: FROM_EMAIL
+        sync: false
+
+  # ──────────────────────────────────────────────
+  # Keep-Alive Cron Job — pings /health every 10 min
+  # so the free-tier backend never goes cold.
+  # ──────────────────────────────────────────────
+  - type: cron
+    name: backport-keepalive
+    runtime: python
+    region: ohio
+    schedule: "*/10 * * * *"
+    buildCommand: pip install requests
+    startCommand: python keepalive.py
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          name: backport-backend
+          type: web
+          property: host

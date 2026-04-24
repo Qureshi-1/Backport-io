@@ -1,0 +1,69 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "backend/**"
+      - "render.yaml"
+      - ".github/workflows/deploy-backend.yml"
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: true
+
+jobs:
+  # ──────────────────────────────────────────────
+  # Gate: CI must pass before deploying
+  # ──────────────────────────────────────────────
+  ci-gate:
+    name: CI Gate
+    uses: ./.github/workflows/ci.yml
+
+  # ──────────────────────────────────────────────
+  # Trigger Render deploy via API hook
+  # ──────────────────────────────────────────────
+  deploy:
+    name: Trigger Render Deploy
+    runs-on: ubuntu-latest
+    needs: ci-gate
+    environment: production
+
+    steps:
+      - name: Trigger Render deploy
+        run: |
+          response=$(curl -s -w "\n%{http_code}" -X POST \
+            "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys" \
+            -H "Accept: application/json" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_DEPLOY_KEY }}")
+
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n-1)
+
+          echo "Render API responded with HTTP $http_code"
+          echo "$body"
+
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "::notice::Render deploy triggered successfully"
+            deploy_id=$(echo "$body" | jq -r '.id // empty')
+            if [ -n "$deploy_id" ]; then
+              echo "deploy_id=$deploy_id" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "::error::Render deploy trigger failed with HTTP $http_code"
+            exit 1
+          fi
+        id: trigger
+
+      - name: Deployment summary
+        if: always()
+        run: |
+          echo "## Backend Deploy Summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "| Detail | Value |" >> "$GITHUB_STEP_SUMMARY"
+          echo "|--------|-------|" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Status** | ${{ steps.trigger.outcome == 'success' && 'Triggered' || 'Failed' }} |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Service** | backport-backend (Render) |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Commit** | \`${{ github.sha }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Branch** | \`${{ github.ref_name }}\` |" >> "$GITHUB_STEP_SUMMARY"
+          echo "| **Triggered by** | @${{ github.actor }} |" >> "$GITHUB_STEP_SUMMARY"
