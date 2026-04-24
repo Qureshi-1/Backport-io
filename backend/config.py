@@ -29,7 +29,7 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "https://backport.in").strip().strip('"
 CORS_ORIGINS_STR = os.getenv("CORS_ORIGINS", FRONTEND_URL)
 CORS_ORIGINS = [o.strip().strip('"').strip("'").rstrip("/") for o in CORS_ORIGINS_STR.split(",") if o.strip()]
 
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@backport.dev")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "admin@backport.in")
 ADMIN_SECRET = os.getenv("ADMIN_SECRET", "")
 
 # ─── OAuth Social Login (Google + GitHub) ──────────────────────────────────────
