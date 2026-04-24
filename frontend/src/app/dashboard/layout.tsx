@@ -43,7 +43,6 @@ const sidebarItems = [
   { name: "Teams", href: "/dashboard/teams", icon: Users },
   { name: "Inspector", href: "/dashboard/inspector", icon: Terminal },
   { name: "API Docs", href: "/dashboard/docs", icon: FileText },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
   { name: "Billing", href: "/dashboard/billing", icon: CreditCard },
 ];
 
@@ -62,7 +61,7 @@ function DashboardSidebarContent({
   const isAdmin = user?.is_admin === true;
 
   const allItems = isAdmin
-    ? [...sidebarItems, { name: "Admin", href: "/dashboard/admin", icon: Shield }]
+    ? [...sidebarItems, { name: "Advanced", href: "/dashboard/admin", icon: Settings }]
     : sidebarItems;
 
   return (
@@ -115,22 +114,40 @@ function DashboardSidebarContent({
           </div>
         )}
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#04e184]/[0.1] border border-[#04e184]/15 flex items-center justify-center text-[#04e184] text-xs font-bold flex-shrink-0">
+          <div className="w-8 h-8 rounded-full bg-[#04e184]/[0.1] border border-[#04e184]/15 flex items-center justify-center text-[#04e184] text-xs font-bold flex-shrink-0 relative">
             {email ? email[0].toUpperCase() : "U"}
+            {collapsed && (
+              <Link
+                href="/dashboard/settings"
+                className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#080C10] border border-white/[0.08] flex items-center justify-center"
+                title="Settings"
+              >
+                <Settings className="h-2.5 w-2.5 text-[#A2BDDB]/40" />
+              </Link>
+            )}
           </div>
           {!collapsed && (
-            <>
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-white truncate">{email || "Loading..."}</p>
-              </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs font-medium text-white truncate">{email || "Loading..."}</p>
+            </div>
+          )}
+          {!collapsed && (
+            <div className="flex items-center gap-1 flex-shrink-0">
+              <Link
+                href="/dashboard/settings"
+                className="text-[#A2BDDB]/15 hover:text-white transition-colors w-10 h-10 min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/[0.04]"
+                title="Settings"
+              >
+                <Settings className="h-3.5 w-3.5" />
+              </Link>
               <button
                 onClick={() => auth.logout()}
-                className="text-[#A2BDDB]/15 hover:text-white transition-colors flex-shrink-0 w-10 h-10 min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/[0.04]"
+                className="text-[#A2BDDB]/15 hover:text-white transition-colors w-10 h-10 min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/[0.04]"
                 title="Logout"
               >
                 <LogOut className="h-3.5 w-3.5" />
               </button>
-            </>
+            </div>
           )}
         </div>
       </div>
