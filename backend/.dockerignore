@@ -1,0 +1,10 @@
+__pycache__/
+venv/
+.mypy_cache/
+*.pyc
+*.log
+.env
+*.db
+*.sqlite3
+backport.db
+tests/
