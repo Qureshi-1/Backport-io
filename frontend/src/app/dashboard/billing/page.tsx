@@ -527,7 +527,7 @@ export default function BillingPage() {
                 </div>
                 {showDiscount && (
                   <p className="text-[#04e184] font-headline text-[9px] uppercase tracking-widest mb-2 opacity-70">
-                    You save {(p.price.replace(/[^0-9.]/g, "") * promoDiscount / 100).toFixed(2)} {currency}
+                    You save {(parseFloat(p.price.replace(/[^0-9.]/g, "")) * promoDiscount / 100).toFixed(2)} {currency}
                   </p>
                 )}
                 <p className="text-[#849495] font-body text-xs font-medium leading-relaxed opacity-80 border-b border-white/5 pb-6">{p.desc}</p>
