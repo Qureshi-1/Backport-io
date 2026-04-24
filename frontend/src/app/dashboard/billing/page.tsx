@@ -205,7 +205,7 @@ export default function BillingPage() {
     if (isNaN(num)) return null;
     const discounted = num * (1 - promoDiscount / 100);
     const cur = PRICING[currency];
-    return formatPrice({ ...cur, value: discounted }, cur);
+    return formatPrice(discounted, cur);
   };
 
   // Show loading while user context is loading (but don't block forever)
