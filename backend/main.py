@@ -76,6 +76,10 @@ async def startup():
             ("plan_expires_at", "TIMESTAMP"),
             ("plan_payment_id", "VARCHAR"),
             ("plan_source", "VARCHAR DEFAULT 'none'"),
+            ("is_active", "BOOLEAN DEFAULT true"),
+            ("is_banned", "BOOLEAN DEFAULT false"),
+            ("last_login_at", "TIMESTAMP"),
+            ("login_count", "INTEGER DEFAULT 0"),
         ]
 
         from sqlalchemy import text
@@ -179,12 +183,22 @@ async def startup():
         except Exception as e:
             print(f"⚠️ Table creation skip (ApiEndpoint): {e}")
 
+        # Create audit_logs table
+        try:
+            from models import AuditLog
+            AuditLog.__table__.create(bind=engine, checkfirst=True)
+            print("✅ Table 'audit_logs' ensured")
+        except Exception as e:
+            print(f"⚠️ Table creation skip (AuditLog): {e}")
+
         # ─── Create missing indexes on existing tables ────────────────────────
         index_migrations = [
             ("api_logs", "api_key_id", "ix_api_logs_api_key_id"),
             ("api_logs", "created_at", "ix_api_logs_created_at"),
             ("alerts", "user_id", "ix_alerts_user_id"),
             ("health_checks", "checked_at", "ix_health_checks_checked_at"),
+            ("audit_logs", "event_type", "ix_audit_logs_event_type"),
+            ("audit_logs", "created_at", "ix_audit_logs_created_at"),
         ]
         for table, col, idx_name in index_migrations:
             try:

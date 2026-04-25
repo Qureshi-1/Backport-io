@@ -1,10 +1,11 @@
 import hmac
+import json
 import logging
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
-from sqlalchemy import func
-from typing import List, Optional
-from models import User, Feedback, ApiLog, ApiKey
+from sqlalchemy import func, desc
+from typing import Optional
+from models import User, Feedback, ApiLog, ApiKey, AuditLog, create_audit_log
 from dependencies import get_current_admin, get_db
 from pydantic import BaseModel
 from config import ADMIN_SECRET
@@ -27,7 +28,7 @@ def _verify_admin_secret(input_secret: str) -> bool:
 class UserUpdate(BaseModel):
     email: str
     plan: str
-    duration_days: int = 30  # How many days the plan lasts
+    duration_days: int = 30
 
 class BootstrapReq(BaseModel):
     email: str
@@ -41,198 +42,462 @@ class ResendVerifyReq(BaseModel):
     email: str
     secret: str
 
+class UserActionReq(BaseModel):
+    action: str  # suspend, ban, unban, activate, make_admin, remove_admin
 
-# ─── Plan Duration Defaults ─────────────────────────────────────────────────────
 
 PLAN_DURATION_DAYS = {
-    "free": 90,        # 3 months free trial
-    "plus": 30,        # 1 month
-    "pro": 30,         # 1 month
-    "enterprise": 365,  # 1 year
+    "free": 90,
+    "plus": 30,
+    "pro": 30,
+    "enterprise": 365,
 }
 
+PLAN_PRICES_INR = {
+    "free": 0,
+    "plus": 499,
+    "pro": 999,
+    "enterprise": 4999,
+}
 
 def _get_plan_expiry(plan: str, duration_days: int) -> datetime:
-    """Calculate plan expiry date based on plan and duration."""
     now = datetime.now(timezone.utc)
     return now + timedelta(days=duration_days)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# STATS
+# STATS — Enhanced
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @router.get("/stats")
 def get_admin_stats(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
-    total_users = db.query(func.count(User.id)).scalar()
-    total_requests = db.query(func.count(ApiLog.id)).scalar()
-    recent_feedbacks = db.query(func.count(Feedback.id)).filter(Feedback.status == "pending").scalar()
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    total_users = db.query(func.count(User.id)).scalar() or 0
+
+    # Active users today (logged in today)
+    active_users_today = db.query(func.count(User.id)).filter(
+        User.last_login_at >= today_start
+    ).scalar() or 0
+
+    total_api_keys = db.query(func.count(ApiKey.id)).scalar() or 0
+
+    # Total requests today (from ApiLog)
+    total_requests_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start
+    ).scalar() or 0
+
+    # MRR — sum of plan prices for active paid users
+    active_paid = db.query(User.plan, func.count(User.id)).filter(
+        User.plan.in_(["plus", "pro", "enterprise"]),
+        User.plan_expires_at > now
+    ).group_by(User.plan).all()
+    mrr = sum(PLAN_PRICES_INR.get(plan, 0) * count for plan, count in active_paid)
 
     # Plan distribution
     plans = db.query(User.plan, func.count(User.id)).group_by(User.plan).all()
-    plan_stats = {plan: count for plan, count in plans}
+    plan_distribution = {plan: count for plan, count in plans}
 
-    # Expiring soon (within 7 days)
-    now = datetime.now(timezone.utc)
-    seven_days = now + timedelta(days=7)
-    expiring_soon = db.query(func.count(User.id)).filter(
-        User.plan_expires_at.isnot(None),
-        User.plan_expires_at > now,
-        User.plan_expires_at <= seven_days,
-        User.plan != "free",
-    ).scalar()
+    # WAF blocks today — try Redis first, fallback to DB
+    waf_blocks_today = 0
+    try:
+        from cache import cache
+        today_key = f"waf_blocks:{now.strftime('%Y-%m-%d')}"
+        cached = cache.get(today_key)
+        if cached:
+            waf_blocks_today = int(cached)
+        else:
+            waf_blocks_today = db.query(func.count(ApiLog.id)).filter(
+                ApiLog.created_at >= today_start,
+                ApiLog.status_code == 403
+            ).scalar() or 0
+    except Exception:
+        waf_blocks_today = 0
 
-    # Expired plans (not free)
-    expired = db.query(func.count(User.id)).filter(
-        User.plan_expires_at.isnot(None),
-        User.plan_expires_at < now,
-        User.plan != "free",
-    ).scalar()
-
-    # Paid users
-    paid_users = db.query(func.count(User.id)).filter(User.plan.in_(["plus", "pro", "enterprise"])).scalar()
-
-    # 1. Requests in last 24 hours
-    requests_last_24h = db.query(func.count(ApiLog.id)).filter(
+    # Error rate 24h
+    requests_24h = db.query(func.count(ApiLog.id)).filter(
         ApiLog.created_at >= now - timedelta(hours=24)
-    ).scalar()
-
-    # 2. Active API Keys count
-    active_api_keys = db.query(func.count(ApiKey.id)).scalar()
-
-    # 3. Error rate (4xx + 5xx in last 24h / total requests in last 24h)
+    ).scalar() or 0
     errors_24h = db.query(func.count(ApiLog.id)).filter(
         ApiLog.created_at >= now - timedelta(hours=24),
         ApiLog.status_code >= 400
-    ).scalar()
-    error_rate = round((errors_24h / requests_last_24h * 100), 1) if requests_last_24h and requests_last_24h > 0 else 0
+    ).scalar() or 0
+    error_rate_24h = round((errors_24h / requests_24h * 100), 2) if requests_24h > 0 else 0
 
-    # 4. Average latency in last 24h (from ApiLog.latency_ms)
+    # Avg latency 24h
     avg_latency = db.query(func.avg(ApiLog.latency_ms)).filter(
         ApiLog.created_at >= now - timedelta(hours=24)
     ).scalar()
     avg_latency_ms = round(avg_latency) if avg_latency else 0
 
-    # 5. MRR (Monthly Recurring Revenue) - using plan prices in INR paise
-    PLAN_PRICES = {"plus": 49900, "pro": 99900, "enterprise": 499900}  # INR paise
-    active_paid_users = db.query(User.plan, func.count(User.id)).filter(
-        User.plan.in_(["plus", "pro", "enterprise"]),
-        User.plan_expires_at > now
-    ).group_by(User.plan).all()
-    mrr = sum(PLAN_PRICES.get(plan, 0) * count for plan, count in active_paid_users)
-    # Convert to INR rupees (divide by 100)
-    mrr_inr = mrr / 100
+    # Users by day last 7 days
+    users_by_day = []
+    for i in range(6, -1, -1):
+        day = today_start - timedelta(days=i)
+        next_day = day + timedelta(days=1)
+        count = db.query(func.count(User.id)).filter(
+            User.created_at >= day,
+            User.created_at < next_day
+        ).scalar() or 0
+        users_by_day.append({"date": day.strftime("%Y-%m-%d"), "count": count})
 
-    # 6. WAF blocks - sum of hit_count from all custom_waf_rules
-    try:
-        from custom_waf import CustomWafRule
-        waf_blocks = db.query(func.sum(CustomWafRule.hit_count)).scalar() or 0
-    except ImportError:
-        waf_blocks = 0
-
-    # 7. Total teams
-    try:
-        from teams import Team
-        total_teams = db.query(func.count(Team.id)).scalar() or 0
-    except ImportError:
-        total_teams = 0
-
-    # 8. Total webhooks
-    try:
-        from webhooks import Webhook
-        total_webhooks = db.query(func.count(Webhook.id)).scalar() or 0
-    except ImportError:
-        total_webhooks = 0
+    # Users last month for % change
+    last_month_start = (now - timedelta(days=30)).replace(hour=0, minute=0, second=0, microsecond=0)
+    users_last_month = db.query(func.count(User.id)).filter(
+        User.created_at >= last_month_start,
+        User.created_at < now
+    ).scalar() or 0
+    prev_month_start = (now - timedelta(days=60)).replace(hour=0, minute=0, second=0, microsecond=0)
+    users_prev_month = db.query(func.count(User.id)).filter(
+        User.created_at >= prev_month_start,
+        User.created_at < last_month_start
+    ).scalar() or 0
+    user_growth_pct = round(((users_last_month - users_prev_month) / users_prev_month * 100), 1) if users_prev_month > 0 else 0
 
     return {
         "total_users": total_users,
-        "total_requests": total_requests,
-        "pending_feedbacks": recent_feedbacks,
-        "plan_distribution": plan_stats,
-        "expiring_soon": expiring_soon or 0,
-        "expired_plans": expired or 0,
-        "paid_users": paid_users or 0,
-        # NEW METRICS:
-        "requests_last_24h": requests_last_24h or 0,
-        "active_api_keys": active_api_keys or 0,
-        "error_rate": error_rate,
+        "active_users_today": active_users_today,
+        "total_api_keys": total_api_keys,
+        "total_requests_today": total_requests_today,
+        "mrr": mrr,
+        "plan_distribution": plan_distribution,
+        "waf_blocks_today": waf_blocks_today,
+        "error_rate_24h": error_rate_24h,
         "avg_latency_ms": avg_latency_ms,
-        "mrr_inr": mrr_inr,
-        "waf_blocks": waf_blocks,
-        "total_teams": total_teams,
-        "total_webhooks": total_webhooks,
+        "users_by_day_last_7_days": users_by_day,
+        "user_growth_pct": user_growth_pct,
     }
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# USERS — Full detail with plan tracking
+# USERS — Enhanced with pagination, sorting, avatar, status
 # ═══════════════════════════════════════════════════════════════════════════════
 
 @router.get("/users")
 def list_users(
     admin: User = Depends(get_current_admin),
     db: Session = Depends(get_db),
-    plan_filter: Optional[str] = Query(None, description="Filter by plan: free, plus, pro, enterprise"),
-    status_filter: Optional[str] = Query(None, description="Filter by status: active, expiring, expired"),
-    search: Optional[str] = Query(None, description="Search by email"),
+    search: Optional[str] = Query(None),
+    plan: Optional[str] = Query(None),
+    sort: Optional[str] = Query("created_at"),
+    order: Optional[str] = Query("desc"),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
 ):
-    query = db.query(User).order_by(User.created_at.desc())
-
-    if plan_filter and plan_filter in ["free", "plus", "pro", "enterprise"]:
-        query = query.filter(User.plan == plan_filter)
+    query = db.query(User)
 
     if search:
-        # Escape SQL LIKE wildcards to prevent injection
         escaped = search.replace("%", r"\%").replace("_", r"\_")
-        query = query.filter(User.email.ilike(f"%{escaped}%", escape="\\"))
+        query = query.filter(
+            (User.email.ilike(f"%{escaped}%", escape="\\")) |
+            (User.name.ilike(f"%{escaped}%", escape="\\"))
+        )
 
-    users = query.limit(200).all()
-    now = datetime.now(timezone.utc)
+    if plan and plan in ["free", "plus", "pro", "enterprise"]:
+        query = query.filter(User.plan == plan)
+
+    # Sorting
+    sort_col = getattr(User, sort, User.created_at)
+    if order == "asc":
+        query = query.order_by(sort_col.asc())
+    else:
+        query = query.order_by(sort_col.desc())
+
+    total = query.count()
+    users = query.offset((page - 1) * limit).limit(limit).all()
 
     result = []
     for u in users:
-        # Determine plan status
-        plan_status = "active"
-        if u.plan_expires_at:
-            if u.plan_expires_at < now:
-                plan_status = "expired"
-            elif u.plan_expires_at <= now + timedelta(days=7):
-                plan_status = "expiring_soon"
-
-        # If status_filter is applied, skip non-matching users
-        if status_filter:
-            if status_filter == "active" and plan_status != "active":
-                continue
-            if status_filter == "expiring" and plan_status != "expiring_soon":
-                continue
-            if status_filter == "expired" and plan_status != "expired":
-                continue
-
-        # Count API keys for this user
         api_key_count = db.query(func.count(ApiKey.id)).filter(ApiKey.user_id == u.id).scalar() or 0
+
+        # Determine status
+        status = "active"
+        if u.is_banned:
+            status = "banned"
+        elif not u.is_active:
+            status = "suspended"
 
         result.append({
             "id": u.id,
             "email": u.email,
             "name": u.name,
+            "avatar_url": u.avatar_url,
             "plan": u.plan,
-            "plan_started_at": u.plan_started_at.isoformat() if u.plan_started_at else None,
-            "plan_expires_at": u.plan_expires_at.isoformat() if u.plan_expires_at else None,
-            "plan_payment_id": u.plan_payment_id,
-            "plan_source": u.plan_source or "none",
-            "plan_status": plan_status,
+            "plan_expiry_date": u.plan_expires_at.isoformat() if u.plan_expires_at else None,
             "is_admin": u.is_admin,
-            "is_verified": u.is_verified,
-            "api_key_count": api_key_count,
+            "is_active": u.is_active,
+            "is_banned": u.is_banned,
+            "status": status,
             "created_at": u.created_at.isoformat() if u.created_at else None,
+            "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
+            "login_count": u.login_count or 0,
+            "api_key_count": api_key_count,
         })
 
-    return result
+    return {"users": result, "total": total, "page": page, "limit": limit}
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# UPDATE USER PLAN — with dates and source tracking
+# USER ACTIONS — suspend, ban, unban, activate, make_admin, remove_admin
 # ═══════════════════════════════════════════════════════════════════════════════
+
+@router.patch("/users/{user_id}/action")
+def user_action(
+    user_id: int,
+    req: UserActionReq,
+    request: Request,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if target.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot perform action on yourself")
+
+    action = req.action
+    if action not in ["suspend", "ban", "unban", "activate", "make_admin", "remove_admin"]:
+        raise HTTPException(status_code=400, detail=f"Invalid action: {action}")
+
+    old_values = {"is_active": target.is_active, "is_banned": target.is_banned, "is_admin": target.is_admin}
+
+    if action == "suspend":
+        target.is_active = False
+        target.is_banned = False
+    elif action == "ban":
+        target.is_active = False
+        target.is_banned = True
+    elif action == "unban":
+        target.is_active = True
+        target.is_banned = False
+    elif action == "activate":
+        target.is_active = True
+        target.is_banned = False
+    elif action == "make_admin":
+        target.is_admin = True
+    elif action == "remove_admin":
+        target.is_admin = False
+
+    db.commit()
+
+    # Audit log
+    try:
+        admin_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(
+            db, user_id=admin.id, email=admin.email,
+            event_type="admin_action",
+            details={"action": action, "target_user_id": target.id, "target_email": target.email, "old_values": str(old_values)},
+            ip_address=admin_ip,
+        )
+    except Exception as e:
+        logger.warning(f"Audit log error: {e}")
+
+    return {"status": "success", "message": f"Action '{action}' applied to {target.email}", "user": {
+        "id": target.id,
+        "email": target.email,
+        "is_active": target.is_active,
+        "is_banned": target.is_banned,
+        "is_admin": target.is_admin,
+    }}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DELETE USER — Soft delete preferred
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.delete("/users/{user_id}")
+def delete_user(
+    user_id: int,
+    request: Request,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if target.id == admin.id:
+        raise HTTPException(status_code=400, detail="Cannot delete yourself")
+
+    # Soft delete: mark as deleted/inactive
+    target.is_active = False
+    target.is_banned = True
+    target.email = f"deleted_{target.id}_{target.email}"
+    target.hashed_password = ""
+    db.commit()
+
+    # Audit log
+    try:
+        admin_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(
+            db, user_id=admin.id, email=admin.email,
+            event_type="admin_action",
+            details={"action": "delete_user", "target_user_id": target.id, "target_email": target.email},
+            ip_address=admin_ip,
+        )
+    except Exception as e:
+        logger.warning(f"Audit log error: {e}")
+
+    return {"status": "success", "message": f"User {target.email} soft-deleted"}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# AUDIT LOGS
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/audit-logs")
+def list_audit_logs(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+    event_type: Optional[str] = Query(None),
+    user_id: Optional[int] = Query(None),
+    from_date: Optional[str] = Query(None),
+    to_date: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(50, ge=1, le=200),
+):
+    query = db.query(AuditLog).order_by(desc(AuditLog.created_at))
+
+    if event_type:
+        query = query.filter(AuditLog.event_type == event_type)
+    if user_id:
+        query = query.filter(AuditLog.user_id == user_id)
+    if from_date:
+        try:
+            fd = datetime.fromisoformat(from_date)
+            query = query.filter(AuditLog.created_at >= fd)
+        except ValueError:
+            pass
+    if to_date:
+        try:
+            td = datetime.fromisoformat(to_date)
+            query = query.filter(AuditLog.created_at <= td)
+        except ValueError:
+            pass
+
+    total = query.count()
+    logs = query.offset((page - 1) * limit).limit(limit).all()
+
+    result = []
+    for log in logs:
+        entry = {
+            "id": log.id,
+            "user_id": log.user_id,
+            "email": log.email,
+            "event_type": log.event_type,
+            "details": None,
+            "ip_address": log.ip_address,
+            "created_at": log.created_at.isoformat() if log.created_at else None,
+        }
+        if log.details:
+            try:
+                entry["details"] = json.loads(log.details)
+            except Exception:
+                entry["details"] = log.details
+        result.append(entry)
+
+    return {"logs": result, "total": total, "page": page, "limit": limit}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# REVENUE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/revenue")
+def get_revenue(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # MRR
+    active_paid = db.query(User.plan, func.count(User.id)).filter(
+        User.plan.in_(["plus", "pro", "enterprise"]),
+        User.plan_expires_at > now
+    ).group_by(User.plan).all()
+    mrr = sum(PLAN_PRICES_INR.get(plan, 0) * count for plan, count in active_paid)
+
+    # Current month revenue (from audit_logs plan_purchase events this month)
+    month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    current_month_purchases = db.query(AuditLog).filter(
+        AuditLog.event_type == "plan_purchase",
+        AuditLog.created_at >= month_start,
+    ).all()
+
+    current_month_revenue = 0
+    for log in current_month_purchases:
+        try:
+            details = json.loads(log.details) if log.details else {}
+            current_month_revenue += details.get("amount", 0) / 100  # paise to INR
+        except Exception:
+            pass
+
+    # Last month revenue
+    if now.month == 1:
+        last_month_start = now.replace(year=now.year - 1, month=12, day=1, hour=0, minute=0, second=0, microsecond=0)
+    else:
+        last_month_start = now.replace(month=now.month - 1, day=1, hour=0, minute=0, second=0, microsecond=0)
+    last_month_purchases = db.query(AuditLog).filter(
+        AuditLog.event_type == "plan_purchase",
+        AuditLog.created_at >= last_month_start,
+        AuditLog.created_at < month_start,
+    ).all()
+
+    last_month_revenue = 0
+    for log in last_month_purchases:
+        try:
+            details = json.loads(log.details) if log.details else {}
+            last_month_revenue += details.get("amount", 0) / 100
+        except Exception:
+            pass
+
+    # Revenue by plan
+    revenue_by_plan = []
+    for plan_name in ["plus", "pro", "enterprise"]:
+        plan_users = db.query(func.count(User.id)).filter(
+            User.plan == plan_name,
+            User.plan_expires_at > now
+        ).scalar() or 0
+        amount = PLAN_PRICES_INR.get(plan_name, 0) * plan_users
+        revenue_by_plan.append({"plan": plan_name, "users": plan_users, "amount": amount})
+
+    # Daily revenue last 30 days
+    daily_revenue = []
+    for i in range(29, -1, -1):
+        day = today_start - timedelta(days=i)
+        next_day = day + timedelta(days=1)
+        day_purchases = db.query(AuditLog).filter(
+            AuditLog.event_type == "plan_purchase",
+            AuditLog.created_at >= day,
+            AuditLog.created_at < next_day,
+        ).all()
+        day_revenue = 0
+        for log in day_purchases:
+            try:
+                details = json.loads(log.details) if log.details else {}
+                day_revenue += details.get("amount", 0) / 100
+            except Exception:
+                pass
+        daily_revenue.append({"date": day.strftime("%Y-%m-%d"), "revenue": round(day_revenue, 2)})
+
+    return {
+        "mrr": mrr,
+        "current_month_revenue": round(current_month_revenue, 2),
+        "last_month_revenue": round(last_month_revenue, 2),
+        "revenue_by_plan": revenue_by_plan,
+        "daily_revenue_last_30_days": daily_revenue,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LEGACY ENDPOINTS — Keep backward compatible
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/feedbacks")
+def list_all_feedbacks(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    feedbacks = db.query(Feedback).order_by(Feedback.created_at.desc()).limit(100).all()
+    return feedbacks
+
 
 @router.post("/update-plan")
 def update_user_plan(data: UserUpdate, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
@@ -253,7 +518,7 @@ def update_user_plan(data: UserUpdate, admin: User = Depends(get_current_admin),
     target_user.plan_started_at = now
     target_user.plan_expires_at = _get_plan_expiry(data.plan, data.duration_days)
     target_user.plan_source = "admin"
-    target_user.plan_payment_id = None  # Admin-assigned, no payment
+    target_user.plan_payment_id = None
 
     db.commit()
 
@@ -268,10 +533,6 @@ def update_user_plan(data: UserUpdate, admin: User = Depends(get_current_admin),
     }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# EXTEND PLAN — Add more days to existing plan
-# ═══════════════════════════════════════════════════════════════════════════════
-
 class ExtendPlanReq(BaseModel):
     email: str
     extra_days: int = 30
@@ -279,7 +540,7 @@ class ExtendPlanReq(BaseModel):
 @router.post("/extend-plan")
 def extend_user_plan(data: ExtendPlanReq, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
     if data.extra_days < 1 or data.extra_days > 3650:
-        raise HTTPException(status_code=400, detail="Extra days must be between 1 and 3650")
+        raise HTTPException(status_code=400, detail="Extra days must be between 1 and 3650 days")
 
     target_user = db.query(User).filter(User.email == data.email).first()
     if not target_user:
@@ -288,7 +549,6 @@ def extend_user_plan(data: ExtendPlanReq, admin: User = Depends(get_current_admi
     if target_user.plan == "free":
         raise HTTPException(status_code=400, detail="Cannot extend free plan. Assign a paid plan first.")
 
-    # Extend from current expiry (or now if expired/missing)
     now = datetime.now(timezone.utc)
     base_date = target_user.plan_expires_at if target_user.plan_expires_at and target_user.plan_expires_at > now else now
     target_user.plan_expires_at = base_date + timedelta(days=data.extra_days)
@@ -302,10 +562,6 @@ def extend_user_plan(data: ExtendPlanReq, admin: User = Depends(get_current_admi
         "new_expires_at": target_user.plan_expires_at.isoformat(),
     }
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# REVOKE PLAN — Reset user to free
-# ═══════════════════════════════════════════════════════════════════════════════
 
 class RevokePlanReq(BaseModel):
     email: str
@@ -331,20 +587,6 @@ def revoke_user_plan(data: RevokePlanReq, admin: User = Depends(get_current_admi
     }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# FEEDBACKS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-@router.get("/feedbacks")
-def list_all_feedbacks(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
-    feedbacks = db.query(Feedback).order_by(Feedback.created_at.desc()).limit(100).all()
-    return feedbacks
-
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# BOOTSTRAP ADMIN
-# ═══════════════════════════════════════════════════════════════════════════════
-
 @router.post("/bootstrap")
 def bootstrap_admin(data: BootstrapReq, db: Session = Depends(get_db)):
     if not _verify_admin_secret(data.secret):
@@ -363,12 +605,8 @@ def bootstrap_admin(data: BootstrapReq, db: Session = Depends(get_db)):
     }
 
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# DELETE USER
-# ═══════════════════════════════════════════════════════════════════════════════
-
 @router.post("/delete-user")
-def delete_user(data: DeleteUserReq, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+def delete_user_legacy(data: DeleteUserReq, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
     if not _verify_admin_secret(data.secret):
         raise HTTPException(status_code=403, detail="Invalid secret")
 
@@ -376,7 +614,6 @@ def delete_user(data: DeleteUserReq, admin: User = Depends(get_current_admin), d
     if not target:
         return {"status": "not_found", "message": "No user found with that email."}
 
-    # Delete dependencies (ordered to respect foreign keys)
     from models import ApiKey, ApiLog, Feedback, TeamMember
     try:
         from webhooks import Webhook, WebhookLog
@@ -412,7 +649,7 @@ def delete_user(data: DeleteUserReq, admin: User = Depends(get_current_admin), d
         db.query(HealthCheck).filter(HealthCheck.user_id == target.id).delete()
         db.query(Integration).filter(Integration.user_id == target.id).delete()
     except Exception as e:
-        logger.warning(f"Failed to delete user-related data (integrations/health/alerts): {e}")
+        logger.warning(f"Failed to delete user-related data: {e}")
     db.query(ApiLog).filter(ApiLog.user_id == target.id).delete()
     db.query(ApiKey).filter(ApiKey.user_id == target.id).delete()
     db.query(Feedback).filter(Feedback.user_id == target.id).delete()
@@ -422,10 +659,6 @@ def delete_user(data: DeleteUserReq, admin: User = Depends(get_current_admin), d
     db.commit()
     return {"status": "deleted", "message": "User and all related data deleted."}
 
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# RESEND VERIFICATION EMAIL
-# ═══════════════════════════════════════════════════════════════════════════════
 
 @router.post("/resend-verify")
 def admin_resend_verify(data: ResendVerifyReq, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
@@ -448,8 +681,8 @@ def admin_resend_verify(data: ResendVerifyReq, admin: User = Depends(get_current
 
     from email_service import send_verification_email
     result = send_verification_email(target.email, token)
-    status = "sent" if result else "failed"
+    status_val = "sent" if result else "failed"
     return {
-        "status": status,
-        "message": f"Verification email {status} to user."
+        "status": status_val,
+        "message": f"Verification email {status_val} to user."
     }
