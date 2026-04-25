@@ -101,7 +101,7 @@ interface HealthData {
   version: string;
   uptime: string;
   uptime_seconds: number;
-  checks: { database: string; cache: string };
+  checks: Record<string, string>;
 }
 
 // ─── Constants ──────────────────────────────────────────────────────────────
