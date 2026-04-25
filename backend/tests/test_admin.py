@@ -54,7 +54,7 @@ class TestAdminStats:
         assert resp.status_code == 200
         data = resp.json()
         assert "total_users" in data
-        assert "total_requests" in data
+        assert "total_requests_today" in data
         assert "plan_distribution" in data
 
     def test_get_stats_as_non_admin_rejected(self, client):
@@ -76,7 +76,10 @@ class TestListUsers:
         h, _ = _create_admin_headers(client)
         resp = client.get("/api/admin/users", headers=h)
         assert resp.status_code == 200
-        assert isinstance(resp.json(), list)
+        body = resp.json()
+        assert isinstance(body, dict)
+        assert "users" in body
+        assert isinstance(body["users"], list)
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
