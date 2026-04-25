@@ -7,6 +7,7 @@ import {
   CheckCircle2, XCircle, X, Crown, Zap, Star, TrendingUp, UserCog,
   Plus, ArrowDownUp, Ban, Server, Database, Shield, Cpu, RefreshCw,
   Eye, Trash2, UserMinus, Mail, ExternalLink,
+  DollarSign, Key, Wifi, WifiOff, Gauge, Timer, Globe,
 } from "lucide-react";
 
 type Tab = "overview" | "users" | "feedback";
@@ -220,6 +221,11 @@ export default function AdminPage() {
             <div key={i} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-28" />
           ))}
         </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-28" />
+          ))}
+        </div>
         <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-64" />
       </div>
     );
@@ -243,6 +249,14 @@ export default function AdminPage() {
     );
   }
 
+  // ─── Helper: Error Rate Color ──────────────────────────────────────────
+  const getErrorRateColor = (rate: number | undefined) => {
+    if (rate === undefined || rate === null) return { text: "text-zinc-500", bg: "bg-zinc-500/10", border: "border-zinc-500/20" };
+    if (rate >= 5) return { text: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" };
+    if (rate >= 1) return { text: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" };
+    return { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" };
+  };
+
   return (
     <div className="space-y-6 max-w-7xl">
       {/* Header */}
@@ -258,7 +272,7 @@ export default function AdminPage() {
         </div>
         <div className="flex items-center gap-2">
           <button onClick={refreshData} className="p-2 rounded-lg bg-white/[0.03] border border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-600 transition-colors" title="Refresh">
-            <RefreshCw className="w-4 h-4" />
+            <RefreshCw className="h-4 w-4" />
           </button>
           <UserCog className="w-5 h-5 text-zinc-600" />
         </div>
@@ -267,7 +281,7 @@ export default function AdminPage() {
       {/* Action Toast */}
       {actionMsg && (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${actionMsg.type === "success" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"}`}>
-          {actionMsg.type === "success" ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <XCircle className="w-4 h-4 flex-shrink-0" />}
+          {actionMsg.type === "success" ? <CheckCircle2 className="h-4 w-4 flex-shrink-0" /> : <XCircle className="h-4 w-4 flex-shrink-0" />}
           <span className="text-sm font-medium">{actionMsg.text}</span>
         </div>
       )}
@@ -276,7 +290,7 @@ export default function AdminPage() {
       <div className="flex gap-1 p-1 bg-zinc-900/40 border border-zinc-800 rounded-xl w-fit">
         {([
           { id: "overview" as Tab, label: "Overview", icon: Activity },
-          { id: "users" as Tab, label: `Users (${users.length})`, icon: Users },
+          { id: "users" as Tab, label: `Users (${stats?.total_users || 0})`, icon: Users },
           { id: "feedback" as Tab, label: "Feedback", icon: MessageSquare, badge: pendingFeedbacks },
         ]).map(tab => (
           <button
@@ -302,20 +316,39 @@ export default function AdminPage() {
       ═══════════════════════════════════════════════════════════════ */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          {/* Stats Cards */}
+          {/* Stats Cards — Row 1 */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
               { label: "Total Users", value: stats?.total_users || 0, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
               { label: "Paid Users", value: stats?.paid_users || 0, icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
               { label: "Expiring Soon", value: stats?.expiring_soon || 0, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", sub: "(7 days)" },
-              { label: "Total Requests", value: stats?.total_requests || 0, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+              { label: "MRR", value: stats?.mrr != null ? `$${stats.mrr}` : "$0", icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", raw: true },
             ].map((card) => (
               <div key={card.label} className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors`}>
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`p-2 ${card.bg} rounded-lg ${card.color}`}><card.icon className="h-4 w-4" /></div>
                   <span className="text-xs text-zinc-500">{card.label}</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{card.value.toLocaleString()}</p>
+                <p className="text-2xl font-bold text-white">{card.raw ? card.value : card.value.toLocaleString()}</p>
+                {card.sub && <span className="text-[10px] text-zinc-600">{card.sub}</span>}
+              </div>
+            ))}
+          </div>
+
+          {/* Stats Cards — Row 2 */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Requests (24h)", value: stats?.requests_last_24h || 0, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+              { label: "Active API Keys", value: stats?.active_api_keys || 0, icon: Key, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20" },
+              { label: "WAF Blocks (Today)", value: stats?.waf_blocks_today || 0, icon: WifiOff, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
+              { label: "Error Rate (5xx)", value: stats?.error_rate_5xx != null ? `${stats.error_rate_5xx.toFixed(1)}%` : "0%", icon: AlertTriangle, color: getErrorRateColor(stats?.error_rate_5xx).text, bg: getErrorRateColor(stats?.error_rate_5xx).bg, border: getErrorRateColor(stats?.error_rate_5xx).border, raw: true },
+            ].map((card) => (
+              <div key={card.label} className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 ${card.bg} rounded-lg ${card.color}`}><card.icon className="h-4 w-4" /></div>
+                  <span className="text-xs text-zinc-500">{card.label}</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{card.raw ? card.value : card.value.toLocaleString()}</p>
                 {card.sub && <span className="text-[10px] text-zinc-600">{card.sub}</span>}
               </div>
             ))}
@@ -358,7 +391,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* System Health */}
+            {/* System Health — Connected to Real /health Endpoint */}
             <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <Server className="w-4 h-4 text-zinc-500" />
@@ -366,9 +399,11 @@ export default function AdminPage() {
               </div>
               <div className="space-y-3">
                 {[
-                  { label: "Backend Status", value: health ? "Online" : "Checking...", icon: Cpu, ok: !!health, detail: health ? `v${health.version || "2.0"}` : null },
-                  { label: "Gateway", value: health?.gateway ? "Active" : "Unknown", icon: Shield, ok: !!health?.gateway },
-                  { label: "Expired Plans", value: stats?.expired_plans || 0, icon: AlertTriangle, ok: (stats?.expired_plans || 0) < 3, detail: stats?.expired_plans > 0 ? "Need attention" : null },
+                  { label: "Backend Status", value: health?.status === "ok" ? "Online" : health ? "Offline" : "Checking...", icon: Cpu, ok: health?.status === "ok", detail: null },
+                  { label: "Database", value: health?.database === "connected" ? "Connected" : health ? "Disconnected" : "Unknown", icon: Database, ok: health?.database === "connected", detail: health?.db_latency_ms != null ? `${health.db_latency_ms}ms` : null },
+                  { label: "Uptime", value: health?.uptime || "—", icon: Timer, ok: true, detail: null },
+                  { label: "Avg Latency", value: stats?.avg_latency_ms != null ? `${stats.avg_latency_ms}ms` : "—", icon: Gauge, ok: true, detail: null },
+                  { label: "Expired Plans", value: stats?.expired_plans || 0, icon: AlertTriangle, ok: (stats?.expired_plans || 0) === 0, detail: stats?.expired_plans > 0 ? "Need attention" : null },
                   { label: "Pending Feedback", value: stats?.pending_feedbacks || 0, icon: MessageSquare, ok: (stats?.pending_feedbacks || 0) < 5 },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30">
@@ -392,14 +427,14 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Quick Actions</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "Manage Users", desc: "Plans, access & more", icon: Users, tab: "users" as Tab },
-                { label: "View Feedback", desc: `${pendingFeedbacks} pending`, icon: MessageSquare, tab: "feedback" as Tab },
-                { label: "API Docs", desc: "Swagger / OpenAPI", icon: ExternalLink, href: "/dashboard/docs" },
-                { label: "System Health", desc: "Backend status", icon: Server, action: () => {} },
+                { label: "Manage Users", desc: "Plans, access & more", icon: Users, action: () => setActiveTab("users") },
+                { label: "View Feedback", desc: `${pendingFeedbacks} pending`, icon: MessageSquare, action: () => setActiveTab("feedback") },
+                { label: "Ban User", desc: "Search & suspend", icon: Ban, action: () => { setActiveTab("users"); setTimeout(() => { document.querySelector<HTMLInputElement>("input[type='text']")?.focus(); }, 100); } },
+                { label: "View Activity", desc: "System logs", icon: Activity, action: () => setActiveTab("overview") },
               ].map(action => (
                 <button
                   key={action.label}
-                  onClick={() => action.tab ? setActiveTab(action.tab) : action.href ? window.open(action.href, "_blank") : null}
+                  onClick={action.action}
                   className="flex items-start gap-3 p-4 rounded-xl bg-zinc-800/30 border border-zinc-800 hover:border-zinc-600 text-left transition-colors group"
                 >
                   <div className="p-2 rounded-lg bg-white/[0.03] group-hover:bg-white/[0.06] transition-colors">
@@ -433,6 +468,17 @@ export default function AdminPage() {
                 className="w-full pl-9 pr-4 py-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-zinc-600"
               />
             </div>
+            <select
+              value={planFilter}
+              onChange={(e) => setPlanFilter(e.target.value as PlanFilter)}
+              className="px-3 py-2.5 rounded-xl bg-zinc-900/60 border border-zinc-800 text-sm text-zinc-400 focus:outline-none focus:border-zinc-600"
+            >
+              <option value="all">All Plans</option>
+              <option value="free">Free</option>
+              <option value="plus">Plus</option>
+              <option value="pro">Pro</option>
+              <option value="enterprise">Enterprise</option>
+            </select>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
@@ -752,7 +798,7 @@ export default function AdminPage() {
               disabled={updating === selectedUser.email}
               className="w-full py-3 rounded-xl text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {updating === selectedUser.email ? <><Loader2 className="w-4 w-4 animate-spin" /> Updating...</> : <>Assign {PLAN_CONFIG[modalPlan]?.label} Plan</>}
+              {updating === selectedUser.email ? <><Loader2 className="h-4 w-4 animate-spin" /> Updating...</> : <>Assign {PLAN_CONFIG[modalPlan]?.label} Plan</>}
             </button>
           </div>
         </div>
@@ -796,7 +842,7 @@ export default function AdminPage() {
               disabled={deleteConfirmEmail !== selectedUser.email || updating === selectedUser.email}
               className="w-full py-3 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-400 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {updating === selectedUser.email ? <><Loader2 className="w-4 w-4 animate-spin" /> Deleting...</> : <><Trash2 className="w-4 h-4" /> Delete Permanently</>}
+              {updating === selectedUser.email ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : <><Trash2 className="w-4 h-4" /> Delete Permanently</>}
             </button>
           </div>
         </div>
