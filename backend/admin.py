@@ -1,11 +1,12 @@
 import hmac
 import json
 import logging
+import time as _time
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 from typing import Optional
-from models import User, Feedback, ApiLog, ApiKey, AuditLog, create_audit_log
+from models import User, Feedback, ApiLog, ApiKey, AuditLog, ApiEndpoint, create_audit_log
 from dependencies import get_current_admin, get_db
 from pydantic import BaseModel
 from config import ADMIN_SECRET
@@ -686,3 +687,386 @@ def admin_resend_verify(data: ResendVerifyReq, admin: User = Depends(get_current
         "status": status_val,
         "message": f"Verification email {status_val} to user."
     }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# MONITORING — System monitoring endpoints (Phase 3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/monitoring/summary")
+def get_monitoring_summary(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Get system monitoring summary — request counts, latency, circuit breakers."""
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Circuit breaker states
+    try:
+        import circuit_breaker as _cb
+        circuit_states = _cb.get_all_circuit_states()
+    except Exception:
+        circuit_states = {}
+
+    active_circuits = len(circuit_states)
+    open_circuits = sum(1 for s in circuit_states.values() if s.get("state") == "OPEN")
+    half_open_circuits = sum(1 for s in circuit_states.values() if s.get("state") == "HALF_OPEN")
+
+    # Request counts today
+    total_requests_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start
+    ).scalar() or 0
+
+    success_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start,
+        ApiLog.status_code < 400
+    ).scalar() or 0
+
+    errors_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start,
+        ApiLog.status_code >= 400
+    ).scalar() or 0
+
+    # Avg latency today
+    avg_latency = db.query(func.avg(ApiLog.latency_ms)).filter(
+        ApiLog.created_at >= today_start
+    ).scalar()
+    avg_latency_today = round(avg_latency) if avg_latency else 0
+
+    # P95 latency (approximate from top 5%)
+    all_latencies = db.query(ApiLog.latency_ms).filter(
+        ApiLog.created_at >= today_start
+    ).order_by(ApiLog.latency_ms.desc()).limit(100).all()
+    p95_latency = all_latencies[int(len(all_latencies) * 0.05)][0] if all_latencies and len(all_latencies) > 1 else 0
+
+    return {
+        "circuits": {
+            "active": active_circuits,
+            "open": open_circuits,
+            "half_open": half_open_circuits,
+            "closed": active_circuits - open_circuits - half_open_circuits,
+            "total": active_circuits,
+        },
+        "requests_today": {
+            "total": total_requests_today,
+            "success": success_today,
+            "errors": errors_today,
+            "error_rate_pct": round((errors_today / total_requests_today * 100), 2) if total_requests_today > 0 else 0,
+        },
+        "latency_today": {
+            "avg_ms": avg_latency_today,
+            "p95_ms": p95_latency,
+        },
+        "circuit_details": circuit_states,
+    }
+
+
+@router.get("/monitoring/metrics")
+def get_system_metrics(admin: User = Depends(get_current_admin)):
+    """Get system metrics — CPU-like stats, memory usage, uptime."""
+    now = _time.time()
+
+    # Try to get process-level metrics
+    import os as _os
+    import sys as _sys
+
+    try:
+        import resource
+        max_rss_mb = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024  # macOS: bytes, Linux: KB
+    except Exception:
+        max_rss_mb = 0
+
+    # Get uptime from main module
+    try:
+        import main as _main
+        uptime_seconds = int(now - _main._START_TIME)
+    except Exception:
+        uptime_seconds = 0
+
+    # Get thread count
+    import threading
+    active_threads = threading.active_count()
+
+    # Get circuit breaker stats
+    try:
+        import circuit_breaker as _cb
+        cb_states = _cb.get_all_circuit_states()
+    except Exception:
+        cb_states = {}
+
+    total_cb_requests = sum(s.get("total_requests", 0) for s in cb_states.values())
+    total_cb_successes = sum(s.get("success_count", 0) for s in cb_states.values())
+    total_cb_failures = sum(s.get("failure_total", 0) for s in cb_states.values())
+
+    return {
+        "uptime_seconds": uptime_seconds,
+        "uptime_str": f"{uptime_seconds // 3600}h {(uptime_seconds % 3600) // 60}m",
+        "memory": {
+            "max_rss_mb": round(max_rss_mb, 2),
+        },
+        "process": {
+            "thread_count": active_threads,
+            "python_version": _sys.version.split()[0],
+        },
+        "circuit_breaker": {
+            "total_circuits": len(cb_states),
+            "total_requests_tracked": total_cb_requests,
+            "total_successes": total_cb_successes,
+            "total_failures": total_cb_failures,
+        },
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECURITY — WAF & rate limiting endpoints (Phase 3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/security/waf-stats")
+def get_waf_stats(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Get WAF statistics — blocks by category, top blocked IPs."""
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Total WAF blocks today (403 status)
+    blocks_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start,
+        ApiLog.status_code == 403
+    ).scalar() or 0
+
+    # Blocks in last 24h
+    blocks_24h = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code == 403
+    ).scalar() or 0
+
+    # Top blocked IPs (last 24h)
+    blocked_ips = db.query(
+        ApiLog.ip_address, func.count(ApiLog.id).label("block_count")
+    ).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code == 403,
+        ApiLog.ip_address.isnot(None),
+    ).group_by(ApiLog.ip_address).order_by(desc("block_count")).limit(10).all()
+
+    # Top blocked paths (last 24h)
+    blocked_paths = db.query(
+        ApiLog.path, func.count(ApiLog.id).label("block_count")
+    ).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code == 403,
+    ).group_by(ApiLog.path).order_by(desc("block_count")).limit(10).all()
+
+    # Blocks by hour today
+    blocks_by_hour = []
+    for hour in range(24):
+        hour_start = today_start + timedelta(hours=hour)
+        hour_end = hour_start + timedelta(hours=1)
+        count = db.query(func.count(ApiLog.id)).filter(
+            ApiLog.created_at >= hour_start,
+            ApiLog.created_at < hour_end,
+            ApiLog.status_code == 403
+        ).scalar() or 0
+        blocks_by_hour.append({"hour": hour, "count": count})
+
+    return {
+        "blocks_today": blocks_today,
+        "blocks_24h": blocks_24h,
+        "top_blocked_ips": [{"ip": ip, "count": count} for ip, count in blocked_ips],
+        "top_blocked_paths": [{"path": path, "count": count} for path, count in blocked_paths],
+        "blocks_by_hour_today": blocks_by_hour,
+    }
+
+
+@router.get("/security/rate-limits")
+def get_rate_limit_stats(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Get rate limiting statistics."""
+    now = datetime.now(timezone.utc)
+    today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    # Total rate-limited requests (429) today
+    rate_limited_today = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= today_start,
+        ApiLog.status_code == 429
+    ).scalar() or 0
+
+    # Rate-limited in last 24h
+    rate_limited_24h = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code == 429
+    ).scalar() or 0
+
+    # Top rate-limited IPs
+    rate_limited_ips = db.query(
+        ApiLog.ip_address, func.count(ApiLog.id).label("count")
+    ).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code == 429,
+        ApiLog.ip_address.isnot(None),
+    ).group_by(ApiLog.ip_address).order_by(desc("count")).limit(10).all()
+
+    # Get rate limiter usage info if available
+    rate_limiter_info = {}
+    try:
+        from rate_limiter import rate_limiter
+        rate_limiter_info = {"backend": type(rate_limiter._store).__name__}
+    except Exception:
+        pass
+
+    return {
+        "rate_limited_today": rate_limited_today,
+        "rate_limited_24h": rate_limited_24h,
+        "top_rate_limited_ips": [{"ip": ip, "count": count} for ip, count in rate_limited_ips],
+        "rate_limiter": rate_limiter_info,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LOGS — Live log tail endpoint (Phase 3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/logs/live")
+def get_live_logs(
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+    seconds: int = Query(60, ge=10, le=300),
+):
+    """Get recent API logs for live tail — last N seconds."""
+    now = datetime.now(timezone.utc)
+    cutoff = now - timedelta(seconds=seconds)
+
+    logs = db.query(ApiLog).filter(
+        ApiLog.created_at >= cutoff
+    ).order_by(desc(ApiLog.created_at)).limit(200).all()
+
+    result = []
+    for log in logs:
+        entry = {
+            "id": log.id,
+            "method": log.method,
+            "path": log.path,
+            "status": log.status_code,
+            "latency_ms": log.latency_ms,
+            "ip": log.ip_address,
+            "created_at": log.created_at.isoformat() if log.created_at else None,
+            "was_cached": log.was_cached,
+        }
+        result.append(entry)
+
+    return {"logs": result, "count": len(result), "window_seconds": seconds}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ENDPOINTS — All registered proxy endpoints (Phase 3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/endpoints")
+def get_all_endpoints(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Get all registered proxy endpoints across all users."""
+    endpoints = db.query(ApiEndpoint).order_by(desc(ApiEndpoint.total_requests)).limit(500).all()
+
+    result = []
+    for ep in endpoints:
+        # Get user email
+        user = db.query(User).filter(User.id == ep.user_id).first()
+        result.append({
+            "id": ep.id,
+            "user_id": ep.user_id,
+            "user_email": user.email if user else "unknown",
+            "method": ep.method,
+            "path": ep.path,
+            "description": ep.description,
+            "avg_latency_ms": ep.avg_latency_ms,
+            "total_requests": ep.total_requests,
+            "success_rate": ep.success_rate,
+            "last_seen": ep.last_seen.isoformat() if ep.last_seen else None,
+            "is_starred": ep.is_starred,
+        })
+
+    return {"endpoints": result, "total": len(result)}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WAF RULES — Admin view of all WAF rules (Phase 3)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/waf/rules")
+def get_waf_rules(admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Get all WAF rules (built-in + custom) for admin view."""
+    # Get built-in rules from waf_engine
+    builtin_rules = []
+    try:
+        from waf_engine import waf_engine
+        builtin_rules = waf_engine.get_builtin_rules()
+    except Exception:
+        pass
+
+    # Get custom rules from waf_engine
+    custom_rules = []
+    try:
+        from waf_engine import waf_engine
+        custom_rules = waf_engine.get_custom_rules()
+    except Exception:
+        pass
+
+    # Also get custom WAF rules from DB
+    db_custom_rules = []
+    try:
+        from custom_waf import CustomWafRule
+        rules = db.query(CustomWafRule).order_by(desc(CustomWafRule.hit_count)).limit(200).all()
+        for rule in rules:
+            user = db.query(User).filter(User.id == rule.user_id).first()
+            db_custom_rules.append({
+                "id": rule.id,
+                "user_id": rule.user_id,
+                "user_email": user.email if user else "unknown",
+                "name": rule.name,
+                "pattern": rule.pattern,
+                "action": rule.action,
+                "severity": rule.severity,
+                "is_enabled": rule.is_enabled,
+                "hit_count": rule.hit_count or 0,
+                "created_at": rule.created_at.isoformat() if rule.created_at else None,
+            })
+    except Exception:
+        pass
+
+    return {
+        "builtin_rules": builtin_rules,
+        "engine_custom_rules": custom_rules,
+        "db_custom_rules": db_custom_rules,
+        "builtin_count": len(builtin_rules),
+        "custom_count": len(db_custom_rules),
+    }
+
+
+@router.post("/waf/rules/{rule_id}/toggle")
+def toggle_waf_rule_admin(rule_id: int, admin: User = Depends(get_current_admin), db: Session = Depends(get_db)):
+    """Admin toggle any user's WAF rule."""
+    try:
+        from custom_waf import CustomWafRule
+        rule = db.query(CustomWafRule).filter(CustomWafRule.id == rule_id).first()
+        if not rule:
+            raise HTTPException(status_code=404, detail="WAF rule not found")
+
+        rule.is_enabled = not rule.is_enabled
+        db.commit()
+        db.refresh(rule)
+
+        # Audit log
+        try:
+            create_audit_log(
+                db, user_id=admin.id, email=admin.email,
+                event_type="admin_action",
+                details={"action": "toggle_waf_rule", "rule_id": rule_id, "new_state": "enabled" if rule.is_enabled else "disabled"},
+            )
+        except Exception:
+            pass
+
+        return {
+            "status": "success",
+            "rule_id": rule_id,
+            "is_enabled": rule.is_enabled,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to toggle WAF rule: {e}")
