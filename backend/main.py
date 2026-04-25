@@ -7,6 +7,7 @@ import threading
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
 from starlette.middleware.gzip import GZipMiddleware
 from sqlalchemy import text
 from database import engine, Base, SessionLocal
@@ -283,15 +284,75 @@ app.add_middleware(
 )
 
 
+# ─── Error Code Mapping ─────────────────────────────────────────────────────────
+_ERROR_CODE_MAP = {
+    400: "validation_error",
+    401: "unauthorized",
+    403: "forbidden",
+    404: "not_found",
+    413: "validation_error",
+    422: "validation_error",
+    429: "rate_limit_exceeded",
+    500: "server_error",
+    502: "server_error",
+    503: "server_error",
+    504: "server_error",
+}
+
+
+def _build_error_response(status_code: int, message: str, code: str = None, request_id: str = None) -> JSONResponse:
+    """Build a uniform JSON error response."""
+    if code is None:
+        code = _ERROR_CODE_MAP.get(status_code, "server_error")
+    payload = {"error": True, "message": message, "code": code}
+    if request_id:
+        payload["request_id"] = request_id
+    return JSONResponse(status_code=status_code, content=payload)
+
+
+def _get_request_id(request: Request) -> str:
+    """Extract request ID from X-Request-ID header or generate one."""
+    return request.headers.get("X-Request-ID", "") or ""
+
+
 # Exception handlers
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    request_id = _get_request_id(request)
+    errors = exc.errors()
+    # Build a human-readable message from validation errors
+    details = "; ".join(
+        f"{e.get('loc', ['field'])[-1]}: {e.get('msg', 'invalid')}"
+        for e in errors
+    )
+    logger.warning(f"Validation error (request_id={request_id}): {details}")
+    return _build_error_response(422, f"Validation error: {details}", "validation_error", request_id)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    request_id = _get_request_id(request)
+    message = str(exc.detail) if exc.detail else _ERROR_CODE_MAP.get(exc.status_code, "Unknown error")
+    code = _ERROR_CODE_MAP.get(exc.status_code, "server_error")
+    if exc.status_code == 401 and "api_key" in message.lower():
+        code = "invalid_api_key"
+    if exc.status_code == 400 and "body" in message.lower():
+        code = "missing_body"
+    if exc.status_code == 403 and "waf" in message.lower():
+        code = "waf_blocked"
+    if exc.status_code == 429:
+        code = "rate_limit_exceeded"
+    logger.warning(f"HTTP {exc.status_code} (request_id={request_id}, code={code}): {message}")
+    return _build_error_response(exc.status_code, message, code, request_id)
+
+
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    from fastapi import HTTPException as _HTTPException
-    if isinstance(exc, _HTTPException):
-        raise exc
+    request_id = _get_request_id(request)
     import traceback
     traceback.print_exc()
-    return JSONResponse(status_code=500, content={"error": "Internal server error"})
+    logger.error(f"Unhandled exception (request_id={request_id}): {exc}")
+    return _build_error_response(500, "Internal server error", "server_error", request_id)
 
 # Health Endpoint (Public — enhanced with system checks)
 @app.get("/health")
