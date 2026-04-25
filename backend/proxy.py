@@ -72,13 +72,18 @@ BLOCKED_HOSTNAMES = [
 ALLOWED_SCHEMES = {"http", "https"}
 
 # ─── WAF PATTERNS (Regex-based) ──────────────────────────────────────────────
+# NOTE: SQLi patterns temporarily disabled (v2.0.1).
+# Regex-based SQLi detection causes false positives and is trivially bypassable.
+# Custom WAF rules can fill this gap in the interim.
+# TODO: Replace with libinjection-based detection in a future release.
+#
 WAF_PATTERNS = [
-    # SQL Injection
-    re.compile(r"(\b(union\s+(all\s+)?select|insert\s+into|update\s+.*\bset\b|delete\s+from|drop\s+(table|database|column)|alter\s+table|create\s+table|truncate\s+table)\b)", re.IGNORECASE),
-    re.compile(r"(\b(select\s+.*\bfrom\b|exec\s*\(|execute\s*\(|xp_cmdshell|sp_executesql)\b)", re.IGNORECASE),
-    re.compile(r"(--|#|/\*.*\*/|;\s*(drop|alter|create|truncate|delete|update|insert))", re.IGNORECASE),
-    re.compile(r"('\s*(or|and)\s+[\d'\"=]+)", re.IGNORECASE),
-    re.compile(r"(\b(1\s*=\s*1|1\s*=\s*'1'|'1'\s*=\s*'1')\b)", re.IGNORECASE),
+    # SQL Injection — DISABLED (see note above)
+    # re.compile(r"(\b(union\s+(all\s+)?select|insert\s+into|update\s+.*\bset\b|delete\s+from|drop\s+(table|database|column)|alter\s+table|create\s+table|truncate\s+table)\b)", re.IGNORECASE),
+    # re.compile(r"(\b(select\s+.*\bfrom\b|exec\s*\(|execute\s*\(|xp_cmdshell|sp_executesql)\b)", re.IGNORECASE),
+    # re.compile(r"(--|#|/\*.*\*/|;\s*(drop|alter|create|truncate|delete|update|insert))", re.IGNORECASE),
+    # re.compile(r"('\s*(or|and)\s+[\d'\"=]+)", re.IGNORECASE),
+    # re.compile(r"(\b(1\s*=\s*1|1\s*=\s*'1'|'1'\s*=\s*'1')\b)", re.IGNORECASE),
 
     # XSS (Cross-Site Scripting)
     re.compile(r"(<\s*script[^>]*>|<\s*/\s*script\s*>)", re.IGNORECASE),

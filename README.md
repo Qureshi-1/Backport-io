@@ -346,6 +346,25 @@ graph TB
 
 ---
 
+## 🏗️ Deployment: Managed Cloud vs. Self-Hosted
+
+Backport runs the same codebase in both modes. Here's what changes:
+
+| | ☁️ **Managed Cloud** ([backport.in](https://backport.in)) | 🏠 **Self-Hosted** (your server) |
+|---|---|---|
+| **Database** | PostgreSQL (Supabase) | SQLite (zero config) or PostgreSQL |
+| **Cache** | Redis / Upstash (distributed) | In-memory LRU (single worker) |
+| **Workers** | Multi-worker, auto-scaling | Single worker (`uvicorn`) |
+| **Rate Limiting** | Persistent across restarts | In-memory, resets on restart |
+| **Analytics** | Persistent history, real-time WebSocket | In-memory, resets on restart |
+| **WAF Rules** | Full suite + custom rules | Full suite + custom rules |
+| **Setup** | Sign up, get API key in 30s | Clone repo, configure, run |
+| **Cost** | Free tier + paid plans | Free (your infra) |
+
+> **Recommendation:** Use **Managed Cloud** for production — persistent data, Redis caching, and zero ops. Use **Self-Hosted** for development, testing, or air-gapped environments.
+
+---
+
 ## 🚢 Deployment
 
 ### ☁️ Vercel (Frontend — One Click)
@@ -391,17 +410,19 @@ Once deployed, route your API calls through Backport:
 # Before (direct to backend)
 curl https://your-backend.com/api/users
 
-# After (through Backport gateway)
-curl https://backport.in/api/YOUR_KEY/your-backend.com/api/users
+# After (through Backport gateway — just add one header)
+curl -H "X-API-Key: bk_your_api_key" https://backport-io.onrender.com/proxy/your-backend.com/api/users
 ```
 
 ### Request Headers
 
-| Header | Description |
-|---|---|
-| `Authorization: Bearer <key>` | API key authentication |
-| `X-Target-Url: <url>` | Target backend URL |
-| `X-Idempotency-Key: <key>` | Deduplication key |
+| Header | Required | Description |
+|---|---|---|
+| `X-API-Key: <key>` | **Yes** | Your API key for authentication. The gateway strips this header before forwarding to your backend — your backend never sees it. |
+| `X-Target-Url: <url>` | No | Override target backend URL (useful for playground/testing) |
+| `X-Idempotency-Key: <key>` | No | Prevent duplicate request processing |
+
+> **"No Code Changes" — what this means:** Backport sits as a transparent proxy in front of your backend. Your backend code doesn't change at all. The only modification is on the **client side** — add one `X-API-Key` header to outgoing requests. This is the same pattern used by Cloudflare, Kong, Tyk, and every other API gateway. Think of it as a single-line config change in your HTTP client, not a code change.
 
 ### Response Codes
 
