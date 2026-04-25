@@ -1,6 +1,5 @@
 import hmac
 import logging
-import time as _time
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -93,55 +92,75 @@ def get_admin_stats(admin: User = Depends(get_current_admin), db: Session = Depe
     # Paid users
     paid_users = db.query(func.count(User.id)).filter(User.plan.in_(["plus", "pro", "enterprise"])).scalar()
 
-    # ─── 24h metrics ─────────────────────────────────────────────────
-    since_24h = now - timedelta(hours=24)
-    requests_24h = db.query(func.count(ApiLog.id)).filter(ApiLog.created_at >= since_24h).scalar() or 0
+    # 1. Requests in last 24 hours
+    requests_last_24h = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= now - timedelta(hours=24)
+    ).scalar()
 
-    # WAF blocks (403 status codes in last 24h)
-    waf_blocks_24h = db.query(func.count(ApiLog.id)).filter(
-        ApiLog.created_at >= since_24h,
-        ApiLog.status_code == 403,
-    ).scalar() or 0
+    # 2. Active API Keys count
+    active_api_keys = db.query(func.count(ApiKey.id)).scalar()
 
-    # 5xx errors in last 24h
-    errors_5xx = db.query(func.count(ApiLog.id)).filter(
-        ApiLog.created_at >= since_24h,
-        ApiLog.status_code >= 500,
-    ).scalar() or 0
-    error_rate = round((errors_5xx / requests_24h) * 100, 1) if requests_24h > 0 else 0
+    # 3. Error rate (4xx + 5xx in last 24h / total requests in last 24h)
+    errors_24h = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= now - timedelta(hours=24),
+        ApiLog.status_code >= 400
+    ).scalar()
+    error_rate = round((errors_24h / requests_last_24h * 100), 1) if requests_last_24h and requests_last_24h > 0 else 0
 
-    # Avg latency (last 24h)
+    # 4. Average latency in last 24h (from ApiLog.latency_ms)
     avg_latency = db.query(func.avg(ApiLog.latency_ms)).filter(
-        ApiLog.created_at >= since_24h,
+        ApiLog.created_at >= now - timedelta(hours=24)
     ).scalar()
     avg_latency_ms = round(avg_latency) if avg_latency else 0
 
-    # Active API Keys
-    active_api_keys = db.query(func.count(ApiKey.id)).scalar() or 0
-
-    # MRR calculation (based on active non-expired paid plans)
-    PLAN_PRICES = {"plus": 29, "pro": 99, "enterprise": 499}
-    active_paid = db.query(User.plan, func.count(User.id)).filter(
+    # 5. MRR (Monthly Recurring Revenue) - using plan prices in INR paise
+    PLAN_PRICES = {"plus": 49900, "pro": 99900, "enterprise": 499900}  # INR paise
+    active_paid_users = db.query(User.plan, func.count(User.id)).filter(
         User.plan.in_(["plus", "pro", "enterprise"]),
-        User.plan_expires_at > now,
+        User.plan_expires_at > now
     ).group_by(User.plan).all()
-    mrr = sum(PLAN_PRICES.get(plan, 0) * count for plan, count in active_paid)
+    mrr = sum(PLAN_PRICES.get(plan, 0) * count for plan, count in active_paid_users)
+    # Convert to INR rupees (divide by 100)
+    mrr_inr = mrr / 100
+
+    # 6. WAF blocks - sum of hit_count from all custom_waf_rules
+    try:
+        from custom_waf import CustomWafRule
+        waf_blocks = db.query(func.sum(CustomWafRule.hit_count)).scalar() or 0
+    except ImportError:
+        waf_blocks = 0
+
+    # 7. Total teams
+    try:
+        from teams import Team
+        total_teams = db.query(func.count(Team.id)).scalar() or 0
+    except ImportError:
+        total_teams = 0
+
+    # 8. Total webhooks
+    try:
+        from webhooks import Webhook
+        total_webhooks = db.query(func.count(Webhook.id)).scalar() or 0
+    except ImportError:
+        total_webhooks = 0
 
     return {
         "total_users": total_users,
         "total_requests": total_requests,
-        "requests_last_24h": requests_24h,
         "pending_feedbacks": recent_feedbacks,
         "plan_distribution": plan_stats,
         "expiring_soon": expiring_soon or 0,
         "expired_plans": expired or 0,
         "paid_users": paid_users or 0,
-        "waf_blocks_today": waf_blocks_24h,
-        "error_rate_5xx": error_rate,
-        "errors_5xx": errors_5xx,
+        # NEW METRICS:
+        "requests_last_24h": requests_last_24h or 0,
+        "active_api_keys": active_api_keys or 0,
+        "error_rate": error_rate,
         "avg_latency_ms": avg_latency_ms,
-        "active_api_keys": active_api_keys,
-        "mrr": mrr,
+        "mrr_inr": mrr_inr,
+        "waf_blocks": waf_blocks,
+        "total_teams": total_teams,
+        "total_webhooks": total_webhooks,
     }
 
 

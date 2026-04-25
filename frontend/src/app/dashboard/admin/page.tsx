@@ -6,11 +6,10 @@ import {
   Lightbulb, Bug, ChevronDown, ChevronUp, Search, Clock, CreditCard,
   CheckCircle2, XCircle, X, Crown, Zap, Star, TrendingUp, UserCog,
   Plus, ArrowDownUp, Ban, Server, Database, Shield, Cpu, RefreshCw,
-  Eye, Trash2, UserMinus, Mail, ExternalLink,
-  DollarSign, Key, Wifi, WifiOff, Gauge, Timer, Globe,
+  Eye, Trash2, UserMinus, Mail, ExternalLink, DollarSign, Key, Monitor, Gauge,
 } from "lucide-react";
 
-type Tab = "overview" | "users" | "feedback";
+type Tab = "overview" | "users" | "system" | "feedback";
 type PlanFilter = "all" | "free" | "plus" | "pro" | "enterprise";
 type StatusFilter = "all" | "active" | "expiring" | "expired";
 
@@ -116,7 +115,7 @@ export default function AdminPage() {
         method: "POST",
         body: JSON.stringify({ email: selectedUser.email, plan: modalPlan, duration_days: modalDuration }),
       });
-      showMsg("success", `${selectedUser.email} → ${modalPlan} (${modalDuration} days)`);
+      showMsg("success", `${selectedUser.email} -> ${modalPlan} (${modalDuration} days)`);
       setShowPlanModal(false);
       await Promise.all([fetchUsers(planFilter, statusFilter, searchQuery), fetchApi("/api/admin/stats").then(s => setStats(s))]);
     } catch {
@@ -192,13 +191,13 @@ export default function AdminPage() {
   };
 
   const formatDate = (iso: string | null) => {
-    if (!iso) return "—";
+    if (!iso) return "--";
     const d = new Date(iso);
     return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
   };
 
   const formatDateTime = (iso: string | null) => {
-    if (!iso) return "—";
+    if (!iso) return "--";
     const d = new Date(iso);
     return d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   };
@@ -209,7 +208,19 @@ export default function AdminPage() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
+  const formatMRR = (mrr: number) => {
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(mrr);
+  };
+
   const pendingFeedbacks = feedbacks.filter((f: any) => f.status === "pending").length;
+
+  // Health check helper
+  const healthStatus = (key: string) => {
+    const val = health?.checks?.[key];
+    if (val === "ok") return { label: "Healthy", ok: true };
+    if (val) return { label: val, ok: false };
+    return { label: "Unknown", ok: false };
+  };
 
   // ─── Loading State ─────────────────────────────────────────────────────
   if (loading && !stats && !error) {
@@ -217,12 +228,7 @@ export default function AdminPage() {
       <div className="space-y-6 animate-pulse max-w-7xl">
         <div className="h-8 w-64 bg-zinc-800 rounded-lg" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => (
-            <div key={i} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-28" />
-          ))}
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1,2,3,4].map(i => (
+          {[1,2,3,4,5,6,7,8].map(i => (
             <div key={i} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-28" />
           ))}
         </div>
@@ -249,14 +255,6 @@ export default function AdminPage() {
     );
   }
 
-  // ─── Helper: Error Rate Color ──────────────────────────────────────────
-  const getErrorRateColor = (rate: number | undefined) => {
-    if (rate === undefined || rate === null) return { text: "text-zinc-500", bg: "bg-zinc-500/10", border: "border-zinc-500/20" };
-    if (rate >= 5) return { text: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/20" };
-    if (rate >= 1) return { text: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20" };
-    return { text: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" };
-  };
-
   return (
     <div className="space-y-6 max-w-7xl">
       {/* Header */}
@@ -268,11 +266,11 @@ export default function AdminPage() {
             </div>
             <h1 className="text-xl sm:text-2xl font-bold text-white">Admin Control Center</h1>
           </div>
-          <p className="text-sm text-zinc-500 ml-12">Platform analytics, user management & system health.</p>
+          <p className="text-sm text-zinc-500 ml-12">Full platform control: analytics, users, system health & revenue.</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={refreshData} className="p-2 rounded-lg bg-white/[0.03] border border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-600 transition-colors" title="Refresh">
-            <RefreshCw className="h-4 w-4" />
+            <RefreshCw className="w-4 w-4" />
           </button>
           <UserCog className="w-5 h-5 text-zinc-600" />
         </div>
@@ -281,16 +279,17 @@ export default function AdminPage() {
       {/* Action Toast */}
       {actionMsg && (
         <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border ${actionMsg.type === "success" ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400" : "bg-red-500/10 border-red-500/20 text-red-400"}`}>
-          {actionMsg.type === "success" ? <CheckCircle2 className="h-4 w-4 flex-shrink-0" /> : <XCircle className="h-4 w-4 flex-shrink-0" />}
+          {actionMsg.type === "success" ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> : <XCircle className="w-4 h-4 flex-shrink-0" />}
           <span className="text-sm font-medium">{actionMsg.text}</span>
         </div>
       )}
 
       {/* Tab Switcher */}
-      <div className="flex gap-1 p-1 bg-zinc-900/40 border border-zinc-800 rounded-xl w-fit">
+      <div className="flex gap-1 p-1 bg-zinc-900/40 border border-zinc-800 rounded-xl w-fit flex-wrap">
         {([
           { id: "overview" as Tab, label: "Overview", icon: Activity },
-          { id: "users" as Tab, label: `Users (${stats?.total_users || 0})`, icon: Users },
+          { id: "users" as Tab, label: `Users (${stats?.total_users ?? users.length})`, icon: Users },
+          { id: "system" as Tab, label: "System", icon: Monitor },
           { id: "feedback" as Tab, label: "Feedback", icon: MessageSquare, badge: pendingFeedbacks },
         ]).map(tab => (
           <button
@@ -316,40 +315,30 @@ export default function AdminPage() {
       ═══════════════════════════════════════════════════════════════ */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          {/* Stats Cards — Row 1 */}
+          {/* Stats Cards — 8 metrics */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: "Total Users", value: stats?.total_users || 0, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
-              { label: "Paid Users", value: stats?.paid_users || 0, icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
-              { label: "Expiring Soon", value: stats?.expiring_soon || 0, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", sub: "(7 days)" },
-              { label: "MRR", value: stats?.mrr != null ? `$${stats.mrr}` : "$0", icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20", raw: true },
+              { label: "Total Users", value: stats?.total_users || 0, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10", format: "number" },
+              { label: "Revenue (MRR)", value: stats?.mrr_inr || 0, icon: DollarSign, color: "text-emerald-400", bg: "bg-emerald-500/10", format: "currency" },
+              { label: "Requests (24h)", value: stats?.requests_last_24h || 0, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", format: "number" },
+              { label: "Active API Keys", value: stats?.active_api_keys || 0, icon: Key, color: "text-indigo-400", bg: "bg-indigo-500/10", format: "number" },
+              { label: "Paid Users", value: stats?.paid_users || 0, icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10", format: "number" },
+              { label: "WAF Blocks", value: stats?.waf_blocks || 0, icon: Shield, color: "text-red-400", bg: "bg-red-500/10", format: "number" },
+              { label: "Error Rate", value: stats?.error_rate || 0, icon: AlertTriangle, color: "text-yellow-400", bg: "bg-yellow-500/10", format: "percent", ok: (stats?.error_rate || 0) < 5 },
+              { label: "Avg Latency", value: stats?.avg_latency_ms || 0, icon: Gauge, color: "text-cyan-400", bg: "bg-cyan-500/10", format: "ms", ok: (stats?.avg_latency_ms || 0) < 500 },
             ].map((card) => (
-              <div key={card.label} className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors`}>
+              <div key={card.label} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className={`p-2 ${card.bg} rounded-lg ${card.color}`}><card.icon className="h-4 w-4" /></div>
                   <span className="text-xs text-zinc-500">{card.label}</span>
                 </div>
-                <p className="text-2xl font-bold text-white">{card.raw ? card.value : card.value.toLocaleString()}</p>
-                {card.sub && <span className="text-[10px] text-zinc-600">{card.sub}</span>}
-              </div>
-            ))}
-          </div>
-
-          {/* Stats Cards — Row 2 */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { label: "Requests (24h)", value: stats?.requests_last_24h || 0, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
-              { label: "Active API Keys", value: stats?.active_api_keys || 0, icon: Key, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/20" },
-              { label: "WAF Blocks (Today)", value: stats?.waf_blocks_today || 0, icon: WifiOff, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20" },
-              { label: "Error Rate (5xx)", value: stats?.error_rate_5xx != null ? `${stats.error_rate_5xx.toFixed(1)}%` : "0%", icon: AlertTriangle, color: getErrorRateColor(stats?.error_rate_5xx).text, bg: getErrorRateColor(stats?.error_rate_5xx).bg, border: getErrorRateColor(stats?.error_rate_5xx).border, raw: true },
-            ].map((card) => (
-              <div key={card.label} className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors`}>
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-2 ${card.bg} rounded-lg ${card.color}`}><card.icon className="h-4 w-4" /></div>
-                  <span className="text-xs text-zinc-500">{card.label}</span>
-                </div>
-                <p className="text-2xl font-bold text-white">{card.raw ? card.value : card.value.toLocaleString()}</p>
-                {card.sub && <span className="text-[10px] text-zinc-600">{card.sub}</span>}
+                <p className="text-2xl font-bold text-white">
+                  {card.format === "currency" && formatMRR(card.value)}
+                  {card.format === "percent" && `${card.value}%`}
+                  {card.format === "ms" && `${card.value}ms`}
+                  {card.format === "number" && card.value.toLocaleString()}
+                </p>
+                {card.ok === false && <span className="text-[10px] text-yellow-400 mt-1 block">Needs attention</span>}
               </div>
             ))}
           </div>
@@ -391,7 +380,7 @@ export default function AdminPage() {
               </div>
             )}
 
-            {/* System Health — Connected to Real /health Endpoint */}
+            {/* System Health — Enhanced with real data */}
             <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
               <div className="flex items-center gap-2 mb-4">
                 <Server className="w-4 h-4 text-zinc-500" />
@@ -399,12 +388,11 @@ export default function AdminPage() {
               </div>
               <div className="space-y-3">
                 {[
-                  { label: "Backend Status", value: health?.status === "ok" ? "Online" : health ? "Offline" : "Checking...", icon: Cpu, ok: health?.status === "ok", detail: null },
-                  { label: "Database", value: health?.database === "connected" ? "Connected" : health ? "Disconnected" : "Unknown", icon: Database, ok: health?.database === "connected", detail: health?.db_latency_ms != null ? `${health.db_latency_ms}ms` : null },
-                  { label: "Uptime", value: health?.uptime || "—", icon: Timer, ok: true, detail: null },
-                  { label: "Avg Latency", value: stats?.avg_latency_ms != null ? `${stats.avg_latency_ms}ms` : "—", icon: Gauge, ok: true, detail: null },
-                  { label: "Expired Plans", value: stats?.expired_plans || 0, icon: AlertTriangle, ok: (stats?.expired_plans || 0) === 0, detail: stats?.expired_plans > 0 ? "Need attention" : null },
-                  { label: "Pending Feedback", value: stats?.pending_feedbacks || 0, icon: MessageSquare, ok: (stats?.pending_feedbacks || 0) < 5 },
+                  { label: "Backend", value: health?.status === "ok" ? "Online" : health?.status === "degraded" ? "Degraded" : "Checking...", icon: Cpu, ok: health?.status === "ok", detail: health ? `v${health.version || "2.0"}` : null },
+                  { label: "Database", value: healthStatus("database").label, icon: Database, ok: healthStatus("database").ok },
+                  { label: "Cache / Redis", value: healthStatus("cache").label, icon: Server, ok: healthStatus("cache").ok },
+                  { label: "Uptime", value: health?.uptime || "--", icon: Clock, ok: true },
+                  { label: "Expired Plans", value: stats?.expired_plans || 0, icon: AlertTriangle, ok: (stats?.expired_plans || 0) < 3, detail: (stats?.expired_plans || 0) > 0 ? "Need attention" : null },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30">
                     <div className="flex items-center gap-3">
@@ -427,21 +415,21 @@ export default function AdminPage() {
             <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Quick Actions</p>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               {[
-                { label: "Manage Users", desc: "Plans, access & more", icon: Users, action: () => setActiveTab("users") },
-                { label: "View Feedback", desc: `${pendingFeedbacks} pending`, icon: MessageSquare, action: () => setActiveTab("feedback") },
-                { label: "Ban User", desc: "Search & suspend", icon: Ban, action: () => { setActiveTab("users"); setTimeout(() => { document.querySelector<HTMLInputElement>("input[type='text']")?.focus(); }, 100); } },
-                { label: "View Activity", desc: "System logs", icon: Activity, action: () => setActiveTab("overview") },
+                { label: "Manage Users", desc: "Plans, access & more", icon: Users, tab: "users" as Tab },
+                { label: "System Monitor", desc: "Health, uptime & checks", icon: Monitor, tab: "system" as Tab },
+                { label: "View Feedback", desc: `${pendingFeedbacks} pending`, icon: MessageSquare, tab: "feedback" as Tab },
+                { label: "API Docs", desc: "Swagger / OpenAPI", icon: ExternalLink, href: "/dashboard/docs" },
               ].map(action => (
                 <button
                   key={action.label}
-                  onClick={action.action}
+                  onClick={() => action.tab ? setActiveTab(action.tab) : action.href ? window.open(action.href, "_blank") : null}
                   className="flex items-start gap-3 p-4 rounded-xl bg-zinc-800/30 border border-zinc-800 hover:border-zinc-600 text-left transition-colors group"
                 >
                   <div className="p-2 rounded-lg bg-white/[0.03] group-hover:bg-white/[0.06] transition-colors">
                     <action.icon className="h-4 w-4 text-zinc-500 group-hover:text-white transition-colors" />
                   </div>
                   <div>
-                    <p className="text-xs font-medium text-white group-hover:text-white">{action.label}</p>
+                    <p className="text-xs font-medium text-white">{action.label}</p>
                     <p className="text-[10px] text-zinc-600">{action.desc}</p>
                   </div>
                 </button>
@@ -647,6 +635,88 @@ export default function AdminPage() {
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
+          SYSTEM TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "system" && (
+        <div className="space-y-6">
+          {/* Service Status */}
+          <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+            <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Service Status</p>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              {[
+                { label: "Database", value: healthStatus("database").label, icon: Database, ok: healthStatus("database").ok },
+                { label: "Cache / Redis", value: healthStatus("cache").label, icon: Server, ok: healthStatus("cache").ok },
+                { label: "Backend", value: health?.status === "ok" ? "Running" : health?.status || "Unknown", icon: Cpu, ok: health?.status === "ok" },
+                { label: "Version", value: health?.version ? `v${health.version}` : "--", icon: Shield, ok: true },
+              ].map((svc) => (
+                <div key={svc.label} className="p-4 rounded-xl bg-zinc-800/30 border border-zinc-800">
+                  <div className="flex items-center gap-3 mb-2">
+                    <svc.icon className={`h-4 w-4 ${svc.ok ? "text-emerald-400" : "text-yellow-400"}`} />
+                    <span className="text-xs text-zinc-400 font-medium">{svc.label}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full ${svc.ok ? "bg-emerald-400" : "bg-yellow-400 animate-pulse"}`} />
+                    <span className="text-sm font-medium text-white">{svc.value}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Uptime & Performance */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Uptime & Performance</p>
+              <div className="space-y-3">
+                {[
+                  { label: "Server Uptime", value: health?.uptime || "--", icon: Clock, ok: true },
+                  { label: "Requests (24h)", value: (stats?.requests_last_24h || 0).toLocaleString(), icon: TrendingUp, ok: true },
+                  { label: "Avg Latency", value: `${stats?.avg_latency_ms || 0}ms`, icon: Gauge, ok: (stats?.avg_latency_ms || 0) < 500 },
+                  { label: "Error Rate", value: `${stats?.error_rate || 0}%`, icon: AlertTriangle, ok: (stats?.error_rate || 0) < 5 },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30">
+                    <div className="flex items-center gap-3">
+                      <item.icon className={`h-4 w-4 ${item.ok ? "text-zinc-500" : "text-yellow-400"}`} />
+                      <span className="text-xs text-zinc-400">{item.label}</span>
+                    </div>
+                    <span className="text-xs font-medium text-white">{item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Platform Stats */}
+            <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+              <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Platform Stats</p>
+              <div className="space-y-3">
+                {[
+                  { label: "Total Teams", value: stats?.total_teams || 0, icon: Users },
+                  { label: "Total Webhooks", value: stats?.total_webhooks || 0, icon: Zap },
+                  { label: "WAF Rule Hits", value: stats?.waf_blocks || 0, icon: Shield },
+                  { label: "Active API Keys", value: stats?.active_api_keys || 0, icon: Key },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30">
+                    <div className="flex items-center gap-3">
+                      <item.icon className="h-4 w-4 text-zinc-500" />
+                      <span className="text-xs text-zinc-400">{item.label}</span>
+                    </div>
+                    <span className="text-xs font-medium text-white">{item.value.toLocaleString()}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Activity Log placeholder */}
+          <div className="bg-zinc-900/40 border border-zinc-800 rounded-2xl p-12 text-center">
+            <Activity className="h-10 w-10 text-zinc-700 mx-auto mb-4" />
+            <p className="text-zinc-500 text-sm font-medium">Activity Log</p>
+            <p className="text-zinc-600 text-xs mt-1">Detailed audit trail with user actions, API events, and system changes coming soon.</p>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
           FEEDBACK TAB
       ═══════════════════════════════════════════════════════════════ */}
       {activeTab === "feedback" && (
@@ -752,97 +822,86 @@ export default function AdminPage() {
 
             {/* Plan Selection */}
             <div className="space-y-2 mb-6">
-              <label className="text-xs text-zinc-500 font-medium">Select New Plan</label>
-              <div className="grid grid-cols-2 gap-2">
-                {(["free", "plus", "pro", "enterprise"] as const).map(plan => {
-                  const PlanIcon = PLAN_CONFIG[plan].icon;
-                  return (
-                  <button key={plan} onClick={() => setModalPlan(plan)} className={`p-3 rounded-xl text-left transition-all border ${modalPlan === plan ? `${PLAN_CONFIG[plan].bg} ${PLAN_CONFIG[plan].color} border-current` : "bg-zinc-800/30 text-zinc-500 border-zinc-800 hover:border-zinc-700"}`}>
-                    <div className="flex items-center gap-2 mb-1">
-                      <PlanIcon className="w-3.5 h-3.5" />
-                      <span className="text-xs font-bold">{PLAN_CONFIG[plan].label}</span>
-                    </div>
-                    <span className="text-[10px] opacity-60">{plan === "free" ? "90 days" : plan === "enterprise" ? "365 days" : "30 days"}</span>
+              <label className="text-xs text-zinc-500 font-medium">Select Plan</label>
+              <div className="grid grid-cols-3 gap-2">
+                {["plus", "pro", "enterprise"].map(p => (
+                  <button
+                    key={p}
+                    onClick={() => setModalPlan(p)}
+                    className={`p-3 rounded-xl border text-center transition-all ${modalPlan === p ? "border-white/20 bg-white/5" : "border-zinc-800 hover:border-zinc-600"}`}
+                  >
+                    <div className={`text-lg font-bold ${PLAN_CONFIG[p].color}`}>{PLAN_CONFIG[p].label}</div>
                   </button>
-                  );
-                })}
+                ))}
               </div>
             </div>
 
             {/* Duration */}
-            {modalPlan !== "free" && (
-              <div className="mb-6">
-                <label className="text-xs text-zinc-500 font-medium mb-2 block">Duration (days)</label>
-                <div className="flex gap-2">
-                  {[7, 30, 90, 365].map(d => (
-                    <button key={d} onClick={() => setModalDuration(d)} className={`flex-1 py-2 rounded-lg text-xs font-bold transition-all ${modalDuration === d ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-zinc-800/30 text-zinc-500 border border-zinc-800 hover:border-zinc-700"}`}>
-                      {d}d
-                    </button>
-                  ))}
-                  <input
-                    type="number"
-                    value={modalDuration}
-                    onChange={(e) => setModalDuration(Math.max(1, Math.min(3650, parseInt(e.target.value) || 30)))}
-                    className="w-20 px-2 py-2 rounded-lg bg-zinc-800/30 border border-zinc-800 text-xs text-white text-center focus:outline-none focus:border-zinc-600"
-                    min="1"
-                    max="3650"
-                  />
-                </div>
-                <p className="text-[10px] text-zinc-600 mt-2">Expires: {formatDate(new Date(Date.now() + modalDuration * 24 * 60 * 60 * 1000).toISOString())}</p>
+            <div className="space-y-2 mb-6">
+              <label className="text-xs text-zinc-500 font-medium">Duration (days)</label>
+              <input
+                type="number"
+                value={modalDuration}
+                onChange={(e) => setModalDuration(parseInt(e.target.value) || 30)}
+                min={1}
+                max={3650}
+                className="w-full px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-white text-sm focus:outline-none focus:border-zinc-500"
+              />
+              <div className="flex gap-2">
+                {[7, 30, 90, 365].map(d => (
+                  <button key={d} onClick={() => setModalDuration(d)} className={`px-3 py-1 rounded-lg text-[10px] font-bold border transition-colors ${modalDuration === d ? "border-white/20 bg-white/5 text-white" : "border-zinc-800 text-zinc-500 hover:text-zinc-300"}`}>{d}d</button>
+                ))}
               </div>
-            )}
+            </div>
 
-            {/* Submit */}
             <button
               onClick={handleAssignPlan}
               disabled={updating === selectedUser.email}
-              className="w-full py-3 rounded-xl text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full py-3 rounded-xl bg-white text-black font-bold text-sm hover:bg-zinc-200 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {updating === selectedUser.email ? <><Loader2 className="h-4 w-4 animate-spin" /> Updating...</> : <>Assign {PLAN_CONFIG[modalPlan]?.label} Plan</>}
+              {updating === selectedUser.email ? <Loader2 className="w-4 w-4 animate-spin" /> : null}
+              Assign {modalPlan.toUpperCase()} Plan
             </button>
           </div>
         </div>
       )}
 
       {/* ═══════════════════════════════════════════════════════════════
-          DELETE USER MODAL
+          DELETE CONFIRMATION MODAL
       ═══════════════════════════════════════════════════════════════ */}
       {showDeleteModal && selectedUser && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteModal(false)}>
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-          <div className="relative bg-zinc-900 border border-red-500/20 rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+          <div className="relative bg-zinc-900 border border-red-500/20 rounded-2xl w-full max-w-md p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <button onClick={() => setShowDeleteModal(false)} className="absolute top-4 right-4 text-zinc-500 hover:text-white"><X className="h-4 w-4" /></button>
 
             <div className="flex items-center gap-3 mb-4">
-              <div className="p-2 bg-red-500/10 rounded-lg"><Trash2 className="h-5 w-5 text-red-400" /></div>
-              <div>
-                <h3 className="text-lg font-bold text-white">Delete User</h3>
-                <p className="text-xs text-zinc-500">This action is permanent</p>
+              <div className="p-2 rounded-lg bg-red-500/10">
+                <Trash2 className="w-5 h-5 text-red-400" />
               </div>
+              <h3 className="text-lg font-bold text-white">Delete User</h3>
             </div>
 
-            <div className="bg-zinc-800/50 rounded-xl p-3 mb-4 border border-zinc-800">
-              <p className="text-sm text-white font-medium">{selectedUser.email}</p>
-              <p className="text-[10px] text-zinc-500 mt-1">All data, logs, API keys, and feedback will be permanently deleted.</p>
-            </div>
+            <p className="text-sm text-zinc-400 mb-2">
+              This will <strong className="text-red-400">permanently</strong> delete the user and ALL their data including API keys, logs, webhooks, and team memberships.
+            </p>
+            <p className="text-sm text-zinc-500 mb-6">Type <code className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 text-xs">{selectedUser.email}</code> to confirm:</p>
 
-            <div className="mb-4">
-              <label className="text-xs text-zinc-500 font-medium mb-2 block">Type the email to confirm</label>
-              <input
-                type="text"
-                value={deleteConfirmEmail}
-                onChange={(e) => setDeleteConfirmEmail(e.target.value)}
-                placeholder={selectedUser.email}
-                className="w-full px-3 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-red-500/50"
-              />
-            </div>
+            <input
+              type="email"
+              value={deleteConfirmEmail}
+              onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+              placeholder={selectedUser.email}
+              className="w-full px-4 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-white text-sm focus:outline-none focus:border-red-500/50 mb-4"
+            />
 
             <button
               onClick={handleDeleteUser}
-              disabled={deleteConfirmEmail !== selectedUser.email || updating === selectedUser.email}
-              className="w-full py-3 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-400 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              disabled={updating === selectedUser.email || deleteConfirmEmail !== selectedUser.email}
+              className="w-full py-3 rounded-xl bg-red-500/20 text-red-400 font-bold text-sm hover:bg-red-500/30 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 border border-red-500/20"
             >
-              {updating === selectedUser.email ? <><Loader2 className="h-4 w-4 animate-spin" /> Deleting...</> : <><Trash2 className="w-4 h-4" /> Delete Permanently</>}
+              {updating === selectedUser.email ? <Loader2 className="w-4 w-4 animate-spin" /> : <Trash2 className="w-4 w-4" />}
+              Delete Permanently
             </button>
           </div>
         </div>
@@ -850,3 +909,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
+// Temporary alias — Webhook icon for System tab (using existing lucide imports)
