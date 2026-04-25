@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, UniqueConstraint
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session
 from datetime import datetime, timezone
+import json as _json
 import secrets
 from database import Base
 
@@ -40,6 +41,11 @@ class User(Base):
     # Team context
     current_team_id = Column(Integer, ForeignKey("teams.id"), nullable=True)
     
+    is_active = Column(Boolean, default=True)
+    is_banned = Column(Boolean, default=False)
+    last_login_at = Column(DateTime, nullable=True)
+    login_count = Column(Integer, default=0)
+
     feedbacks = relationship("Feedback", back_populates="user")
     api_keys = relationship("ApiKey", back_populates="user", cascade="all, delete-orphan")
     team_memberships = relationship("TeamMember", back_populates="user", cascade="all, delete-orphan")
@@ -182,3 +188,27 @@ class Integration(Base):
     last_triggered_at = Column(DateTime, nullable=True)
     last_error = Column(Text, nullable=True)
     user = relationship("User")
+
+
+def create_audit_log(db: Session, user_id=None, email=None, event_type="", details=None, ip_address=None):
+    """Create an audit log entry. details should be a dict — will be JSON-serialized."""
+    log = AuditLog(
+        user_id=user_id,
+        email=email,
+        event_type=event_type,
+        details=_json.dumps(details) if isinstance(details, dict) else details,
+        ip_address=ip_address,
+    )
+    db.add(log)
+    db.commit()
+
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=True, index=True)
+    email = Column(String, nullable=True)
+    event_type = Column(String, nullable=False, index=True)  # login, signup, plan_purchase, plan_upgrade, plan_cancel, plan_expire, api_key_created, api_key_deleted, admin_action, profile_update
+    details = Column(Text, nullable=True)  # JSON string with extra info
+    ip_address = Column(String, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), index=True)

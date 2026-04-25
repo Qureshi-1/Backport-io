@@ -246,6 +246,13 @@ def signup(req: SignupReq, response: Response, request: Request, db: Session = D
     db.add(new_key)
     db.commit()
 
+    # Track signup in audit logs
+    try:
+        from models import create_audit_log
+        create_audit_log(db, user_id=user.id, email=user.email, event_type="signup", ip_address=client_ip)
+    except Exception as e:
+        print(f"⚠️ Audit log error on signup: {e}")
+
     # Send verification email if RESEND_API_KEY is configured (best-effort).
     # SECURITY: OTP is NEVER returned in the response body to prevent leakage.
     from config import RESEND_API_KEY
@@ -408,6 +415,17 @@ def login(req: LoginReq, response: Response, db: Session = Depends(get_db)):
 
     token = create_access_token(data={"sub": str(user.id), "email": user.email})
     api_key = user.api_keys[0].key if user.api_keys else None
+
+    # Track login in audit logs
+    try:
+        from models import create_audit_log
+        client_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        user.login_count = (user.login_count or 0) + 1
+        user.last_login_at = datetime.now(timezone.utc)
+        db.commit()
+        create_audit_log(db, user_id=user.id, email=user.email, event_type="login", ip_address=client_ip)
+    except Exception as e:
+        print(f"⚠️ Audit log error on login: {e}")
 
     # Set HttpOnly Secure cookie (JS cannot read this!)
     set_auth_cookie(response, token)
@@ -882,6 +900,19 @@ async def google_callback(code: str, state: str, request: Request, db: Session =
             email=email, name=name, avatar_url=avatar
         )
 
+        # Track OAuth login in audit logs
+        try:
+            from models import create_audit_log
+            client_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+            if is_new:
+                create_audit_log(db, user_id=user.id, email=user.email, event_type="signup", details={"provider": "google", "name": name}, ip_address=client_ip)
+            create_audit_log(db, user_id=user.id, email=user.email, event_type="login", details={"provider": "google"}, ip_address=client_ip)
+            user.login_count = (user.login_count or 0) + 1
+            user.last_login_at = datetime.now(timezone.utc)
+            db.commit()
+        except Exception as e:
+            print(f"⚠️ Audit log error on Google OAuth: {e}")
+
         # Step 4: Set HttpOnly cookie and redirect to frontend
         token_jwt = create_access_token(data={"sub": str(user.id), "email": user.email})
         response = RedirectResponse(url=f"{FRONTEND_URL.rstrip('/')}/dashboard?oauth=success", status_code=302)
@@ -1003,6 +1034,19 @@ async def github_callback(code: str, state: str, request: Request, db: Session =
             db, provider="github", oauth_id=github_id,
             email=email, name=name, avatar_url=avatar
         )
+
+        # Track OAuth login in audit logs
+        try:
+            from models import create_audit_log
+            client_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+            if is_new:
+                create_audit_log(db, user_id=user.id, email=user.email, event_type="signup", details={"provider": "github", "name": name}, ip_address=client_ip)
+            create_audit_log(db, user_id=user.id, email=user.email, event_type="login", details={"provider": "github"}, ip_address=client_ip)
+            user.login_count = (user.login_count or 0) + 1
+            user.last_login_at = datetime.now(timezone.utc)
+            db.commit()
+        except Exception as e:
+            print(f"⚠️ Audit log error on GitHub OAuth: {e}")
 
         # Step 4: Set HttpOnly cookie and redirect to frontend
         token_jwt = create_access_token(data={"sub": str(user.id), "email": user.email})

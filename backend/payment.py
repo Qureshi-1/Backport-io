@@ -292,6 +292,18 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
     user.plan_expires_at = datetime.now(timezone.utc) + timedelta(days=30)
     db.commit()
 
+    # Track plan purchase in audit logs
+    try:
+        from models import create_audit_log
+        create_audit_log(
+            db, user_id=user.id, email=user.email,
+            event_type="plan_purchase",
+            details={"plan": plan_id, "payment_id": req.razorpay_payment_id, "amount": expected_amount},
+            ip_address="payment_webhook"
+        )
+    except Exception as e:
+        print(f"⚠️ Audit log error on payment: {e}")
+
     response = {
         "status": "success",
         "plan": plan_id,
