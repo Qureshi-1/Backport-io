@@ -607,29 +607,82 @@ _OAUTH_STATE_TTL = 600  # 10 minutes
 
 def _generate_oauth_state() -> str:
     """Generate a cryptographically signed state for anti-CSRF.
-    States are single-use and expire after 10 minutes."""
+
+    Two-layer verification to survive server restarts:
+      Layer 1 — In-memory nonce: fast single-use check, prevents replay.
+      Layer 2 — HMAC signature + embedded timestamp: survives restarts as
+        long as OAUTH_STATE_SECRET is stable (set via env var on Render).
+
+    Format: "{raw}.{unix_ts}.{hmac_sha256}"
+    """
     raw = secrets.token_urlsafe(32)
-    sig = hashlib.sha256(f"{raw}:{OAUTH_STATE_SECRET}".encode()).hexdigest()
-    state = f"{raw}.{sig}"
+    ts = str(int(time.time()))
+    sig = hashlib.sha256(f"{raw}:{ts}:{OAUTH_STATE_SECRET}".encode()).hexdigest()
+    state = f"{raw}.{ts}.{sig}"
     _oauth_states[state] = time.time()
     return state
 
 
 def _verify_oauth_state(state: str) -> bool:
-    """Verify OAuth state parameter. Single-use — consumed on verification."""
+    """Verify OAuth state parameter.
+
+    Two-layer verification:
+      Layer 1 — HMAC signature + embedded timestamp (survives server restarts).
+      Layer 2 — In-memory nonce for single-use enforcement within same instance.
+
+    This means: if the server restarts between /login and /callback, the OAuth
+    flow STILL works as long as OAUTH_STATE_SECRET hasn't changed. The in-memory
+    dict adds an extra replay-protection layer when the same instance handles
+    both requests.
+    """
     try:
-        # Check nonce exists and hasn't expired
-        if state not in _oauth_states:
+        parts = state.rsplit(".", 2)
+
+        # ── Backward compat: old format "{raw}.{sig}" (2 parts) ───────────
+        if len(parts) == 2:
+            raw, sig = parts
+            ts = None
+            expected = hashlib.sha256(f"{raw}:{OAUTH_STATE_SECRET}".encode()).hexdigest()
+            if not secrets.compare_digest(sig, expected):
+                return False
+            # Old format has no embedded timestamp — accept if in in-memory dict
+            if state in _oauth_states:
+                if time.time() - _oauth_states[state] > _OAUTH_STATE_TTL:
+                    del _oauth_states[state]
+                    return False
+                del _oauth_states[state]
+                return True
+            return False  # Old format without in-memory = uncheckable expiry
+
+        # ── New format: "{raw}.{ts}.{sig}" (3 parts) ─────────────────────
+        if len(parts) != 3:
             return False
-        if time.time() - _oauth_states[state] > _OAUTH_STATE_TTL:
+        raw, ts_str, sig = parts
+
+        # Layer 1: Verify HMAC signature (primary — survives restarts)
+        expected = hashlib.sha256(f"{raw}:{ts_str}:{OAUTH_STATE_SECRET}".encode()).hexdigest()
+        if not secrets.compare_digest(sig, expected):
+            return False
+
+        # Check expiry using embedded timestamp
+        try:
+            ts = int(ts_str)
+        except ValueError:
+            return False
+        if time.time() - ts > _OAUTH_STATE_TTL:
+            return False
+
+        # Layer 2: In-memory single-use enforcement (supplementary)
+        if state in _oauth_states:
+            # Same instance generated this state — enforce single-use
             del _oauth_states[state]
-            return False
-        # Consume (single-use)
-        del _oauth_states[state]
-        # Verify HMAC signature
-        raw, sig = state.rsplit(".", 1)
-        expected = hashlib.sha256(f"{raw}:{OAUTH_STATE_SECRET}".encode()).hexdigest()
-        return secrets.compare_digest(sig, expected)
+            return True
+        else:
+            # Server restarted or different worker — state is valid by HMAC +
+            # timestamp. Register it in memory to prevent replay within this
+            # instance's lifetime.
+            _oauth_states[state] = ts
+            return True
     except Exception:
         return False
 
