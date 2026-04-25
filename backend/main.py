@@ -1,7 +1,9 @@
 import sys
 import os
 import logging
+import time as _time
 import uvicorn
+from sqlalchemy import text
 import threading
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.responses import JSONResponse
@@ -30,6 +32,8 @@ if SECRET_KEY and not SECRET_KEY.startswith("backport-dev-only"):
 
 _docs_url = "/docs" if os.getenv("ENVIRONMENT") != "production" else None
 _redoc_url = "/redoc" if os.getenv("ENVIRONMENT") != "production" else None
+
+_APP_START = _time.time()
 
 app = FastAPI(
     title="Backport API Gateway",
@@ -277,11 +281,26 @@ async def global_exception_handler(request: Request, exc: Exception):
 # Health Endpoint (Public — minimal info only)
 @app.get("/health")
 def health():
+    start_time = _time.time()
+    db_ok = False
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+            db_ok = True
+    except Exception:
+        pass
+    db_time = round((_time.time() - start_time) * 1000)
+    uptime_s = _time.time() - _APP_START
+    days = int(uptime_s // 86400)
+    hours = int((uptime_s % 86400) // 3600)
     return {
         "status": "ok",
         "version": "2.0.0",
         "gateway": "Backport",
         "docs": "/docs",
+        "database": "connected" if db_ok else "disconnected",
+        "db_latency_ms": db_time,
+        "uptime": f"{days}d {hours}h" if days > 0 else f"{hours}h",
     }
 
 @app.get("/")

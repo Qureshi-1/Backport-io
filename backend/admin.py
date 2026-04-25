@@ -1,5 +1,6 @@
 import hmac
 import logging
+import time as _time
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -92,14 +93,55 @@ def get_admin_stats(admin: User = Depends(get_current_admin), db: Session = Depe
     # Paid users
     paid_users = db.query(func.count(User.id)).filter(User.plan.in_(["plus", "pro", "enterprise"])).scalar()
 
+    # ─── 24h metrics ─────────────────────────────────────────────────
+    since_24h = now - timedelta(hours=24)
+    requests_24h = db.query(func.count(ApiLog.id)).filter(ApiLog.created_at >= since_24h).scalar() or 0
+
+    # WAF blocks (403 status codes in last 24h)
+    waf_blocks_24h = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= since_24h,
+        ApiLog.status_code == 403,
+    ).scalar() or 0
+
+    # 5xx errors in last 24h
+    errors_5xx = db.query(func.count(ApiLog.id)).filter(
+        ApiLog.created_at >= since_24h,
+        ApiLog.status_code >= 500,
+    ).scalar() or 0
+    error_rate = round((errors_5xx / requests_24h) * 100, 1) if requests_24h > 0 else 0
+
+    # Avg latency (last 24h)
+    avg_latency = db.query(func.avg(ApiLog.latency_ms)).filter(
+        ApiLog.created_at >= since_24h,
+    ).scalar()
+    avg_latency_ms = round(avg_latency) if avg_latency else 0
+
+    # Active API Keys
+    active_api_keys = db.query(func.count(ApiKey.id)).scalar() or 0
+
+    # MRR calculation (based on active non-expired paid plans)
+    PLAN_PRICES = {"plus": 29, "pro": 99, "enterprise": 499}
+    active_paid = db.query(User.plan, func.count(User.id)).filter(
+        User.plan.in_(["plus", "pro", "enterprise"]),
+        User.plan_expires_at > now,
+    ).group_by(User.plan).all()
+    mrr = sum(PLAN_PRICES.get(plan, 0) * count for plan, count in active_paid)
+
     return {
         "total_users": total_users,
         "total_requests": total_requests,
+        "requests_last_24h": requests_24h,
         "pending_feedbacks": recent_feedbacks,
         "plan_distribution": plan_stats,
         "expiring_soon": expiring_soon or 0,
         "expired_plans": expired or 0,
         "paid_users": paid_users or 0,
+        "waf_blocks_today": waf_blocks_24h,
+        "error_rate_5xx": error_rate,
+        "errors_5xx": errors_5xx,
+        "avg_latency_ms": avg_latency_ms,
+        "active_api_keys": active_api_keys,
+        "mrr": mrr,
     }
 
 
