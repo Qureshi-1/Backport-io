@@ -5,10 +5,11 @@ import {
   Users, Activity, MessageSquare, Loader2, ShieldCheck, AlertTriangle,
   Lightbulb, Bug, ChevronDown, ChevronUp, Search, Clock, CreditCard,
   CheckCircle2, XCircle, X, Crown, Zap, Star, TrendingUp, UserCog,
-  Plus, ArrowDownUp, Ban,
+  Plus, ArrowDownUp, Ban, Server, Database, Shield, Cpu, RefreshCw,
+  Eye, Trash2, UserMinus, Mail, ExternalLink,
 } from "lucide-react";
 
-type Tab = "users" | "feedback";
+type Tab = "overview" | "users" | "feedback";
 type PlanFilter = "all" | "free" | "plus" | "pro" | "enterprise";
 type StatusFilter = "all" | "active" | "expiring" | "expired";
 
@@ -27,12 +28,14 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; 
 
 export default function AdminPage() {
   const [stats, setStats] = useState<any>(null);
+  const [health, setHealth] = useState<any>(null);
   const [users, setUsers] = useState<any[]>([]);
   const [feedbacks, setFeedbacks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<Tab>("users");
+  const [activeTab, setActiveTab] = useState<Tab>("overview");
   const [expandedFeedback, setExpandedFeedback] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   // Filters
   const [planFilter, setPlanFilter] = useState<PlanFilter>("all");
@@ -41,9 +44,11 @@ export default function AdminPage() {
 
   // Modals
   const [showPlanModal, setShowPlanModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<any>(null);
   const [modalPlan, setModalPlan] = useState("pro");
   const [modalDuration, setModalDuration] = useState(30);
+  const [deleteConfirmEmail, setDeleteConfirmEmail] = useState("");
 
   // Action feedback
   const [actionMsg, setActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
@@ -65,35 +70,41 @@ export default function AdminPage() {
 
   const refreshData = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
-      const [s, u, f] = await Promise.all([
-        fetchApi("/api/admin/stats"),
-        fetchUsers(planFilter, statusFilter, searchQuery),
-        fetchApi("/api/feedback"),
+      const [s, u, f, h] = await Promise.all([
+        fetchApi("/api/admin/stats").catch(() => null),
+        fetchUsers(planFilter, statusFilter, searchQuery).catch(() => []),
+        fetchApi("/api/feedback").catch(() => []),
+        fetchApi("/health").catch(() => null),
       ]);
-      setStats(s);
+      setStats(s || null);
       setFeedbacks(f || []);
-    } catch (err) {
-      console.error(err);
+      setHealth(h || null);
+    } catch (err: any) {
+      setError(err?.message || "Failed to load admin data");
     } finally {
       setLoading(false);
     }
   }, [fetchUsers, planFilter, statusFilter, searchQuery]);
 
-  useEffect(() => {
-    refreshData();
-  }, []);
+  useEffect(() => { refreshData(); }, [refreshData]);
 
-  // Re-fetch users when filters change
   useEffect(() => {
-    fetchUsers(planFilter, statusFilter, searchQuery);
-  }, [planFilter, statusFilter, searchQuery, fetchUsers]);
+    if (activeTab === "users") fetchUsers(planFilter, statusFilter, searchQuery);
+  }, [planFilter, statusFilter, searchQuery, activeTab, fetchUsers]);
 
   const openPlanModal = (user: any) => {
     setSelectedUser(user);
     setModalPlan(user.plan === "free" ? "pro" : user.plan);
     setModalDuration(30);
     setShowPlanModal(true);
+  };
+
+  const openDeleteModal = (user: any) => {
+    setSelectedUser(user);
+    setDeleteConfirmEmail("");
+    setShowDeleteModal(true);
   };
 
   const handleAssignPlan = async () => {
@@ -147,6 +158,25 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteUser = async () => {
+    if (!selectedUser || deleteConfirmEmail !== selectedUser.email) return;
+    if (!confirm(`PERMANENTLY delete ${selectedUser.email} and ALL their data? This cannot be undone!`)) return;
+    setUpdating(selectedUser.email);
+    try {
+      await fetchApi("/api/admin/delete-user", {
+        method: "POST",
+        body: JSON.stringify({ email: selectedUser.email, secret: "skip" }),
+      });
+      showMsg("success", `User ${selectedUser.email} deleted permanently`);
+      setShowDeleteModal(false);
+      refreshData();
+    } catch {
+      showMsg("error", "Failed to delete user");
+    } finally {
+      setUpdating(null);
+    }
+  };
+
   const handleUpdateFeedbackStatus = async (id: number, status: string) => {
     try {
       await fetchApi(`/api/feedback/${id}/status`, {
@@ -156,7 +186,7 @@ export default function AdminPage() {
       const updated = await fetchApi("/api/feedback");
       setFeedbacks(updated || []);
     } catch {
-      alert("Failed to update feedback");
+      alert("Failed to update feedback status");
     }
   };
 
@@ -178,19 +208,60 @@ export default function AdminPage() {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
   };
 
-  if (loading && !stats) return <div className="p-8 text-zinc-400 flex items-center gap-2"><Loader2 className="animate-spin h-4 w-4" /> Loading Admin Dashboard...</div>;
-
   const pendingFeedbacks = feedbacks.filter((f: any) => f.status === "pending").length;
+
+  // ─── Loading State ─────────────────────────────────────────────────────
+  if (loading && !stats && !error) {
+    return (
+      <div className="space-y-6 animate-pulse max-w-7xl">
+        <div className="h-8 w-64 bg-zinc-800 rounded-lg" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[1,2,3,4].map(i => (
+            <div key={i} className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-28" />
+          ))}
+        </div>
+        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl h-64" />
+      </div>
+    );
+  }
+
+  // ─── Error State ───────────────────────────────────────────────────────
+  if (error && !stats) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 gap-4">
+        <div className="w-14 h-14 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+          <AlertTriangle className="h-6 w-6 text-red-400" />
+        </div>
+        <div className="text-center">
+          <p className="text-white text-sm font-medium mb-1">Failed to load admin data</p>
+          <p className="text-zinc-500 text-xs">{error}</p>
+        </div>
+        <button onClick={refreshData} className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/5 border border-zinc-700 text-white text-sm hover:bg-white/10 transition-colors">
+          <RefreshCw className="h-4 w-4" /> Retry
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 max-w-7xl">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-white mb-1">Admin Control Center</h1>
-          <p className="text-sm text-zinc-500">Manage users, plans, and platform analytics.</p>
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center">
+              <ShieldCheck className="w-5 h-5 text-purple-400" />
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-white">Admin Control Center</h1>
+          </div>
+          <p className="text-sm text-zinc-500 ml-12">Platform analytics, user management & system health.</p>
         </div>
-        <UserCog className="w-6 h-6 text-zinc-600 flex-shrink-0" />
+        <div className="flex items-center gap-2">
+          <button onClick={refreshData} className="p-2 rounded-lg bg-white/[0.03] border border-zinc-800 text-zinc-500 hover:text-white hover:border-zinc-600 transition-colors" title="Refresh">
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <UserCog className="w-5 h-5 text-zinc-600" />
+        </div>
       </div>
 
       {/* Action Toast */}
@@ -201,77 +272,149 @@ export default function AdminPage() {
         </div>
       )}
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg text-blue-400"><Users className="h-4 w-4" /></div>
-            <span className="text-xs text-zinc-500">Total Users</span>
-          </div>
-          <p className="text-2xl font-bold text-white">{stats?.total_users || 0}</p>
-        </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-400"><CreditCard className="h-4 w-4" /></div>
-            <span className="text-xs text-zinc-500">Paid Users</span>
-          </div>
-          <p className="text-2xl font-bold text-white">{stats?.paid_users || 0}</p>
-        </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl cursor-pointer hover:border-yellow-500/20 transition-colors">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg text-yellow-400"><Clock className="h-4 w-4" /></div>
-            <span className="text-xs text-zinc-500">Expiring Soon</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <p className="text-2xl font-bold text-white">{stats?.expiring_soon || 0}</p>
-            <span className="text-[10px] text-zinc-600">(7 days)</span>
-          </div>
-        </div>
-        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg text-purple-400"><TrendingUp className="h-4 w-4" /></div>
-            <span className="text-xs text-zinc-500">Total Requests</span>
-          </div>
-          <p className="text-2xl font-bold text-white">{stats?.total_requests || 0}</p>
-        </div>
-      </div>
-
-      {/* Plan Distribution Bar */}
-      {stats?.plan_distribution && (
-        <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
-          <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-3">Plan Distribution</p>
-          <div className="flex h-3 rounded-full overflow-hidden bg-zinc-800">
-            {["free", "plus", "pro", "enterprise"].map(plan => {
-              const count = stats.plan_distribution[plan] || 0;
-              const total = stats.total_users || 1;
-              const pct = (count / total) * 100;
-              if (pct === 0) return null;
-              const colors: Record<string, string> = { free: "bg-zinc-500", plus: "bg-blue-500", pro: "bg-emerald-500", enterprise: "bg-orange-500" };
-              return <div key={plan} className={`${colors[plan]} transition-all`} style={{ width: `${pct}%` }} title={`${plan}: ${count} (${pct.toFixed(0)}%)`} />;
-            })}
-          </div>
-          <div className="flex gap-4 mt-3 flex-wrap">
-            {["free", "plus", "pro", "enterprise"].map(plan => {
-              const count = stats.plan_distribution[plan] || 0;
-              return (
-                <button key={plan} onClick={() => setPlanFilter(planFilter === plan ? "all" : plan as PlanFilter)} className={`flex items-center gap-1.5 text-xs ${planFilter === plan ? "text-white" : "text-zinc-500 hover:text-zinc-300"} transition-colors`}>
-                  <span className={`w-2 h-2 rounded-full ${PLAN_CONFIG[plan]?.bg.replace("/10", "/40").replace("bg-zinc-800/60", "bg-zinc-400")}`} style={{ backgroundColor: planFilter === plan ? undefined : undefined }} />
-                  {PLAN_CONFIG[plan]?.label}: {count}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
       {/* Tab Switcher */}
-      <div className="flex gap-2">
-        {(["users", "feedback"] as Tab[]).map(tab => (
-          <button key={tab} onClick={() => setActiveTab(tab)} className={`px-5 py-2.5 min-h-[44px] rounded-lg text-sm font-medium transition-all ${activeTab === tab ? "bg-white/10 text-white border border-white/20" : "text-zinc-500 hover:text-zinc-300 border border-transparent"}`}>
-            {tab === "users" ? <><Users className="h-4 w-4 inline mr-2" />Users</> : <><MessageSquare className="h-4 w-4 inline mr-2" />Feedback{pendingFeedbacks > 0 && <span className="ml-2 text-xs bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full">{pendingFeedbacks}</span>}</>}
+      <div className="flex gap-1 p-1 bg-zinc-900/40 border border-zinc-800 rounded-xl w-fit">
+        {([
+          { id: "overview" as Tab, label: "Overview", icon: Activity },
+          { id: "users" as Tab, label: `Users (${users.length})`, icon: Users },
+          { id: "feedback" as Tab, label: "Feedback", icon: MessageSquare, badge: pendingFeedbacks },
+        ]).map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+              activeTab === tab.id
+                ? "bg-white/10 text-white shadow-sm"
+                : "text-zinc-500 hover:text-zinc-300"
+            }`}
+          >
+            <tab.icon className="h-4 w-4" />
+            <span className="hidden sm:inline">{tab.label}</span>
+            {tab.badge && tab.badge > 0 && (
+              <span className="text-[10px] bg-red-500/20 text-red-400 px-1.5 py-0.5 rounded-full font-bold">{tab.badge}</span>
+            )}
           </button>
         ))}
       </div>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          OVERVIEW TAB
+      ═══════════════════════════════════════════════════════════════ */}
+      {activeTab === "overview" && (
+        <div className="space-y-6">
+          {/* Stats Cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
+              { label: "Total Users", value: stats?.total_users || 0, icon: Users, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20" },
+              { label: "Paid Users", value: stats?.paid_users || 0, icon: CreditCard, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/20" },
+              { label: "Expiring Soon", value: stats?.expiring_soon || 0, icon: Clock, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/20", sub: "(7 days)" },
+              { label: "Total Requests", value: stats?.total_requests || 0, icon: TrendingUp, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/20" },
+            ].map((card) => (
+              <div key={card.label} className={`bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors`}>
+                <div className="flex items-center gap-3 mb-3">
+                  <div className={`p-2 ${card.bg} rounded-lg ${card.color}`}><card.icon className="h-4 w-4" /></div>
+                  <span className="text-xs text-zinc-500">{card.label}</span>
+                </div>
+                <p className="text-2xl font-bold text-white">{card.value.toLocaleString()}</p>
+                {card.sub && <span className="text-[10px] text-zinc-600">{card.sub}</span>}
+              </div>
+            ))}
+          </div>
+
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Plan Distribution */}
+            {stats?.plan_distribution && (
+              <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Plan Distribution</p>
+                <div className="flex h-3 rounded-full overflow-hidden bg-zinc-800 mb-4">
+                  {["free", "plus", "pro", "enterprise"].map(plan => {
+                    const count = stats.plan_distribution[plan] || 0;
+                    const total = stats.total_users || 1;
+                    const pct = (count / total) * 100;
+                    if (pct === 0) return null;
+                    const colors: Record<string, string> = { free: "bg-zinc-500", plus: "bg-blue-500", pro: "bg-emerald-500", enterprise: "bg-orange-500" };
+                    return <div key={plan} className={`${colors[plan]} transition-all`} style={{ width: `${Math.max(pct, 2)}%` }} title={`${plan}: ${count}`} />;
+                  })}
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {["free", "plus", "pro", "enterprise"].map(plan => {
+                    const count = stats.plan_distribution[plan] || 0;
+                    const cfg = PLAN_CONFIG[plan];
+                    const pct = stats.total_users ? Math.round((count / stats.total_users) * 100) : 0;
+                    return (
+                      <div key={plan} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/30">
+                        <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center`}>
+                          <cfg.icon className={`h-3.5 w-3.5 ${cfg.color}`} />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-xs text-white font-medium">{cfg.label}</p>
+                          <p className="text-[10px] text-zinc-500">{count} users ({pct}%)</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* System Health */}
+            <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+              <div className="flex items-center gap-2 mb-4">
+                <Server className="w-4 h-4 text-zinc-500" />
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider">System Health</p>
+              </div>
+              <div className="space-y-3">
+                {[
+                  { label: "Backend Status", value: health ? "Online" : "Checking...", icon: Cpu, ok: !!health, detail: health ? `v${health.version || "2.0"}` : null },
+                  { label: "Gateway", value: health?.gateway ? "Active" : "Unknown", icon: Shield, ok: !!health?.gateway },
+                  { label: "Expired Plans", value: stats?.expired_plans || 0, icon: AlertTriangle, ok: (stats?.expired_plans || 0) < 3, detail: stats?.expired_plans > 0 ? "Need attention" : null },
+                  { label: "Pending Feedback", value: stats?.pending_feedbacks || 0, icon: MessageSquare, ok: (stats?.pending_feedbacks || 0) < 5 },
+                ].map(item => (
+                  <div key={item.label} className="flex items-center justify-between p-3 rounded-xl bg-zinc-800/30">
+                    <div className="flex items-center gap-3">
+                      <item.icon className={`h-4 w-4 ${item.ok ? "text-zinc-500" : "text-yellow-400"}`} />
+                      <span className="text-xs text-zinc-400">{item.label}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {item.detail && <span className="text-[10px] text-zinc-600">{item.detail}</span>}
+                      <span className={`w-2 h-2 rounded-full ${item.ok ? "bg-emerald-400" : "bg-yellow-400 animate-pulse"}`} />
+                      <span className="text-xs font-medium text-white">{item.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Actions */}
+          <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl">
+            <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-4">Quick Actions</p>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Manage Users", desc: "Plans, access & more", icon: Users, tab: "users" as Tab },
+                { label: "View Feedback", desc: `${pendingFeedbacks} pending`, icon: MessageSquare, tab: "feedback" as Tab },
+                { label: "API Docs", desc: "Swagger / OpenAPI", icon: ExternalLink, href: "/dashboard/docs" },
+                { label: "System Health", desc: "Backend status", icon: Server, action: () => {} },
+              ].map(action => (
+                <button
+                  key={action.label}
+                  onClick={() => action.tab ? setActiveTab(action.tab) : action.href ? window.open(action.href, "_blank") : null}
+                  className="flex items-start gap-3 p-4 rounded-xl bg-zinc-800/30 border border-zinc-800 hover:border-zinc-600 text-left transition-colors group"
+                >
+                  <div className="p-2 rounded-lg bg-white/[0.03] group-hover:bg-white/[0.06] transition-colors">
+                    <action.icon className="h-4 w-4 text-zinc-500 group-hover:text-white transition-colors" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-white group-hover:text-white">{action.label}</p>
+                    <p className="text-[10px] text-zinc-600">{action.desc}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ═══════════════════════════════════════════════════════════════
           USERS TAB
@@ -376,19 +519,22 @@ export default function AdminPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex items-center justify-end gap-1">
-                            <button onClick={() => openPlanModal(u)} disabled={updating === u.email} className="px-2 py-1 rounded-lg text-[10px] font-bold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors disabled:opacity-50" title="Change Plan">
-                              <ArrowDownUp className="w-3 h-3" />
+                            <button onClick={() => openPlanModal(u)} disabled={updating === u.email} className="p-1.5 rounded-lg text-zinc-600 hover:text-blue-400 hover:bg-blue-500/10 transition-colors disabled:opacity-50" title="Change Plan">
+                              <ArrowDownUp className="w-3.5 h-3.5" />
                             </button>
                             {u.plan !== "free" && (
                               <>
-                                <button onClick={() => handleExtendPlan(u.email, 30)} disabled={updating === u.email} className="px-2 py-1 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors disabled:opacity-50" title="Extend +30 days">
-                                  <Plus className="w-3 h-3" />
+                                <button onClick={() => handleExtendPlan(u.email, 30)} disabled={updating === u.email} className="p-1.5 rounded-lg text-zinc-600 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors disabled:opacity-50" title="Extend +30 days">
+                                  <Plus className="w-3.5 h-3.5" />
                                 </button>
-                                <button onClick={() => handleRevokePlan(u.email)} disabled={updating === u.email} className="px-2 py-1 rounded-lg text-[10px] font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors disabled:opacity-50" title="Revoke to Free">
-                                  <Ban className="w-3 h-3" />
+                                <button onClick={() => handleRevokePlan(u.email)} disabled={updating === u.email} className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50" title="Revoke to Free">
+                                  <Ban className="w-3.5 h-3.5" />
                                 </button>
                               </>
                             )}
+                            <button onClick={() => openDeleteModal(u)} disabled={updating === u.email} className="p-1.5 rounded-lg text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-colors disabled:opacity-50" title="Delete User">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </td>
                       </tr>
@@ -430,13 +576,14 @@ export default function AdminPage() {
                     )}
 
                     <div className="flex gap-2 pt-1">
-                      <button onClick={() => openPlanModal(u)} className="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-blue-500/10 text-blue-400 text-center min-h-[40px] inline-flex items-center justify-center">Change Plan</button>
+                      <button onClick={() => openPlanModal(u)} className="flex-1 py-1.5 rounded-lg text-[10px] font-bold bg-blue-500/10 text-blue-400 text-center min-h-[40px] inline-flex items-center justify-center gap-1"><ArrowDownUp className="w-3 h-3" /> Plan</button>
                       {u.plan !== "free" && (
                         <>
-                          <button onClick={() => handleExtendPlan(u.email, 30)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-400 min-h-[40px] inline-flex items-center justify-center">+30d</button>
-                          <button onClick={() => handleRevokePlan(u.email)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-red-500/10 text-red-400 min-h-[40px] inline-flex items-center justify-center">Revoke</button>
+                          <button onClick={() => handleExtendPlan(u.email, 30)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-emerald-500/10 text-emerald-400 min-h-[40px] inline-flex items-center justify-center gap-1"><Plus className="w-3 h-3" /> +30d</button>
+                          <button onClick={() => handleRevokePlan(u.email)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-red-500/10 text-red-400 min-h-[40px] inline-flex items-center justify-center gap-1"><Ban className="w-3 h-3" /> Revoke</button>
                         </>
                       )}
+                      <button onClick={() => openDeleteModal(u)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-zinc-800/50 text-zinc-500 min-h-[40px] inline-flex items-center justify-center"><Trash2 className="w-3 h-3" /></button>
                     </div>
                   </div>
                 );
@@ -605,7 +752,51 @@ export default function AdminPage() {
               disabled={updating === selectedUser.email}
               className="w-full py-3 rounded-xl text-sm font-bold bg-emerald-500 hover:bg-emerald-400 text-black transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
-              {updating === selectedUser.email ? <><Loader2 className="w-4 h-4 animate-spin" /> Updating...</> : <>Assign {PLAN_CONFIG[modalPlan]?.label} Plan</>}
+              {updating === selectedUser.email ? <><Loader2 className="w-4 w-4 animate-spin" /> Updating...</> : <>Assign {PLAN_CONFIG[modalPlan]?.label} Plan</>}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════════
+          DELETE USER MODAL
+      ═══════════════════════════════════════════════════════════════ */}
+      {showDeleteModal && selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setShowDeleteModal(false)}>
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="relative bg-zinc-900 border border-red-500/20 rounded-2xl w-full max-w-sm p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setShowDeleteModal(false)} className="absolute top-4 right-4 text-zinc-500 hover:text-white"><X className="h-4 w-4" /></button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="p-2 bg-red-500/10 rounded-lg"><Trash2 className="h-5 w-5 text-red-400" /></div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Delete User</h3>
+                <p className="text-xs text-zinc-500">This action is permanent</p>
+              </div>
+            </div>
+
+            <div className="bg-zinc-800/50 rounded-xl p-3 mb-4 border border-zinc-800">
+              <p className="text-sm text-white font-medium">{selectedUser.email}</p>
+              <p className="text-[10px] text-zinc-500 mt-1">All data, logs, API keys, and feedback will be permanently deleted.</p>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-xs text-zinc-500 font-medium mb-2 block">Type the email to confirm</label>
+              <input
+                type="text"
+                value={deleteConfirmEmail}
+                onChange={(e) => setDeleteConfirmEmail(e.target.value)}
+                placeholder={selectedUser.email}
+                className="w-full px-3 py-2.5 rounded-xl bg-zinc-800 border border-zinc-700 text-sm text-white placeholder:text-zinc-600 focus:outline-none focus:border-red-500/50"
+              />
+            </div>
+
+            <button
+              onClick={handleDeleteUser}
+              disabled={deleteConfirmEmail !== selectedUser.email || updating === selectedUser.email}
+              className="w-full py-3 rounded-xl text-sm font-bold bg-red-500 hover:bg-red-400 text-white transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              {updating === selectedUser.email ? <><Loader2 className="w-4 w-4 animate-spin" /> Deleting...</> : <><Trash2 className="w-4 h-4" /> Delete Permanently</>}
             </button>
           </div>
         </div>
