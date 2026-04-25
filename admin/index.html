@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backport Admin Panel</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       TOAST NOTIFICATIONS
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       LOGIN PAGE
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="login-page">
+    <div class="login-container">
+      <div class="login-card">
+        <div class="login-logo">
+          <div class="shield-icon">🛡️</div>
+          <h1>Backport</h1>
+        </div>
+        <p class="login-subtitle">API Gateway Admin Panel</p>
+
+        <form id="login-form" class="login-form">
+          <div class="form-group">
+            <label for="api-key-input">Admin API Key</label>
+            <input
+              type="password"
+              id="api-key-input"
+              placeholder="Enter your admin API key"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            >
+          </div>
+
+          <div id="login-error" class="login-error"></div>
+
+          <button type="submit" id="login-btn" class="login-btn">
+            <span>🔓</span> Connect
+          </button>
+        </form>
+
+        <div class="login-footer">
+          Backport API Gateway — Secure Admin Access
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       MAIN APP (SPA)
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="app">
+
+    <!-- ─── Sidebar ──────────────────────────────────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-icon">🛡️</div>
+        <div class="brand-text">
+          <span class="brand-name">Backport</span>
+          <span class="brand-sub">Admin Panel</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="sidebar-section-label">Main</div>
+        <a href="#" data-page="dashboard" class="active">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" data-page="endpoints">
+          <span class="nav-icon">🔗</span>
+          <span>Endpoints</span>
+        </a>
+
+        <div class="sidebar-section-label">Security</div>
+        <a href="#" data-page="waf">
+          <span class="nav-icon">🛡️</span>
+          <span>WAF Rules</span>
+        </a>
+
+        <div class="sidebar-section-label">Monitoring</div>
+        <a href="#" data-page="logs">
+          <span class="nav-icon">📋</span>
+          <span>Analytics & Logs</span>
+        </a>
+
+        <div class="sidebar-section-label">System</div>
+        <a href="#" data-page="settings">
+          <span class="nav-icon">⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        &copy; 2025 Backport.io
+      </div>
+    </aside>
+
+    <!-- ─── Sidebar Overlay (Mobile) ─────────────────────────────────────────── -->
+    <div class="sidebar-overlay"></div>
+
+    <!-- ─── Header ───────────────────────────────────────────────────────────── -->
+    <header class="header">
+      <div class="header-left">
+        <button class="mobile-menu-btn" id="mobile-menu-btn">☰</button>
+        <div class="header-title">
+          <span class="header-icon" id="header-title-icon">📊</span>
+          <span id="header-title-text">Dashboard</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="header-badge">
+          <span class="dot"></span>
+          Connected
+        </div>
+        <div class="header-user">
+          <div class="avatar">A</div>
+          <span>Admin</span>
+        </div>
+        <button class="logout-btn" id="logout-btn">Logout</button>
+      </div>
+    </header>
+
+    <!-- ─── Main Content Area ────────────────────────────────────────────────── -->
+    <main class="main-content">
+
+      <!-- ─── Dashboard Page ───────────────────────────────────────────────── -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <h2>Dashboard</h2>
+          <p>Overview of your API gateway performance and health</p>
+        </div>
+
+        <div id="page-loading-dashboard" class="loading-overlay" style="display:none;">
+          <div class="spinner"></div>
+          <span>Loading dashboard...</span>
+        </div>
+
+        <div id="dashboard-content"></div>
+      </div>
+
+      <!-- ─── Endpoints Page ───────────────────────────────────────────────── -->
+      <div id="page-endpoints" class="page">
+        <div class="page-header">
+          <h2>Endpoints</h2>
+          <p>Monitor all proxied endpoints and their performance</p>
+        </div>
+
+        <div id="page-loading-endpoints" class="loading-overlay" style="display:none;">
+          <div class="spinner"></div>
+          <span>Loading endpoints...</span>
+        </div>
+
+        <div id="endpoints-content"></div>
+      </div>
+
+      <!-- ─── WAF Rules Page ───────────────────────────────────────────────── -->
+      <div id="page-waf" class="page">
+        <div class="page-header">
+          <h2>WAF Rules</h2>
+          <p>Configure Web Application Firewall protection rules</p>
+        </div>
+
+        <div id="page-loading-waf" class="loading-overlay" style="display:none;">
+          <div class="spinner"></div>
+          <span>Loading WAF rules...</span>
+        </div>
+
+        <div id="waf-content"></div>
+      </div>
+
+      <!-- ─── Logs Page ────────────────────────────────────────────────────── -->
+      <div id="page-logs" class="page">
+        <div class="page-header">
+          <h2>Analytics & Logs</h2>
+          <p>Real-time request logs and error monitoring</p>
+        </div>
+
+        <div id="page-loading-logs" class="loading-overlay" style="display:none;">
+          <div class="spinner"></div>
+          <span>Loading logs...</span>
+        </div>
+
+        <div id="logs-content"></div>
+      </div>
+
+      <!-- ─── Settings Page ────────────────────────────────────────────────── -->
+      <div id="page-settings" class="page">
+        <div class="page-header">
+          <h2>Settings</h2>
+          <p>API key management, webhooks, and system configuration</p>
+        </div>
+
+        <div id="page-loading-settings" class="loading-overlay" style="display:none;">
+          <div class="spinner"></div>
+          <span>Loading settings...</span>
+        </div>
+
+        <div id="settings-content"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       LOG DETAIL MODAL
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <div id="log-detail-modal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>📋 Log Detail</h3>
+        <button class="modal-close" id="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="log-detail-body">
+        <div class="loading-overlay"><div class="spinner"></div></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeLogDetail()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════════════════════════════════
+       APPLICATION JS
+       ═══════════════════════════════════════════════════════════════════════════ -->
+  <script src="app.js"></script>
+
+</body>
+</html>
