@@ -154,7 +154,7 @@ class TestVerifyPaymentMocked:
         }, headers=h)
 
         assert resp.status_code == 400
-        assert "signature" in resp.json()["detail"].lower()
+        assert "signature" in resp.json()["message"].lower()
 
     @patch("payment.rzp_client")
     def test_verify_success(self, mock_rzp, client):
@@ -230,4 +230,4 @@ class TestVerifyPaymentMocked:
         }, headers=h)
 
         assert resp.status_code == 400
-        assert "expired" in resp.json()["detail"].lower()
+        assert "expired" in resp.json()["message"].lower()
