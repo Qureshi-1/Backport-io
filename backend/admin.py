@@ -421,7 +421,7 @@ def get_revenue(admin: User = Depends(get_current_admin), db: Session = Depends(
     # Current month revenue (from audit_logs plan_purchase events this month)
     month_start = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
     current_month_purchases = db.query(AuditLog).filter(
-        AuditLog.event_type == "plan_purchase",
+        AuditLog.event_type.in_(["plan_purchase", "plan_upgrade"]),
         AuditLog.created_at >= month_start,
     ).all()
 
@@ -439,7 +439,7 @@ def get_revenue(admin: User = Depends(get_current_admin), db: Session = Depends(
     else:
         last_month_start = now.replace(month=now.month - 1, day=1, hour=0, minute=0, second=0, microsecond=0)
     last_month_purchases = db.query(AuditLog).filter(
-        AuditLog.event_type == "plan_purchase",
+        AuditLog.event_type.in_(["plan_purchase", "plan_upgrade"]),
         AuditLog.created_at >= last_month_start,
         AuditLog.created_at < month_start,
     ).all()
@@ -468,7 +468,7 @@ def get_revenue(admin: User = Depends(get_current_admin), db: Session = Depends(
         day = today_start - timedelta(days=i)
         next_day = day + timedelta(days=1)
         day_purchases = db.query(AuditLog).filter(
-            AuditLog.event_type == "plan_purchase",
+            AuditLog.event_type.in_(["plan_purchase", "plan_upgrade"]),
             AuditLog.created_at >= day,
             AuditLog.created_at < next_day,
         ).all()
