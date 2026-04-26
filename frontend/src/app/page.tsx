@@ -1252,7 +1252,7 @@ export default function Home() {
                       if (!contactForm.name.trim() || !contactForm.email.trim() || contactForm.message.trim().length < 10) return;
                       setContactStatus({ state: "submitting", text: "" });
                       try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ""}/api/contact-sales`, {
+                        const res = await fetch("/api/proxy/contact-sales", {
                           method: "POST",
                           headers: { "Content-Type": "application/json" },
                           body: JSON.stringify(contactForm),

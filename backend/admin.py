@@ -839,21 +839,23 @@ def get_waf_stats(admin: User = Depends(get_current_admin), db: Session = Depend
     ).scalar() or 0
 
     # Top blocked IPs (last 24h)
+    _bc = func.count(ApiLog.id).label("block_count")
     blocked_ips = db.query(
-        ApiLog.ip_address, func.count(ApiLog.id).label("block_count")
+        ApiLog.ip_address, _bc
     ).filter(
         ApiLog.created_at >= now - timedelta(hours=24),
         ApiLog.status_code == 403,
         ApiLog.ip_address.isnot(None),
-    ).group_by(ApiLog.ip_address).order_by(desc("block_count")).limit(10).all()
+    ).group_by(ApiLog.ip_address).order_by(_bc.desc()).limit(10).all()
 
     # Top blocked paths (last 24h)
+    _bc2 = func.count(ApiLog.id).label("block_count")
     blocked_paths = db.query(
-        ApiLog.path, func.count(ApiLog.id).label("block_count")
+        ApiLog.path, _bc2
     ).filter(
         ApiLog.created_at >= now - timedelta(hours=24),
         ApiLog.status_code == 403,
-    ).group_by(ApiLog.path).order_by(desc("block_count")).limit(10).all()
+    ).group_by(ApiLog.path).order_by(_bc2.desc()).limit(10).all()
 
     # Blocks by hour today
     blocks_by_hour = []
@@ -895,13 +897,14 @@ def get_rate_limit_stats(admin: User = Depends(get_current_admin), db: Session =
     ).scalar() or 0
 
     # Top rate-limited IPs
+    _cnt = func.count(ApiLog.id).label("count")
     rate_limited_ips = db.query(
-        ApiLog.ip_address, func.count(ApiLog.id).label("count")
+        ApiLog.ip_address, _cnt
     ).filter(
         ApiLog.created_at >= now - timedelta(hours=24),
         ApiLog.status_code == 429,
         ApiLog.ip_address.isnot(None),
-    ).group_by(ApiLog.ip_address).order_by(desc("count")).limit(10).all()
+    ).group_by(ApiLog.ip_address).order_by(_cnt.desc()).limit(10).all()
 
     # Get rate limiter usage info if available
     rate_limiter_info = {}
