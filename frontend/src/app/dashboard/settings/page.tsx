@@ -1,10 +1,12 @@
 "use client";
 import { useEffect, useState } from "react";
 import { fetchApi } from "@/lib/api";
-import { Loader2, Server, AlertCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Loader2, Server, AlertCircle, Lock, Trash2, X } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function SettingsPage() {
+  const router = useRouter();
   const [url, setUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -15,6 +17,18 @@ export default function SettingsPage() {
   const [wafEnabled, setWafEnabled] = useState(false);
   const [testingConnection, setTestingConnection] = useState(false);
   const [lastTested, setLastTested] = useState<string | null>(null);
+
+  // Password change state
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [passwordError, setPasswordError] = useState("");
+
+  // Account deletion state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetchApi("/api/user/settings")
@@ -50,7 +64,7 @@ export default function SettingsPage() {
     try {
       await fetchApi("/api/user/settings", {
         method: "PUT",
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           target_backend_url: url,
           rate_limit_enabled: rateLimitEnabled,
           caching_enabled: cachingEnabled,
@@ -98,6 +112,65 @@ export default function SettingsPage() {
     }
   };
 
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError("");
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      setPasswordError("All fields are required.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      setPasswordError("New password must be at least 8 characters.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPasswordError("New passwords do not match.");
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      await fetchApi("/api/auth/change-password", {
+        method: "POST",
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+        }),
+      });
+      toast.success("Password changed successfully!");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to change password";
+      setPasswordError(msg);
+      toast.error(msg);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== "DELETE") return;
+
+    setDeleting(true);
+    try {
+      await fetchApi("/api/user/account", {
+        method: "DELETE",
+      });
+      toast.success("Account deleted successfully.");
+      router.push("/");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to delete account";
+      toast.error(msg);
+      setShowDeleteModal(false);
+      setDeleteConfirmText("");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center py-20">
       <Loader2 className="h-6 w-6 animate-spin text-[#04e184]" />
@@ -111,7 +184,7 @@ export default function SettingsPage() {
           <h1 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">Settings</h1>
           <p className="text-sm text-zinc-400">Configure your target backend URL.</p>
         </div>
-        
+
         {/* Status Indicator */}
         <div className="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 sm:px-4 py-2 rounded-xl min-w-0">
           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
@@ -121,6 +194,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      {/* ─── Backend Configuration ─── */}
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 transition-colors hover:border-zinc-700 hover:bg-zinc-900/80">
         <form onSubmit={handleSave} className="space-y-6">
           <div>
@@ -151,7 +225,7 @@ export default function SettingsPage() {
 
           <div className="pt-4 border-t border-zinc-800 space-y-4">
             <h3 className="text-zinc-300 font-semibold mb-4">Security & Performance Features</h3>
-            
+
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
               <div>
                 <h4 className="text-sm font-medium text-zinc-200">Rate Limiting</h4>
@@ -191,7 +265,7 @@ export default function SettingsPage() {
                 <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${wafEnabled ? 'translate-x-8 sm:translate-x-6' : 'translate-x-1'}`} />
               </button>
             </div>
-            
+
           </div>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pt-4 border-t border-zinc-800">
@@ -212,7 +286,7 @@ export default function SettingsPage() {
                 </span>
               )}
             </div>
-            
+
             <button
               type="submit"
               disabled={saving}
@@ -224,6 +298,169 @@ export default function SettingsPage() {
           </div>
         </form>
       </div>
+
+      {/* ─── Change Password ─── */}
+      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 transition-colors hover:border-zinc-700 hover:bg-zinc-900/80">
+        <div className="flex items-center gap-2 mb-1">
+          <Lock className="h-4 w-4 text-zinc-400" />
+          <h2 className="text-lg font-bold text-white">Change Password</h2>
+        </div>
+        <p className="text-sm text-zinc-500 mb-6">Update your password to keep your account secure.</p>
+
+        <form onSubmit={handleChangePassword} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              Current Password
+            </label>
+            <input
+              type="password"
+              required
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="Enter current password"
+              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              New Password
+            </label>
+            <input
+              type="password"
+              required
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter new password (min. 8 characters)"
+              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-zinc-300 mb-2">
+              Confirm New Password
+            </label>
+            <input
+              type="password"
+              required
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm new password"
+              className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-emerald-500 outline-none transition-colors"
+            />
+          </div>
+
+          {passwordError && (
+            <div className="flex items-start gap-2 text-sm text-red-500 bg-red-500/10 p-3 rounded-lg border border-red-500/20">
+              <AlertCircle className="h-4 w-4 mt-0.5 flex-shrink-0" />
+              <span>{passwordError}</span>
+            </div>
+          )}
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={changingPassword}
+              className="bg-emerald-500 hover:bg-emerald-400 text-black font-semibold px-6 py-2.5 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50 min-h-[44px]"
+            >
+              {changingPassword && <Loader2 className="h-4 w-4 animate-spin" />}
+              Change Password
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* ─── Danger Zone ─── */}
+      <div className="bg-zinc-900 border border-red-500/30 rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-1">
+          <Trash2 className="h-4 w-4 text-red-500" />
+          <h2 className="text-lg font-bold text-red-500">Danger Zone</h2>
+        </div>
+        <p className="text-sm text-zinc-500 mb-6">
+          Permanently delete your account and all associated data. This action cannot be undone.
+        </p>
+
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 bg-red-500/5 rounded-lg border border-red-500/20">
+          <div>
+            <h4 className="text-sm font-medium text-zinc-200">Delete Account</h4>
+            <p className="text-xs text-zinc-500 mt-1">
+              Once you delete your account, there is no going back.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowDeleteModal(true)}
+            className="bg-red-500/10 hover:bg-red-500/20 text-red-500 text-sm font-semibold px-4 py-2.5 rounded-lg flex items-center gap-2 transition-colors border border-red-500/30 min-h-[44px]"
+          >
+            <Trash2 className="h-4 w-4" />
+            Delete Account
+          </button>
+        </div>
+      </div>
+
+      {/* ─── Delete Confirmation Modal ─── */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+            onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+          />
+          {/* Modal */}
+          <div className="relative bg-zinc-900 border border-zinc-800 rounded-2xl p-6 sm:p-8 max-w-md w-full shadow-2xl">
+            <button
+              onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+              className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center flex-shrink-0">
+                <Trash2 className="h-5 w-5 text-red-500" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Delete Account</h3>
+                <p className="text-sm text-zinc-500">This action is permanent</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-zinc-400 mb-6">
+              This will permanently delete your account, API keys, logs, and all associated data. You will be logged out and redirected to the homepage.
+            </p>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-zinc-300 mb-2">
+                Type <span className="text-red-500 font-bold">DELETE</span> to confirm
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="DELETE"
+                className="w-full bg-zinc-950 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:border-red-500 outline-none transition-colors"
+              />
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-end">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(""); }}
+                className="bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium px-4 py-2.5 rounded-lg transition-colors border border-zinc-700 min-h-[44px]"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== "DELETE" || deleting}
+                className="bg-red-500 hover:bg-red-400 text-white font-semibold px-6 py-2.5 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-30 disabled:cursor-not-allowed min-h-[44px]"
+              >
+                {deleting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {deleting ? "Deleting..." : "Delete Forever"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

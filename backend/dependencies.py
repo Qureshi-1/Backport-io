@@ -93,6 +93,37 @@ def clear_auth_cookie(response: Response) -> None:
     )
 
 
+# ─── Refresh Token Cookie ────────────────────────────────────────────────────
+REFRESH_COOKIE_NAME = "backport_refresh_token"
+REFRESH_COOKIE_MAX_AGE = 30 * 24 * 60 * 60  # 30 days in seconds
+
+def set_refresh_cookie(response: Response, token: str) -> None:
+    """Set the refresh token HttpOnly cookie."""
+    response.set_cookie(
+        key=REFRESH_COOKIE_NAME,
+        value=token,
+        httponly=True,
+        secure=True,
+        samesite="None",
+        path="/",
+        max_age=REFRESH_COOKIE_MAX_AGE,
+        domain=COOKIE_DOMAIN,
+    )
+
+def clear_refresh_cookie(response: Response) -> None:
+    """Clear the refresh token cookie."""
+    response.set_cookie(
+        key=REFRESH_COOKIE_NAME,
+        value="",
+        httponly=True,
+        secure=True,
+        samesite="None",
+        path="/",
+        max_age=0,
+        domain=COOKIE_DOMAIN,
+    )
+
+
 def get_current_user(
     request: Request,
     creds: HTTPAuthorizationCredentials = Depends(security),

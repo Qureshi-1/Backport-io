@@ -21,6 +21,7 @@ if SECRET_KEY and SECRET_KEY.startswith("backport-dev-only") and os.environ.get(
 
 ALGORITHM = "HS256"
 TOKEN_EXPIRE_MINUTES = 60 * 24
+REFRESH_TOKEN_EXPIRE_DAYS = 30  # Refresh token valid for 30 days
 
 RAZORPAY_KEY_ID = os.getenv("RAZORPAY_KEY_ID", "")
 RAZORPAY_KEY_SECRET = os.getenv("RAZORPAY_KEY_SECRET", "")
