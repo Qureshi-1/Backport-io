@@ -39,13 +39,13 @@ export default function GSAPMarquee({
       });
 
       // Store tween for cleanup
-      (track as any)._marqueeTween = tween; // eslint-disable-line @typescript-eslint/no-explicit-any
+      (track as any)._marqueeTween = tween;  
     }).catch((e) => {
       console.warn("GSAPMarquee: failed to init", e);
     });
 
     return () => {
-      const tween = (track as any)?._marqueeTween; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const tween = (track as any)?._marqueeTween;  
       if (tween && typeof tween.kill === "function") tween.kill();
     };
   }, [items, speed, reverse]);

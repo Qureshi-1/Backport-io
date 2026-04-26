@@ -24,8 +24,6 @@ import {
   Bell,
 } from "lucide-react";
 import { auth } from "@/lib/auth";
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { useUser } from "@/lib/user-context";
 
 const navItems = [

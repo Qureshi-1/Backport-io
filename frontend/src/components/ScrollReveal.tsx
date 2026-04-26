@@ -60,11 +60,11 @@ export default function ScrollReveal({
         },
       });
 
-      (el as any)._tween = tween; // eslint-disable-line
+      (el as any)._tween = tween;  
     }).catch((e) => console.warn("ScrollReveal: failed to init", e));
 
     return () => {
-      const tween = (el as any)?._tween; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const tween = (el as any)?._tween;  
       if (tween && typeof tween.kill === "function") tween.kill();
       killTriggersFor(el);
     };

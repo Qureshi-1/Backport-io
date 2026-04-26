@@ -10,7 +10,7 @@ export default function ScrollProgress() {
     const bar = barRef.current;
     if (!bar || typeof window === "undefined") return;
 
-    let tween: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+    let tween: any = null;  
 
     getGsap().then(({ gsap }) => {
       tween = gsap.to(bar, {

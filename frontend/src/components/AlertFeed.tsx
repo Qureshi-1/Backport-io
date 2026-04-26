@@ -8,7 +8,7 @@ interface Alert {
   message: string;
   severity: string;
   timestamp: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   details: Record<string, any>;
   is_read: boolean;
 }
@@ -18,7 +18,7 @@ interface AlertFeedProps {
   onMarkRead?: (_id: number) => void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 const SEVERITY_ICONS: Record<string, any> = {
   critical: ShieldAlert,
   high: AlertTriangle,

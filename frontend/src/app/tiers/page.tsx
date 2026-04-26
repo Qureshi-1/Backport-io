@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { ArrowRight, CheckCircle2, Zap, Shield, Database, ChevronDown, X, Loader2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, ChevronDown, X, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import { PRICING, detectUserCurrency, formatPrice, ALL_CURRENCIES, type CurrencyCode } from "@/lib/currency";
 

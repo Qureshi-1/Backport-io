@@ -11,7 +11,7 @@ import {
 import toast from "react-hot-toast";
 import GlowOrb from "@/components/GlowOrb";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface LogDetail {
   id: number;
   method: string;
@@ -22,9 +22,9 @@ interface LogDetail {
   was_cached: boolean;
   ip_address: string | null;
   request_headers: Record<string, string>;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   request_body: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   response_body: any;
   response_size: number;
   created_at: string | null;

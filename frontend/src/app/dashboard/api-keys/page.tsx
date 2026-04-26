@@ -26,7 +26,7 @@ export default function ApiKeysPage() {
         setKeys(res.api_keys || []);
         setLoading(false);
       })
-      .catch((err) => {
+      .catch((_err) => {
         toast.error("Failed to load keys");
         setLoading(false);
       });

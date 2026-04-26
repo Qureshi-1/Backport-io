@@ -10,7 +10,7 @@ export default function SnapSvgNetwork({ className = "" }: SnapSvgNetworkProps) 
   const svgRef = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+     
     let snap: any = null;
     let rafId: number | null = null;
 
@@ -50,7 +50,7 @@ export default function SnapSvgNetwork({ className = "" }: SnapSvgNetworkProps) 
 
         // Orbiting client nodes
         const nodeCount = 6;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+         
         const nodes: any[] = [];
         const colors = ["#6BA9FF", "#A2BDDB", "#6BA9FF", "#A2BDDB", "#6BA9FF", "#A2BDDB"];
         const labels = ["Client", "Mobile", "API", "Partner", "Bot", "IoT"];

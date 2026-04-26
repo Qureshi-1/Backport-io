@@ -9,9 +9,9 @@
  * and caches the loaded instances for reuse.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 let _gsap: any = null;
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 let _ScrollTrigger: any = null;
 let _loaded = false;
 
@@ -42,7 +42,7 @@ export async function getGsap() {
 }
 
 /** Kill every ScrollTrigger whose trigger matches the given element. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 export function killTriggersFor(el: Element) {
   if (_ScrollTrigger && typeof _ScrollTrigger.getAll === "function") {
     _ScrollTrigger.getAll().forEach((st: any) => {

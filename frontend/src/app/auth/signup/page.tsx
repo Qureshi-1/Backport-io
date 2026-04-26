@@ -3,8 +3,6 @@ import { Suspense } from "react";
 import { motion } from "framer-motion";
 import SignupCard from "@/components/SignupCard";
 import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
 export default function SignupPage() {
   return (
     <Suspense fallback={<div className="min-h-screen bg-[#080C10]" />}>

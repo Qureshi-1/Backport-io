@@ -62,7 +62,7 @@ export default function Changelog() {
         <p className="text-[#A2BDDB]/30 mb-16">What&apos;s new in each release. We ship frequently.</p>
         
         <div className="space-y-16">
-          {CHANGES.map((change, idx) => (
+          {CHANGES.map((change, _idx) => (
             <div key={change.version} className="relative pl-8 border-l border-zinc-800">
               <div className={`absolute -left-[9px] top-0 h-4 w-4 rounded-full border-4 border-[#080C10] ${
                 change.color === 'emerald' ? 'bg-[#04e184]' :
