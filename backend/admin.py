@@ -46,6 +46,13 @@ class ResendVerifyReq(BaseModel):
 class UserActionReq(BaseModel):
     action: str  # suspend, ban, unban, activate, make_admin, remove_admin
 
+class AssignPlanReq(BaseModel):
+    plan: str  # free, plus, pro, enterprise
+    duration_days: int = 30
+
+class ExtendPlanByUserReq(BaseModel):
+    extra_days: int = 30
+
 
 PLAN_DURATION_DAYS = {
     "free": 90,
@@ -219,6 +226,14 @@ def list_users(
         elif not u.is_active:
             status = "suspended"
 
+        # Determine plan status
+        plan_status = "active"
+        if u.plan != "free" and u.plan_expires_at:
+            if u.plan_expires_at < now:
+                plan_status = "expired"
+            elif (u.plan_expires_at - now).days <= 3:
+                plan_status = "expiring_soon"
+
         result.append({
             "id": u.id,
             "email": u.email,
@@ -226,6 +241,10 @@ def list_users(
             "avatar_url": u.avatar_url,
             "plan": u.plan,
             "plan_expiry_date": u.plan_expires_at.isoformat() if u.plan_expires_at else None,
+            "plan_started_at": u.plan_started_at.isoformat() if u.plan_started_at else None,
+            "plan_source": u.plan_source or "none",
+            "plan_payment_id": u.plan_payment_id,
+            "plan_status": plan_status,
             "is_admin": u.is_admin,
             "is_active": u.is_active,
             "is_banned": u.is_banned,
@@ -237,6 +256,255 @@ def list_users(
         })
 
     return {"users": result, "total": total, "page": page, "limit": limit}
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# USER DETAIL — Full user info with plan history
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.get("/users/{user_id}")
+def get_user_detail(
+    user_id: int,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Get detailed user info including plan history from audit logs."""
+    u = db.query(User).filter(User.id == user_id).first()
+    if not u:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    api_key_count = db.query(func.count(ApiKey.id)).filter(ApiKey.user_id == u.id).scalar() or 0
+
+    # Plan status
+    now = datetime.now(timezone.utc)
+    plan_status = "active"
+    if u.plan != "free" and u.plan_expires_at:
+        if u.plan_expires_at < now:
+            plan_status = "expired"
+        elif (u.plan_expires_at - now).days <= 3:
+            plan_status = "expiring_soon"
+
+    # Days remaining
+    days_remaining = None
+    if u.plan_expires_at:
+        delta = (u.plan_expires_at - now).days
+        days_remaining = max(0, delta)
+
+    # Plan history from audit logs
+    plan_history = db.query(AuditLog).filter(
+        AuditLog.user_id == u.id,
+        AuditLog.event_type.in_(["plan_purchase", "plan_upgrade", "plan_cancel", "plan_expire", "admin_action"]),
+    ).order_by(desc(AuditLog.created_at)).limit(20).all()
+
+    plan_history_list = []
+    for log in plan_history:
+        entry = {"event": log.event_type, "date": log.created_at.isoformat() if log.created_at else None}
+        if log.details:
+            try:
+                details = json.loads(log.details)
+                entry["details"] = details
+            except Exception:
+                entry["details"] = {"raw": log.details}
+        plan_history_list.append(entry)
+
+    # User status
+    status = "active"
+    if u.is_banned:
+        status = "banned"
+    elif not u.is_active:
+        status = "suspended"
+
+    return {
+        "id": u.id,
+        "email": u.email,
+        "name": u.name,
+        "avatar_url": u.avatar_url,
+        "plan": u.plan,
+        "plan_expiry_date": u.plan_expires_at.isoformat() if u.plan_expires_at else None,
+        "plan_started_at": u.plan_started_at.isoformat() if u.plan_started_at else None,
+        "plan_source": u.plan_source or "none",
+        "plan_payment_id": u.plan_payment_id,
+        "plan_status": plan_status,
+        "days_remaining": days_remaining,
+        "is_admin": u.is_admin,
+        "is_active": u.is_active,
+        "is_banned": u.is_banned,
+        "status": status,
+        "created_at": u.created_at.isoformat() if u.created_at else None,
+        "last_login_at": u.last_login_at.isoformat() if u.last_login_at else None,
+        "login_count": u.login_count or 0,
+        "api_key_count": api_key_count,
+        "plan_history": plan_history_list,
+    }
+
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PLAN MANAGEMENT — Assign, Extend, Revoke by user_id
+# ═══════════════════════════════════════════════════════════════════════════════
+
+@router.patch("/users/{user_id}/plan")
+def assign_plan_by_id(
+    user_id: int,
+    req: AssignPlanReq,
+    request: Request,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Assign or change a user's plan. Admin-granted plans are tracked with audit logs."""
+    if req.plan not in ["free", "plus", "pro", "enterprise"]:
+        raise HTTPException(status_code=400, detail="Invalid plan. Must be: free, plus, pro, enterprise")
+    if req.duration_days < 1 or req.duration_days > 3650:
+        raise HTTPException(status_code=400, detail="Duration must be between 1 and 3650 days")
+
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    old_plan = target.plan
+    now = datetime.now(timezone.utc)
+    target.plan = req.plan
+    target.plan_started_at = now
+    target.plan_expires_at = _get_plan_expiry(req.plan, req.duration_days)
+    target.plan_source = "admin"
+    target.plan_payment_id = None
+    db.commit()
+
+    # Audit log
+    try:
+        admin_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(
+            db, user_id=admin.id, email=admin.email,
+            event_type="admin_action",
+            details={
+                "action": "assign_plan",
+                "target_user_id": target.id,
+                "target_email": target.email,
+                "old_plan": old_plan,
+                "new_plan": req.plan,
+                "duration_days": req.duration_days,
+                "expires_at": target.plan_expires_at.isoformat(),
+            },
+            ip_address=admin_ip,
+        )
+    except Exception as e:
+        logger.warning(f"Audit log error: {e}")
+
+    return {
+        "status": "success",
+        "message": f"{target.email}: plan changed from {old_plan} to {req.plan} for {req.duration_days} days",
+        "user": {
+            "id": target.id,
+            "email": target.email,
+            "plan": target.plan,
+            "plan_started_at": target.plan_started_at.isoformat() if target.plan_started_at else None,
+            "plan_expires_at": target.plan_expires_at.isoformat() if target.plan_expires_at else None,
+            "plan_source": target.plan_source,
+        },
+    }
+
+
+@router.post("/users/{user_id}/extend-plan")
+def extend_plan_by_id(
+    user_id: int,
+    req: ExtendPlanByUserReq,
+    request: Request,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Extend a user's current plan by N days."""
+    if req.extra_days < 1 or req.extra_days > 3650:
+        raise HTTPException(status_code=400, detail="Extra days must be between 1 and 3650")
+
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if target.plan == "free":
+        raise HTTPException(status_code=400, detail="Cannot extend free plan. Assign a paid plan first.")
+
+    now = datetime.now(timezone.utc)
+    base_date = target.plan_expires_at if target.plan_expires_at and target.plan_expires_at > now else now
+    target.plan_expires_at = base_date + timedelta(days=req.extra_days)
+    db.commit()
+
+    # Audit log
+    try:
+        admin_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(
+            db, user_id=admin.id, email=admin.email,
+            event_type="admin_action",
+            details={
+                "action": "extend_plan",
+                "target_user_id": target.id,
+                "target_email": target.email,
+                "plan": target.plan,
+                "extra_days": req.extra_days,
+                "new_expires_at": target.plan_expires_at.isoformat(),
+            },
+            ip_address=admin_ip,
+        )
+    except Exception as e:
+        logger.warning(f"Audit log error: {e}")
+
+    return {
+        "status": "success",
+        "message": f"Extended {target.email}'s {target.plan} plan by {req.extra_days} days",
+        "user": {
+            "id": target.id,
+            "email": target.email,
+            "plan": target.plan,
+            "plan_expires_at": target.plan_expires_at.isoformat() if target.plan_expires_at else None,
+        },
+    }
+
+
+@router.post("/users/{user_id}/revoke-plan")
+def revoke_plan_by_id(
+    user_id: int,
+    request: Request,
+    admin: User = Depends(get_current_admin),
+    db: Session = Depends(get_db),
+):
+    """Revoke a user's paid plan and reset to free."""
+    target = db.query(User).filter(User.id == user_id).first()
+    if not target:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    old_plan = target.plan
+    target.plan = "free"
+    target.plan_started_at = None
+    target.plan_expires_at = None
+    target.plan_payment_id = None
+    target.plan_source = "none"
+    db.commit()
+
+    # Audit log
+    try:
+        admin_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(
+            db, user_id=admin.id, email=admin.email,
+            event_type="admin_action",
+            details={
+                "action": "revoke_plan",
+                "target_user_id": target.id,
+                "target_email": target.email,
+                "old_plan": old_plan,
+            },
+            ip_address=admin_ip,
+        )
+    except Exception as e:
+        logger.warning(f"Audit log error: {e}")
+
+    return {
+        "status": "success",
+        "message": f"Revoked {old_plan} plan from {target.email}. User is now on Free plan.",
+        "user": {
+            "id": target.id,
+            "email": target.email,
+            "plan": target.plan,
+            "plan_expires_at": None,
+        },
+    }
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
