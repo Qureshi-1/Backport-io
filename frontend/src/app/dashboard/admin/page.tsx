@@ -83,7 +83,7 @@ interface AuditLog {
   user_id: number;
   email: string;
   event_type: string;
-  details: string;
+  details: string | Record<string, unknown>;
   ip_address: string;
   created_at: string;
 }
@@ -123,6 +123,11 @@ const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string; bg: stri
   login: { label: "Login", color: "text-blue-400", bg: "bg-blue-500/10" },
   signup: { label: "Signup", color: "text-emerald-400", bg: "bg-emerald-500/10" },
   plan_purchase: { label: "Plan Purchase", color: "text-purple-400", bg: "bg-purple-500/10" },
+  plan_upgrade: { label: "Plan Upgrade", color: "text-violet-400", bg: "bg-violet-500/10" },
+  plan_cancel: { label: "Plan Cancel", color: "text-orange-400", bg: "bg-orange-500/10" },
+  plan_expire: { label: "Plan Expire", color: "text-amber-400", bg: "bg-amber-500/10" },
+  api_key_created: { label: "API Key Created", color: "text-cyan-400", bg: "bg-cyan-500/10" },
+  api_key_deleted: { label: "API Key Deleted", color: "text-rose-400", bg: "bg-rose-500/10" },
   admin_action: { label: "Admin Action", color: "text-red-400", bg: "bg-red-500/10" },
   profile_update: { label: "Profile Update", color: "text-yellow-400", bg: "bg-yellow-500/10" },
 };
@@ -134,13 +139,21 @@ function timeAgo(dateStr: string | null): string {
   const now = Date.now();
   const then = new Date(dateStr).getTime();
   const diff = now - then;
-  const minutes = Math.floor(diff / 60000);
+  if (diff < 0) return "Just now";
+  const seconds = Math.floor(diff / 1000);
+  const minutes = Math.floor(seconds / 60);
   if (minutes < 1) return "Just now";
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return `${minutes} min ago`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) {
+    const d = new Date(dateStr);
+    return `Today ${d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+  }
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days === 1) return "Yesterday";
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 4) return `${weeks}w ago`;
   return new Date(dateStr).toLocaleDateString("en-IN", { day: "2-digit", month: "short" });
 }
 
@@ -252,11 +265,28 @@ export default function AdminPage() {
   const [auditFromDate, setAuditFromDate] = useState("");
   const [auditToDate, setAuditToDate] = useState("");
 
+  // User activity logs for detail modal
+  const [userActivityLogs, setUserActivityLogs] = useState<AuditLog[]>([]);
+  const [userActivityLoading, setUserActivityLoading] = useState(false);
+
   // Modals & Actions
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [actionMsg, setActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [actionsDropdown, setActionsDropdown] = useState<number | null>(null);
+
+  // Fetch user activity for detail modal
+  const fetchUserActivity = useCallback(async (userId: number) => {
+    setUserActivityLoading(true);
+    try {
+      const data = await fetchApi(`/api/admin/audit-logs?user_id=${userId}&limit=10`);
+      setUserActivityLogs(data.logs || []);
+    } catch {
+      setUserActivityLogs([]);
+    } finally {
+      setUserActivityLoading(false);
+    }
+  }, []);
 
   // Toast
   const showMsg = useCallback((type: "success" | "error", text: string) => {
@@ -467,8 +497,8 @@ export default function AdminPage() {
       <div className="space-y-6 animate-pulse max-w-7xl">
         <div className="h-8 w-64 bg-zinc-800 rounded-lg" />
         <div className="h-10 w-96 bg-zinc-800 rounded-xl" />
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          {Array.from({ length: 6 }).map((_, i) => (
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
+          {Array.from({ length: 7 }).map((_, i) => (
             <MetricCardSkeleton key={i} />
           ))}
         </div>
@@ -562,8 +592,8 @@ export default function AdminPage() {
       ═══════════════════════════════════════════════════════════════════════ */}
       {activeTab === "overview" && (
         <div className="space-y-6">
-          {/* Top Metrics Row — 6 cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+          {/* Top Metrics Row — 7 cards */}
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-7 gap-4">
             {/* Total Users */}
             <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors">
               <div className="flex items-center gap-3 mb-3">
@@ -605,6 +635,16 @@ export default function AdminPage() {
                 <span className="text-xs text-zinc-500">API Keys</span>
               </div>
               <p className="text-2xl font-bold text-white">{(stats?.total_api_keys || 0).toLocaleString()}</p>
+            </div>
+
+            {/* Total Requests Today */}
+            <div className="bg-zinc-900/40 border border-zinc-800 p-5 rounded-2xl hover:border-zinc-700/50 transition-colors">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-violet-500/10 rounded-lg text-violet-400"><Activity className="h-4 w-4" /></div>
+                <span className="text-xs text-zinc-500">Requests Today</span>
+              </div>
+              <p className="text-2xl font-bold text-white">{(stats?.total_requests_today || 0).toLocaleString()}</p>
+              <span className="text-[10px] text-zinc-600 mt-1 block">API proxy requests</span>
             </div>
 
             {/* WAF Blocks Today */}
@@ -655,6 +695,8 @@ export default function AdminPage() {
                     const count = stats.plan_distribution[plan as keyof typeof stats.plan_distribution] || 0;
                     const cfg = PLAN_CONFIG[plan];
                     const pct = stats.total_users ? Math.round((count / stats.total_users) * 100) : 0;
+                    const priceMap: Record<string, number> = { free: 0, plus: 499, pro: 999, enterprise: 4999 };
+                    const planRev = (priceMap[plan] || 0) * count;
                     return (
                       <div key={plan} className="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/30">
                         <div className={`w-8 h-8 rounded-lg ${cfg.bg} flex items-center justify-center`}>
@@ -663,6 +705,7 @@ export default function AdminPage() {
                         <div className="min-w-0">
                           <p className="text-xs text-white font-medium">{cfg.label}</p>
                           <p className="text-[10px] text-zinc-500">{count} users &middot; {pct}%</p>
+                          {planRev > 0 && <p className="text-[10px] text-emerald-500">{formatMRR(planRev)} revenue</p>}
                         </div>
                       </div>
                     );
@@ -843,7 +886,7 @@ export default function AdminPage() {
                                 </button>
                                 {actionsDropdown === u.id && (
                                   <div className="absolute right-0 top-full mt-1 w-48 bg-zinc-900 border border-zinc-700 rounded-xl shadow-xl z-50 py-1">
-                                    <button onClick={() => { setSelectedUser(u); setActionsDropdown(null); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors">
+                                    <button onClick={() => { setSelectedUser(u); fetchUserActivity(u.id); setActionsDropdown(null); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors">
                                       <Eye className="w-3.5 h-3.5" /> View Details
                                     </button>
                                     {!u.is_banned && u.is_active && (
@@ -1103,6 +1146,11 @@ export default function AdminPage() {
               <option value="login">Login</option>
               <option value="signup">Signup</option>
               <option value="plan_purchase">Plan Purchase</option>
+              <option value="plan_upgrade">Plan Upgrade</option>
+              <option value="plan_cancel">Plan Cancel</option>
+              <option value="plan_expire">Plan Expire</option>
+              <option value="api_key_created">API Key Created</option>
+              <option value="api_key_deleted">API Key Deleted</option>
               <option value="admin_action">Admin Action</option>
               <option value="profile_update">Profile Update</option>
             </select>
@@ -1162,12 +1210,25 @@ export default function AdminPage() {
                     <tbody className="divide-y divide-zinc-800/50">
                       {auditLogs.map((log) => {
                         const eventCfg = EVENT_TYPE_CONFIG[log.event_type] || { label: log.event_type, color: "text-zinc-400", bg: "bg-zinc-800/60" };
-                        let detailsText = log.details || "";
+                        let detailsText = "";
+                        let parsedDetails: Record<string, unknown> | null = null;
                         try {
-                          const parsed = JSON.parse(log.details);
-                          detailsText = JSON.stringify(parsed, null, 2);
+                          const raw = typeof log.details === 'string' ? log.details : JSON.stringify(log.details);
+                          parsedDetails = JSON.parse(raw);
+                          // Extract meaningful summary from known event types
+                          if (log.event_type === 'plan_purchase' && parsedDetails) {
+                            detailsText = `Plan: ${parsedDetails.plan || 'N/A'} | Amount: ${parsedDetails.amount ? formatMRR(Number(parsedDetails.amount) / 100) : 'N/A'}`;
+                          } else if (log.event_type === 'plan_upgrade' && parsedDetails) {
+                            detailsText = `From: ${parsedDetails.previous_plan || 'free'} -> ${parsedDetails.plan || 'N/A'}`;
+                          } else if (log.event_type === 'admin_action' && parsedDetails) {
+                            detailsText = `Action: ${parsedDetails.action || 'N/A'} | Target: ${parsedDetails.target_email || parsedDetails.target_user_id || 'N/A'}`;
+                          } else if (log.event_type === 'login' && parsedDetails) {
+                            detailsText = `Provider: ${parsedDetails.provider || 'email'}`;
+                          } else {
+                            detailsText = JSON.stringify(parsedDetails, null, 2);
+                          }
                         } catch {
-                          // not JSON
+                          detailsText = (log.details as string) || "";
                         }
                         if (detailsText.length > 100) detailsText = detailsText.slice(0, 100) + "...";
 
@@ -1494,6 +1555,35 @@ export default function AdminPage() {
                     </button>
                   )}
                 </div>
+              </div>
+
+              {/* Activity History */}
+              <div>
+                <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-3">Recent Activity</p>
+                {userActivityLoading ? (
+                  <div className="space-y-2">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                      <div key={i} className="h-8 bg-zinc-800/30 rounded-lg animate-pulse" />
+                    ))}
+                  </div>
+                ) : userActivityLogs.length > 0 ? (
+                  <div className="space-y-2 max-h-48 overflow-y-auto no-scrollbar">
+                    {userActivityLogs.map((log) => {
+                      const eventCfg = EVENT_TYPE_CONFIG[log.event_type] || { label: log.event_type, color: 'text-zinc-400', bg: 'bg-zinc-800/60' };
+                      return (
+                        <div key={log.id} className="flex items-center gap-3 p-2 rounded-lg bg-zinc-800/20">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold flex-shrink-0 ${eventCfg.bg} ${eventCfg.color}`}>
+                            {eventCfg.label}
+                          </span>
+                          <span className="text-[10px] text-zinc-500 flex-1 truncate">{timeAgo(log.created_at)}</span>
+                          <span className="text-[9px] text-zinc-600 font-mono flex-shrink-0">{log.ip_address || ''}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-zinc-600">No recent activity found.</p>
+                )}
               </div>
 
               {/* Delete */}

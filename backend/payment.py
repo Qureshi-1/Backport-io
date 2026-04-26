@@ -284,6 +284,7 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
     except Exception:
         raise HTTPException(status_code=400, detail="Could not verify payment. Please contact support.")
 
+    previous_plan = user.plan  # capture before update
     user.plan = plan_id
     user.plan_started_at = datetime.now(timezone.utc)
     user.plan_payment_id = req.razorpay_payment_id
@@ -292,13 +293,17 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
     user.plan_expires_at = datetime.now(timezone.utc) + timedelta(days=30)
     db.commit()
 
-    # Track plan purchase in audit logs
+    # Track plan purchase / plan upgrade in audit logs
     try:
         from models import create_audit_log
+        _event_type = "plan_upgrade" if previous_plan != "free" else "plan_purchase"
+        _log_details = {"plan": plan_id, "payment_id": req.razorpay_payment_id, "amount": expected_amount}
+        if _event_type == "plan_upgrade":
+            _log_details["previous_plan"] = previous_plan
         create_audit_log(
             db, user_id=user.id, email=user.email,
-            event_type="plan_purchase",
-            details={"plan": plan_id, "payment_id": req.razorpay_payment_id, "amount": expected_amount},
+            event_type=_event_type,
+            details=_log_details,
             ip_address="payment_webhook"
         )
     except Exception as e:

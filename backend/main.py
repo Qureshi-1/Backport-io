@@ -394,6 +394,45 @@ def health():
         "checks": checks,
     }
 
+@app.post("/health")
+def health_post():
+    """POST version of the health endpoint — same response as GET /health."""
+    checks = {}
+
+    # 1. Database check
+    try:
+        with SessionLocal() as db:
+            db.execute(text("SELECT 1"))
+        checks["database"] = "ok"
+    except Exception as e:
+        checks["database"] = f"error: {str(e)[:50]}"
+
+    # 2. Cache/Redis check
+    try:
+        from cache import cache
+        cache.set("_health_check", "1", ttl=5)
+        result = cache.get("_health_check")
+        checks["cache"] = "ok" if result else "degraded"
+        cache.delete("_health_check")
+    except Exception:
+        checks["cache"] = "unavailable"
+
+    # 3. Uptime
+    uptime_seconds = int(time.time() - _START_TIME)
+    uptime_str = f"{uptime_seconds // 3600}h {(uptime_seconds % 3600) // 60}m"
+
+    # Determine overall status
+    all_ok = all(v == "ok" for v in checks.values())
+
+    return {
+        "status": "ok" if all_ok else "degraded",
+        "version": "2.0.0",
+        "gateway": "Backport",
+        "uptime": uptime_str,
+        "uptime_seconds": uptime_seconds,
+        "checks": checks,
+    }
+
 @app.get("/")
 def root():
     return {
