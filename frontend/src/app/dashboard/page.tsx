@@ -7,7 +7,8 @@ import {
   CheckCircle2, Circle, X, Download, 
   Clock, BarChart3, ShieldAlert, Zap, ArrowUpRight, Globe, ShieldCheck,
   FileJson, FileSpreadsheet, Radio, TrendingUp, Shield,
-  Settings, KeyRound, ArrowRight, LayoutDashboard, Wifi, WifiOff, Timer
+  Settings, KeyRound, ArrowRight, LayoutDashboard, Wifi, WifiOff, Timer,
+  AlertTriangle
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -290,6 +291,64 @@ export default function DashboardOverview() {
       {/* Glow orbs background */}
       <GlowOrb color="#04e184" size={500} x="20%" y="10%" delay={0} opacity={0.04} />
       <GlowOrb color="#6BA9FF" size={400} x="80%" y="30%" delay={2} opacity={0.03} />
+
+      {/* ═══ Plan Expiry Warning Banner ═══ */}
+      {(() => {
+        const plan = contextUser?.plan;
+        const planExpiresAt = contextUser?.plan_expires_at;
+        if (!plan || plan === "free" || !planExpiresAt) return null;
+        const expiryDate = new Date(planExpiresAt);
+        const now = new Date();
+        const threeDaysFromNow = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        if (expiryDate > threeDaysFromNow) return null;
+        const formattedDate = expiryDate.toLocaleDateString("en-US", {
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+        const isExpired = expiryDate <= now;
+        return (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 border ${
+              isExpired
+                ? "bg-red-500/10 border-red-500/30"
+                : "bg-amber-500/10 border-amber-500/30"
+            }`}
+          >
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
+              isExpired ? "bg-red-500/15" : "bg-amber-500/15"
+            }`}>
+              <AlertTriangle className={`w-5 h-5 ${isExpired ? "text-red-400" : "text-amber-400"}`} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className={`text-sm font-semibold ${isExpired ? "text-red-400" : "text-amber-400"}`}>
+                {isExpired
+                  ? `Your ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan expired on ${formattedDate}.`
+                  : `Your ${plan.charAt(0).toUpperCase() + plan.slice(1)} plan expires on ${formattedDate}.`
+                }
+              </p>
+              <p className="text-xs text-zinc-400 mt-0.5">
+                {isExpired
+                  ? "Renew now to restore your features."
+                  : "Renew now to keep your features."
+                }
+              </p>
+            </div>
+            <Link
+              href="/dashboard/billing"
+              className={`flex-shrink-0 px-5 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-colors min-h-[44px] ${
+                isExpired
+                  ? "bg-red-500 hover:bg-red-400 text-white"
+                  : "bg-amber-500 hover:bg-amber-400 text-black"
+              }`}
+            >
+              Renew Plan
+            </Link>
+          </motion.div>
+        );
+      })()}
 
       <motion.div variants={container} initial="hidden" animate="show">
         {/* ═══ Welcome Header ═══ */}

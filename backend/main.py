@@ -200,6 +200,8 @@ async def startup():
             ("health_checks", "checked_at", "ix_health_checks_checked_at"),
             ("audit_logs", "event_type", "ix_audit_logs_event_type"),
             ("audit_logs", "created_at", "ix_audit_logs_created_at"),
+            # Composite indexes for performance
+            ("api_logs", "user_id, created_at", "ix_api_logs_user_id_created_at"),
         ]
         for table, col, idx_name in index_migrations:
             try:
@@ -208,6 +210,113 @@ async def startup():
                 print(f"✅ Index {idx_name} ensured on {table}({col})")
             except Exception as e:
                 logger.debug(f"Index migration skip ({idx_name}): {e}")
+
+        # Composite indexes for better query performance
+        composite_indexes = [
+            ("CREATE INDEX IF NOT EXISTS ix_api_logs_user_id_created_at ON api_logs (user_id, created_at)"),
+            ("CREATE INDEX IF NOT EXISTS ix_alerts_user_id_alert_type ON alerts (user_id, alert_type)"),
+            ("CREATE INDEX IF NOT EXISTS ix_health_checks_user_id_checked_at ON health_checks (user_id, checked_at)"),
+        ]
+        for idx_sql in composite_indexes:
+            try:
+                with engine.begin() as conn:
+                    conn.execute(text(idx_sql))
+            except Exception as e:
+                logger.debug(f"Composite index skip: {e}")
+
+        # ─── Log Retention Cleanup (background task) ────────────────────────
+        def _cleanup_old_logs():
+            """Delete logs older than 30 days to prevent database bloat."""
+            from models import ApiLog, Alert, HealthCheck
+            from datetime import datetime, timezone, timedelta
+            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+            try:
+                with SessionLocal() as db:
+                    deleted_logs = db.query(ApiLog).filter(ApiLog.created_at < cutoff).delete()
+                    deleted_alerts = db.query(Alert).filter(
+                        Alert.created_at < cutoff,
+                        Alert.is_read == True,
+                    ).delete()
+                    deleted_health = db.query(HealthCheck).filter(HealthCheck.checked_at < cutoff).delete()
+                    db.commit()
+                    if deleted_logs or deleted_alerts or deleted_health:
+                        print(f"🗑️ Log cleanup: removed {deleted_logs} logs, {deleted_alerts} alerts, {deleted_health} health checks older than 30 days")
+            except Exception as e:
+                print(f"⚠️ Log cleanup error: {e}")
+
+        def _schedule_log_cleanup():
+            _cleanup_old_logs()
+            _timer = threading.Timer(3600, _schedule_log_cleanup)  # Run every hour
+            _timer.daemon = True
+            _timer.start()
+
+        _schedule_log_cleanup()
+        print("✅ Log retention cleanup started (30-day retention, hourly check)")
+
+        # ─── Plan Expiry Checker (background task) ─────────────────────────
+        def _check_plan_expirations():
+            """Check for plans expiring in 3 days and send reminder emails."""
+            from models import User
+            from datetime import datetime, timezone, timedelta
+            try:
+                with SessionLocal() as db:
+                    now = datetime.now(timezone.utc)
+                    # Find plans expiring in 3 days
+                    three_days = now + timedelta(days=3)
+                    expiring_users = db.query(User).filter(
+                        User.plan != "free",
+                        User.plan_expires_at != None,
+                        User.plan_expires_at <= three_days,
+                        User.plan_expires_at > now,
+                        User.is_active == True,
+                        User.is_banned == False,
+                    ).all()
+
+                    for user in expiring_users:
+                        try:
+                            from email_service import send_plan_expiry_reminder
+                            expiry_str = user.plan_expires_at.strftime("%d %b %Y")
+                            send_plan_expiry_reminder(
+                                to=user.email,
+                                name=user.name or "",
+                                plan=user.plan,
+                                expiry_date=expiry_str,
+                            )
+                        except Exception as e:
+                            print(f"⚠️ Expiry reminder error for {user.email}: {e}")
+
+                    # Also find plans that already expired (auto-expire)
+                    expired_users = db.query(User).filter(
+                        User.plan != "free",
+                        User.plan_expires_at != None,
+                        User.plan_expires_at <= now,
+                        User.is_active == True,
+                    ).all()
+
+                    for user in expired_users:
+                        user.plan = "free"
+                        user.plan_source = "expired"
+                        try:
+                            from models import create_audit_log
+                            create_audit_log(db, user_id=user.id, email=user.email,
+                                            event_type="plan_expire", details={"previous_plan": user.plan})
+                        except Exception:
+                            pass
+
+                    if expiring_users or expired_users:
+                        db.commit()
+                        print(f"📅 Plan check: {len(expiring_users)} expiring soon, {len(expired_users)} expired")
+            except Exception as e:
+                print(f"⚠️ Plan expiry check error: {e}")
+
+        def _schedule_plan_check():
+            _check_plan_expirations()
+            _timer = threading.Timer(21600, _schedule_plan_check)  # Check every 6 hours
+            _timer.daemon = True
+            _timer.start()
+
+        _schedule_plan_check()
+        print("✅ Plan expiry checker started (6-hour interval)")
 
     except Exception as e:
         print(f"⚠️  DB init warning: {e}")
@@ -355,9 +464,8 @@ async def global_exception_handler(request: Request, exc: Exception):
     return _build_error_response(500, "Internal server error", "server_error", request_id)
 
 # Health Endpoint (Public — enhanced with system checks)
-@app.get("/health")
-def health():
-    """Enhanced health endpoint with system checks."""
+def _get_health_data():
+    """Shared health check logic."""
     checks = {}
 
     # 1. Database check
@@ -393,45 +501,14 @@ def health():
         "uptime_seconds": uptime_seconds,
         "checks": checks,
     }
+
+@app.get("/health")
+def health():
+    return _get_health_data()
 
 @app.post("/health")
 def health_post():
-    """POST version of the health endpoint — same response as GET /health."""
-    checks = {}
-
-    # 1. Database check
-    try:
-        with SessionLocal() as db:
-            db.execute(text("SELECT 1"))
-        checks["database"] = "ok"
-    except Exception as e:
-        checks["database"] = f"error: {str(e)[:50]}"
-
-    # 2. Cache/Redis check
-    try:
-        from cache import cache
-        cache.set("_health_check", "1", ttl=5)
-        result = cache.get("_health_check")
-        checks["cache"] = "ok" if result else "degraded"
-        cache.delete("_health_check")
-    except Exception:
-        checks["cache"] = "unavailable"
-
-    # 3. Uptime
-    uptime_seconds = int(time.time() - _START_TIME)
-    uptime_str = f"{uptime_seconds // 3600}h {(uptime_seconds % 3600) // 60}m"
-
-    # Determine overall status
-    all_ok = all(v == "ok" for v in checks.values())
-
-    return {
-        "status": "ok" if all_ok else "degraded",
-        "version": "2.0.0",
-        "gateway": "Backport",
-        "uptime": uptime_str,
-        "uptime_seconds": uptime_seconds,
-        "checks": checks,
-    }
+    return _get_health_data()
 
 @app.get("/")
 def root():
