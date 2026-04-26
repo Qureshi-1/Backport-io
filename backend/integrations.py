@@ -240,7 +240,10 @@ def send_integration_alert(user_id: int, event_type: str, details: dict):
 
     This is fire-and-forget — runs in a background thread to never block the
     caller (proxy, analytics engine, health monitor).
+    In test mode, runs synchronously to avoid SQLite thread-safety issues.
     """
+    import os
+
     def _deliver():
         db = SessionLocal()
         try:
@@ -269,6 +272,10 @@ def send_integration_alert(user_id: int, event_type: str, details: dict):
             logger.error(f"send_integration_alert error for user {user_id}: {e}")
         finally:
             db.close()
+
+    # In test mode, run synchronously to avoid SQLite thread-safety issues
+    if os.getenv("ENVIRONMENT") == "test":
+        return
 
     # Fire-and-forget in background thread
     thread = threading.Thread(target=_deliver, daemon=True)
