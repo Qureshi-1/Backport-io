@@ -16,6 +16,7 @@ const NAV_ITEMS = [
   { href: "/#pricing", label: "Pricing" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
+  { href: "/changelog", label: "Changelog" },
   { href: "https://github.com/Qureshi-1/Backport-io", label: "GitHub", external: true },
 ];
 

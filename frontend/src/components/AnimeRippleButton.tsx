@@ -128,7 +128,7 @@ export function AnimeTyping({
   className?: string;
 }) {
   const textRef = useRef<HTMLSpanElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const cleanupRef = useRef<any[]>([]);
 
   useEffect(() => {

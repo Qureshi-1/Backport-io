@@ -45,7 +45,7 @@ interface HealthHistoryEntry {
   response_time_ms: number;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 function ResponseTimeTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
   return (

@@ -73,6 +73,46 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${spaceGrotesk.variable} font-sans bg-zinc-950 text-white min-h-screen min-w-0 overflow-x-hidden selection:bg-[#04e184]/30`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": "Backport",
+              "url": "https://backport.in",
+              "applicationCategory": "DeveloperApplication",
+              "operatingSystem": "Web",
+              "description": "Backport is an API gateway that protects your backend with WAF, rate limiting, caching, response transformation, and API mocking. No SDK or code changes required.",
+              "offers": [
+                {
+                  "@type": "Offer",
+                  "price": "0",
+                  "priceCurrency": "USD",
+                  "name": "Free Plan",
+                  "description": "3 months free with 100 requests/min"
+                },
+                {
+                  "@type": "Offer",
+                  "price": "5.99",
+                  "priceCurrency": "USD",
+                  "name": "Plus Plan",
+                  "description": "500 requests/min, response transformation, API mocking"
+                },
+                {
+                  "@type": "Offer",
+                  "price": "11.99",
+                  "priceCurrency": "USD",
+                  "name": "Pro Plan",
+                  "description": "5000 requests/min, custom WAF rules, webhooks"
+                }
+              ],
+              "programmingLanguage": ["Python", "TypeScript"],
+              "isAccessibleForFree": true,
+              "license": "https://opensource.org/licenses/MIT"
+            })
+          }}
+        />
         <Toaster position="bottom-right" toastOptions={{
           style: {
             background: '#18181b',

@@ -56,11 +56,11 @@ export default function TextReveal({
         },
       });
 
-      (container as any)._tween = tween; // eslint-disable-line
+      (container as any)._tween = tween;  
     }).catch((e) => console.warn("TextReveal: failed to init", e));
 
     return () => {
-      const tween = (container as any)?._tween; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const tween = (container as any)?._tween;  
       if (tween && typeof tween.kill === "function") tween.kill();
       killTriggersFor(container);
     };

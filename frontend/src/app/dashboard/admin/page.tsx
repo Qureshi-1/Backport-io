@@ -16,7 +16,6 @@ import {
   Crown,
   Zap,
   TrendingUp,
-  UserCog,
   Ban,
   Server,
   Database,
@@ -37,10 +36,8 @@ import {
   ArrowUp,
   ArrowDown,
   MoreVertical,
-  ShieldAlert,
   UserCheck,
   UserX,
-  Settings,
 } from "lucide-react";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
@@ -285,10 +282,10 @@ export default function AdminPage() {
   const [planForm, setPlanForm] = useState({ plan: "plus", duration_days: 30 });
   const [extendForm, setExtendForm] = useState({ extra_days: 30 });
   const [userDetail, setUserDetail] = useState<any>(null);
-  const [userDetailLoading, setUserDetailLoading] = useState(false);
+  const [_userDetailLoading, setUserDetailLoading] = useState(false);
 
   // Fetch user detail (with plan_history)
-  const fetchUserDetail = useCallback(async (userId: number) => {
+  const _fetchUserDetail = useCallback(async (userId: number) => {
     setUserDetailLoading(true);
     try {
       const data = await fetchApi(`/api/admin/users/${userId}`);
@@ -360,7 +357,7 @@ export default function AdminPage() {
       setUsers(data.users || []);
       setUsersTotal(data.total || 0);
       setUsersPage(data.page || 1);
-    } catch (err: any) {
+    } catch {
       showMsg("error", "Failed to load users");
     } finally {
       setUsersLoading(false);
@@ -497,7 +494,7 @@ export default function AdminPage() {
         body: JSON.stringify(planForm),
       });
       showMsg("success", data.message);
-      planModalUser && setUserDetail(null);
+      if (planModalUser) setUserDetail(null);
       setPlanModalUser(null);
       setPlanModalMode(null);
       fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
@@ -517,7 +514,7 @@ export default function AdminPage() {
         body: JSON.stringify(extendForm),
       });
       showMsg("success", data.message);
-      planModalUser && setUserDetail(null);
+      if (planModalUser) setUserDetail(null);
       setPlanModalUser(null);
       setPlanModalMode(null);
       fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
@@ -534,7 +531,7 @@ export default function AdminPage() {
     try {
       const data = await fetchApi(`/api/admin/users/${userId}/revoke-plan`, { method: "POST" });
       showMsg("success", data.message);
-      planModalUser && setUserDetail(null);
+      if (planModalUser) setUserDetail(null);
       setPlanModalUser(null);
       fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
       fetchStats();

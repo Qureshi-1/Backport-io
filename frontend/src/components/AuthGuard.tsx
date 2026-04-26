@@ -1,6 +1,6 @@
 "use client";
 import { useRouter } from "next/navigation";
-import { useUser, LOADING_MESSAGES } from "@/lib/user-context";
+import { useUser } from "@/lib/user-context";
 import { motion } from "framer-motion";
 import { RefreshCw, WifiOff, Zap, Server, Activity } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -70,8 +70,8 @@ function DashboardSkeleton() {
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { user, loading, error, retry, warming, coldStart, waitSeconds } = useUser();
-  const [tick, setTick] = useState(0);
+  const { user, loading, error, retry, warming: _warming, coldStart, waitSeconds } = useUser();
+  const [_tick, setTick] = useState(0);
   const [redirected, setRedirected] = useState(false);
 
   useEffect(() => {

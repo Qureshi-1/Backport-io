@@ -37,7 +37,7 @@ interface AlertItem {
   message: string;
   severity: string;
   timestamp: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   details: Record<string, any>;
   is_read: boolean;
 }
@@ -244,7 +244,7 @@ export default function DashboardOverview() {
   const userEmail = typeof user?.email === 'string' ? user.email : '';
   const userName = (typeof user?.name === 'string' ? user.name : '') || userEmail.split("@")[0] || "Developer";
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const userAnalytics = (user as any)?.analytics || {};
   const totalRequests = stats?.total_requests || userAnalytics.total_requests || 0;
   const threatsBlocked = stats?.threats_blocked || userAnalytics.threats_blocked || 0;

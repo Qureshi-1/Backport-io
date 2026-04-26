@@ -18,7 +18,7 @@ export interface UserData {
     cache_hits: number;
     avg_latency: number;
   };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   [key: string]: any;
 }
 
@@ -213,7 +213,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     fetchUser(true);
   }, [fetchUser]);
 
-  const currentMessage = LOADING_MESSAGES[messageIndex];
+  const _currentMessage = LOADING_MESSAGES[messageIndex];
 
   return (
     <UserContext.Provider value={{ user, loading, error, retry, warming, coldStart, waitSeconds }}>

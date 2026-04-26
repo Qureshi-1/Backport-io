@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
-  Zap, Shield, Activity, ArrowRight, Check,
+  Shield, Activity, ArrowRight, Check,
   Terminal, Lock, Code2,
   ChevronDown, Database,
   Copy, CheckCircle2,
@@ -661,14 +661,21 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════════════════════════════════════════════════
-          TECH STACK BADGES
+          WHY DEVELOPERS CHOOSE BACKPORT
       ═══════════════════════════════════════════════════════════════ */}
       <section className="py-12 sm:py-16 px-6 border-t border-white/[0.04]">
         <div className="max-w-5xl mx-auto text-center">
-          <p className="text-xs text-[#A2BDDB]/25 uppercase tracking-[0.2em] font-medium mb-8">Built with technologies developers love</p>
-          <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
-            {["FastAPI", "Next.js", "PostgreSQL", "Python", "TypeScript"].map((name) => (
-              <span key={name} className="text-sm sm:text-base font-semibold text-[#A2BDDB]/20 tracking-tight">{name}</span>
+          <p className="text-xs text-[#A2BDDB]/25 uppercase tracking-[0.2em] font-medium mb-8">Why developers choose Backport</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            {[
+              { title: "No Vendor Lock-in", desc: "MIT licensed. Self-hostable. Your data stays yours." },
+              { title: "30-Second Setup", desc: "Sign up, get your API key, point your traffic. Done." },
+              { title: "Built for APIs", desc: "Not a generic CDN. Purpose-built for API protection and management." },
+            ].map((item) => (
+              <div key={item.title} className="text-center px-4">
+                <h3 className="text-sm font-semibold text-white mb-1">{item.title}</h3>
+                <p className="text-xs text-[#A2BDDB]/40">{item.desc}</p>
+              </div>
             ))}
           </div>
         </div>
@@ -690,6 +697,55 @@ export default function Home() {
               <div className="text-xs sm:text-sm text-[#A2BDDB]/40">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ═══════════════════════════════════════════════════════════════
+          CLOUDFLARE COMPARISON
+      ═══════════════════════════════════════════════════════════════ */}
+      <section className="py-20 sm:py-28 px-6 border-t border-white/[0.04]">
+        <div className="max-w-4xl mx-auto">
+          <SectionHeading
+            title="Backport vs Cloudflare"
+            subtitle="Cloudflare is great for websites. Backport is built for APIs."
+          />
+          <FadeIn delay={0.1}>
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl overflow-hidden">
+              <div className="grid grid-cols-3 text-xs font-semibold uppercase tracking-wider">
+                <div className="p-4 border-b border-white/[0.06] text-[#A2BDDB]/40">Feature</div>
+                <div className="p-4 border-b border-white/[0.06] text-center text-[#04e184]">Backport</div>
+                <div className="p-4 border-b border-white/[0.06] text-center text-[#A2BDDB]/30">Cloudflare</div>
+              </div>
+              {[
+                { feature: "API Response Transformation", backport: true, cf: false },
+                { feature: "API Mocking", backport: true, cf: false },
+                { feature: "Custom WAF Rules", backport: true, cf: "Pro $20/mo" },
+                { feature: "Per-API-Key Rate Limiting", backport: true, cf: false },
+                { feature: "Webhook Alerts", backport: true, cf: "Enterprise" },
+                { feature: "Auto API Documentation", backport: true, cf: false },
+                { feature: "No DNS Changes Needed", backport: true, cf: false },
+                { feature: "Starting Price", backport: "Free", cf: "Free" },
+              ].map((row, i) => (
+                <div key={row.feature} className={`grid grid-cols-3 text-sm ${i % 2 === 0 ? "bg-white/[0.01]" : ""}`}>
+                  <div className="p-4 border-b border-white/[0.04] text-white/70">{row.feature}</div>
+                  <div className="p-4 border-b border-white/[0.04] text-center">
+                    {row.backport === true ? (
+                      <span className="text-[#04e184] font-medium">Included</span>
+                    ) : (
+                      <span className="text-white/50">{String(row.backport)}</span>
+                    )}
+                  </div>
+                  <div className="p-4 border-b border-white/[0.04] text-center">
+                    {row.cf === true ? (
+                      <span className="text-[#04e184] font-medium">Included</span>
+                    ) : (
+                      <span className="text-[#A2BDDB]/30">{String(row.cf)}</span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </FadeIn>
         </div>
       </section>
 
@@ -899,37 +955,6 @@ export default function Home() {
               </FadeIn>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          OPEN SOURCE
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="max-w-4xl mx-auto">
-          <FadeIn>
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-dot-grid-subtle opacity-20 pointer-events-none" />
-              <div className="relative z-10">
-                <GithubIcon className="w-10 h-10 text-white mx-auto mb-6" />
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  Open Source
-                </h2>
-                <p className="max-w-lg mx-auto text-[#A2BDDB]/50 text-sm sm:text-base leading-relaxed mb-8">
-                  Backport is MIT licensed. You can audit the code, report issues, or contribute features. Full transparency — nothing is hidden.
-                </p>
-                <Link
-                  href="https://github.com/Qureshi-1/Backport-io"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-xl font-bold text-sm transition-all duration-300 hover:bg-[#A2BDDB]"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                  Star on GitHub
-                </Link>
-              </div>
-            </div>
-          </FadeIn>
         </div>
       </section>
 

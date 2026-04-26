@@ -11,7 +11,7 @@ export default function GSAPMagneticGlow({ className = "" }: { className?: strin
     const glow = glowRef.current;
     if (!glow || typeof window === "undefined") return;
 
-    let gsap: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+    let gsap: any = null;  
 
     getGsap().then((mod) => {
       gsap = mod.gsap;

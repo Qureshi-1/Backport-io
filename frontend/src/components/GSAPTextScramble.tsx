@@ -32,7 +32,7 @@ export default function GSAPTextScramble({
       if (revealOnScroll) {
         gsap.set(chars, { opacity: 0, y: 20, rotateX: -90 });
         ScrollTrigger.batch(chars, {
-          onEnter: (batch: any[]) => { // eslint-disable-line @typescript-eslint/no-explicit-any
+          onEnter: (batch: any[]) => {  
             batch.forEach((el, i) => {
               scrambleChar(el as HTMLSpanElement, i * speed * 3);
             });

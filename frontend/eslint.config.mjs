@@ -10,6 +10,9 @@ const eslintConfig = defineConfig([
       // Allow `any` — many third-party types (Next.js internals, Lucide, etc.) don't have strict types
       "@typescript-eslint/no-explicit-any": "off",
 
+      // Ignore variables prefixed with `_` (common pattern for intentionally unused destructured vars)
+      "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
+
       // Allow `this` aliasing in callback contexts (common in React/Next patterns)
       "@typescript-eslint/no-this-alias": "off",
 
@@ -21,6 +24,9 @@ const eslintConfig = defineConfig([
 
       // Allow setState in effects (used for initial data loading)
       "react-hooks/set-state-in-effect": "off",
+
+      // Allow <img> — we use dynamic external URLs from blog CMS where next/image is impractical
+      "@next/next/no-img-element": "off",
     },
   },
   // Override default ignores of eslint-config-next.

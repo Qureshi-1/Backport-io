@@ -4,13 +4,13 @@ import { fetchApi } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   FileText, Search, Star, RefreshCw, Download, Copy, Check,
-  Clock, BarChart3, CheckCircle2, XCircle, ChevronDown, ChevronUp,
+  Clock, BarChart3, ChevronDown, ChevronUp,
   Filter, Edit3, Save, X,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import GlowOrb from "@/components/GlowOrb";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+ 
 interface EndpointSummary {
   id: number;
   method: string;
@@ -25,9 +25,9 @@ interface EndpointSummary {
 
 interface EndpointDetail extends EndpointSummary {
   request_headers: string[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   request_body_example: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   response_body_example: any;
 }
 

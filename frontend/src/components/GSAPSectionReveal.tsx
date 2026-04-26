@@ -25,9 +25,9 @@ export default function GSAPSectionReveal({
     if (!el || typeof window === "undefined") return;
 
     getGsap().then(({ gsap }) => {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const from: any = {};
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       const to: any = {
         opacity: 1,
         duration: 0.9,

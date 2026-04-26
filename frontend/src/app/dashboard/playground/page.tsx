@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { TerminalSquare, Send, Zap, Activity, Clock, ShieldAlert } from "lucide-react";
+import { TerminalSquare, Send, Zap, Activity, Clock } from "lucide-react";
 import { fetchApi } from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -23,7 +23,7 @@ export default function PlaygroundPage() {
           setApiKey(data[0].key);
         }
       })
-      .catch((err) => {
+      .catch((_err) => {
         toast.error("Failed to load API keys for playground");
       });
   }, []);

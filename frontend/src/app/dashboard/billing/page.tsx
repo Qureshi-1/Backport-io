@@ -2,21 +2,21 @@
 import { useEffect, useState, useCallback } from "react";
 import { fetchApi } from "@/lib/api";
 import { useUser } from "@/lib/user-context";
-import { Loader2, CheckCircle2, ArrowRight, ShieldCheck, Zap, Layers, ChevronDown, AlertTriangle, Tag, X, Gift, Sparkles, Receipt, CreditCard } from "lucide-react";
+import { Loader2, CheckCircle2, ShieldCheck, Zap, Layers, ChevronDown, AlertTriangle, Tag, X, Gift, Sparkles, Receipt, CreditCard } from "lucide-react";
 import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import { PRICING, detectUserCurrency, formatPrice, ALL_CURRENCIES, type CurrencyCode } from "@/lib/currency";
 import ContactSalesModal from "@/components/ContactSalesModal";
 
 export default function BillingPage() {
-  const { user, loading: userLoading, error: userError, retry } = useUser();
+  const { user, loading: userLoading, error: userError, retry: _retry } = useUser();
   const [currentPlan, setCurrentPlan] = useState("free");
   const [processingPlan, setProcessingPlan] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [currency, setCurrency] = useState<CurrencyCode>("USD");
   const [showContactModal, setShowContactModal] = useState(false);
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
-  const [rzpLoaded, setRzpLoaded] = useState(false);
+  const [_rzpLoaded, setRzpLoaded] = useState(false);
   const [verifying, setVerifying] = useState(false);
 
   // Payment history state
