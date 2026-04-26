@@ -100,6 +100,7 @@ def _deliver_webhook(webhook_id: int, url: str, secret: str, event_type: str, pa
     """
     Fire-and-forget delivery of a webhook event.
     Opens its own DB session to log the result.
+    Includes retry logic with exponential backoff (up to 3 retries).
     """
     db = SessionLocal()
     try:
@@ -108,26 +109,49 @@ def _deliver_webhook(webhook_id: int, url: str, secret: str, event_type: str, pa
 
         status_code = None
         response_body = None
+        success = False
 
-        try:
-            with httpx.Client(timeout=10) as client:
-                resp = client.post(
-                    url,
-                    content=payload_str,
-                    headers={
-                        "Content-Type": "application/json",
-                        "X-Backport-Event": event_type,
-                        "X-Backport-Signature": signature,
-                    },
-                )
-                status_code = resp.status_code
-                response_body = resp.text[:4096] if resp.text else None
-        except httpx.TimeoutException:
-            status_code = 504
-            response_body = "Webhook delivery timed out"
-        except Exception as e:
-            status_code = 502
-            response_body = str(e)[:4096]
+        # Retry with exponential backoff: 1s, 5s, 15s
+        retry_delays = [1, 5, 15]
+        for attempt in range(4):  # 1 initial + 3 retries
+            try:
+                with httpx.Client(timeout=10) as client:
+                    resp = client.post(
+                        url,
+                        content=payload_str,
+                        headers={
+                            "Content-Type": "application/json",
+                            "X-Backport-Event": event_type,
+                            "X-Backport-Signature": signature,
+                        },
+                    )
+                    status_code = resp.status_code
+                    response_body = resp.text[:4096] if resp.text else None
+                    if status_code < 500:
+                        success = True
+                        break
+                    # 5xx errors are retryable
+                    if attempt < len(retry_delays):
+                        logger.warning(f"Webhook {webhook_id} got {status_code}, retrying in {retry_delays[attempt]}s (attempt {attempt + 1})")
+                        import time as _time
+                        _time.sleep(retry_delays[attempt])
+                        continue
+            except httpx.TimeoutException:
+                status_code = 504
+                response_body = "Webhook delivery timed out"
+                if attempt < len(retry_delays):
+                    logger.warning(f"Webhook {webhook_id} timed out, retrying in {retry_delays[attempt]}s (attempt {attempt + 1})")
+                    import time as _time
+                    _time.sleep(retry_delays[attempt])
+                    continue
+            except Exception as e:
+                status_code = 502
+                response_body = str(e)[:4096]
+                if attempt < len(retry_delays):
+                    logger.warning(f"Webhook {webhook_id} error, retrying in {retry_delays[attempt]}s (attempt {attempt + 1}): {e}")
+                    import time as _time
+                    _time.sleep(retry_delays[attempt])
+                    continue
 
         # Log delivery
         log_entry = WebhookLog(

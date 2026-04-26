@@ -88,9 +88,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return bcrypt.checkpw(plain_password.encode('utf-8'), hashed_password.encode('utf-8'))
 
 
-def create_access_token(data: dict):
+def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
-    expire = _utcnow() + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
+    expire = _utcnow() + (expires_delta or timedelta(minutes=TOKEN_EXPIRE_MINUTES))
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -430,7 +430,86 @@ def login(req: LoginReq, request: Request, response: Response, db: Session = Dep
     # Set HttpOnly Secure cookie (JS cannot read this!)
     set_auth_cookie(response, token)
 
+    # Set refresh token (30-day expiry)
+    from dependencies import set_refresh_cookie
+    from config import REFRESH_TOKEN_EXPIRE_DAYS
+    refresh_data = {"sub": str(user.id), "email": user.email, "type": "refresh"}
+    refresh_token_jwt = create_access_token(data=refresh_data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+    set_refresh_cookie(response, refresh_token_jwt)
+
     return {"api_key": api_key, "email": user.email}
+
+# ─── Password Change ──────────────────────────────────────────────────────────
+class ChangePasswordReq(BaseModel):
+    current_password: str = Field(..., min_length=1, max_length=128)
+    new_password: str = Field(..., min_length=8, max_length=128)
+
+    @field_validator("new_password")
+    @classmethod
+    def password_strength(cls, v):
+        _validate_password_strength(v)
+        return v
+
+@router.post("/change-password")
+def change_password(req: ChangePasswordReq, request: Request, response: Response, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    """Allow logged-in user to change their password."""
+    # Verify current password
+    if not verify_password(req.current_password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Current password is incorrect")
+    
+    # Check new password is different from current
+    if verify_password(req.new_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="New password must be different from current password")
+    
+    # Update password
+    user.hashed_password = get_password_hash(req.new_password)
+    db.commit()
+    
+    # Track in audit logs
+    try:
+        from models import create_audit_log
+        client_ip = request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        create_audit_log(db, user_id=user.id, email=user.email, event_type="profile_update", details={"action": "password_change"}, ip_address=client_ip)
+    except Exception as e:
+        print(f"⚠️ Audit log error on password change: {e}")
+    
+    # Re-issue token with same cookie
+    token = create_access_token(data={"sub": str(user.id), "email": user.email})
+    set_auth_cookie(response, token)
+    
+    return {"message": "Password changed successfully"}
+
+# ─── Refresh Token ────────────────────────────────────────────────────────────
+@router.post("/refresh")
+def refresh_token(request: Request, response: Response, db: Session = Depends(get_db)):
+    """Exchange a valid refresh token cookie for a new access token."""
+    from dependencies import REFRESH_COOKIE_NAME, REFRESH_COOKIE_MAX_AGE
+    from jose import JWTError, jwt
+    
+    refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
+    if not refresh_token:
+        raise HTTPException(status_code=401, detail="Refresh token not found")
+    
+    try:
+        payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("email")
+        user_id: str = payload.get("sub")
+        if not email or not user_id:
+            raise HTTPException(status_code=401, detail="Invalid refresh token")
+        if payload.get("type") != "refresh":
+            raise HTTPException(status_code=401, detail="Not a refresh token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired refresh token")
+    
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not user.is_active or user.is_banned:
+        raise HTTPException(status_code=401, detail="User not found or inactive")
+    
+    # Issue new access token
+    token = create_access_token(data={"sub": str(user.id), "email": user.email})
+    set_auth_cookie(response, token)
+    
+    return {"message": "Token refreshed", "email": user.email}
 
 # ─── Password Reset ───────────────────────────────────────────────────────────
 class ForgotPasswordReq(BaseModel):
@@ -524,6 +603,8 @@ def reset_password(req: ResetPasswordReq, db: Session = Depends(get_db)):
 def logout(response: Response):
     """Clear the HttpOnly auth cookie. Client cannot clear it themselves since HttpOnly."""
     clear_auth_cookie(response)
+    from dependencies import clear_refresh_cookie
+    clear_refresh_cookie(response)
     return {"message": "Logged out successfully"}
 
 
@@ -917,6 +998,12 @@ async def google_callback(code: str, state: str, request: Request, db: Session =
         token_jwt = create_access_token(data={"sub": str(user.id), "email": user.email})
         response = RedirectResponse(url=f"{FRONTEND_URL.rstrip('/')}/dashboard?oauth=success", status_code=302)
         set_auth_cookie(response, token_jwt)
+        # Set refresh token
+        from dependencies import set_refresh_cookie
+        from config import REFRESH_TOKEN_EXPIRE_DAYS
+        refresh_data = {"sub": str(user.id), "email": user.email, "type": "refresh"}
+        refresh_jwt = create_access_token(data=refresh_data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+        set_refresh_cookie(response, refresh_jwt)
         return response
 
     except Exception as e:
@@ -1052,6 +1139,12 @@ async def github_callback(code: str, state: str, request: Request, db: Session =
         token_jwt = create_access_token(data={"sub": str(user.id), "email": user.email})
         response = RedirectResponse(url=f"{FRONTEND_URL.rstrip('/')}/dashboard?oauth=success", status_code=302)
         set_auth_cookie(response, token_jwt)
+        # Set refresh token
+        from dependencies import set_refresh_cookie
+        from config import REFRESH_TOKEN_EXPIRE_DAYS
+        refresh_data = {"sub": str(user.id), "email": user.email, "type": "refresh"}
+        refresh_jwt = create_access_token(data=refresh_data, expires_delta=timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+        set_refresh_cookie(response, refresh_jwt)
         return response
 
     except Exception as e:

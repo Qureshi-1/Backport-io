@@ -1,7 +1,7 @@
 import time
 import json as _json
 import logging
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from models import User, Feedback, ApiKey
@@ -487,3 +487,52 @@ def inspect_log(log_id: int, user: User = Depends(get_current_user), db: Session
         "response_size": log.response_size,
         "created_at": log.created_at.isoformat() if log.created_at else None,
     }
+
+# ─── Account Deletion (GDPR) ─────────────────────────────────────────────────
+
+@router.delete("/account")
+def delete_account(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    """Self-service account deletion. Soft-deletes user and all their data (GDPR)."""
+    from models import AuditLog, ApiLog, ApiKey, Alert, HealthCheck, Integration
+    from sqlalchemy import text
+    
+    # Track in audit logs before deletion
+    try:
+        audit = AuditLog(
+            user_id=user.id,
+            email=user.email,
+            event_type="admin_action",
+            details='{"action": "self_delete"}',
+            ip_address=request.headers.get("X-Forwarded-For", request.client.host if request.client else "unknown")
+        )
+        db.add(audit)
+        db.commit()
+    except Exception:
+        pass
+    
+    # Soft delete: mark user as banned and inactive
+    user.is_active = False
+    user.is_banned = True
+    user.is_verified = False
+    user.target_backend_url = None
+    user.hashed_password = ""  # Clear password
+    # Anonymize email
+    from datetime import datetime, timezone
+    user.email = f"deleted_{user.id}_{datetime.now(timezone.utc).timestamp()}@deleted.backport.in"
+    user.name = None
+    user.avatar_url = None
+    user.oauth_provider = None
+    user.oauth_id = None
+    
+    # Delete all API keys
+    db.query(ApiKey).filter(ApiKey.user_id == user.id).delete()
+    
+    # Delete logs (keep audit logs for compliance)
+    db.query(ApiLog).filter(ApiLog.user_id == user.id).delete()
+    db.query(Alert).filter(Alert.user_id == user.id).delete()
+    db.query(HealthCheck).filter(HealthCheck.user_id == user.id).delete()
+    db.query(Integration).filter(Integration.user_id == user.id).delete()
+    
+    db.commit()
+    
+    return {"message": "Account deleted successfully. All your data has been removed."}
