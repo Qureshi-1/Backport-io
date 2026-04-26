@@ -76,6 +76,10 @@ interface User {
   last_login_at: string;
   login_count: number;
   api_key_count: number;
+  plan_started_at: string | null;
+  plan_source: string;
+  plan_payment_id: string | null;
+  plan_status: string;
 }
 
 interface AuditLog {
@@ -275,16 +279,44 @@ export default function AdminPage() {
   const [actionMsg, setActionMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [actionsDropdown, setActionsDropdown] = useState<number | null>(null);
 
+  // Plan management modal state
+  const [planModalUser, setPlanModalUser] = useState<User | null>(null);
+  const [planModalMode, setPlanModalMode] = useState<"assign" | "extend" | null>(null);
+  const [planForm, setPlanForm] = useState({ plan: "plus", duration_days: 30 });
+  const [extendForm, setExtendForm] = useState({ extra_days: 30 });
+  const [userDetail, setUserDetail] = useState<any>(null);
+  const [userDetailLoading, setUserDetailLoading] = useState(false);
+
+  // Fetch user detail (with plan_history)
+  const fetchUserDetail = useCallback(async (userId: number) => {
+    setUserDetailLoading(true);
+    try {
+      const data = await fetchApi(`/api/admin/users/${userId}`);
+      setUserDetail(data);
+    } catch {
+      setUserDetail(null);
+    } finally {
+      setUserDetailLoading(false);
+    }
+  }, []);
+
   // Fetch user activity for detail modal
   const fetchUserActivity = useCallback(async (userId: number) => {
     setUserActivityLoading(true);
+    setUserDetailLoading(true);
     try {
-      const data = await fetchApi(`/api/admin/audit-logs?user_id=${userId}&limit=10`);
-      setUserActivityLogs(data.logs || []);
+      const [activityData, detailData] = await Promise.all([
+        fetchApi(`/api/admin/audit-logs?user_id=${userId}&limit=10`),
+        fetchApi(`/api/admin/users/${userId}`),
+      ]);
+      setUserActivityLogs(activityData.logs || []);
+      setUserDetail(detailData);
     } catch {
       setUserActivityLogs([]);
+      setUserDetail(null);
     } finally {
       setUserActivityLoading(false);
+      setUserDetailLoading(false);
     }
   }, []);
 
@@ -452,6 +484,62 @@ export default function AdminPage() {
       setSelectedUser(null);
     } catch (err: any) {
       showMsg("error", err?.message || "Failed to delete user");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleAssignPlan = async (userId: number) => {
+    setActionLoading(true);
+    try {
+      const data = await fetchApi(`/api/admin/users/${userId}/plan`, {
+        method: "PATCH",
+        body: JSON.stringify(planForm),
+      });
+      showMsg("success", data.message);
+      planModalUser && setUserDetail(null);
+      setPlanModalUser(null);
+      setPlanModalMode(null);
+      fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
+      fetchStats();
+    } catch (err: any) {
+      showMsg("error", err?.message || "Failed to assign plan");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleExtendPlan = async (userId: number) => {
+    setActionLoading(true);
+    try {
+      const data = await fetchApi(`/api/admin/users/${userId}/extend-plan`, {
+        method: "POST",
+        body: JSON.stringify(extendForm),
+      });
+      showMsg("success", data.message);
+      planModalUser && setUserDetail(null);
+      setPlanModalUser(null);
+      setPlanModalMode(null);
+      fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
+    } catch (err: any) {
+      showMsg("error", err?.message || "Failed to extend plan");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleRevokePlan = async (userId: number) => {
+    if (!confirm("Are you sure you want to revoke this user's plan? They will be moved to Free.")) return;
+    setActionLoading(true);
+    try {
+      const data = await fetchApi(`/api/admin/users/${userId}/revoke-plan`, { method: "POST" });
+      showMsg("success", data.message);
+      planModalUser && setUserDetail(null);
+      setPlanModalUser(null);
+      fetchUsers(usersPage, userSearch, userPlanFilter, userSort, userSortOrder);
+      fetchStats();
+    } catch (err: any) {
+      showMsg("error", err?.message || "Failed to revoke plan");
     } finally {
       setActionLoading(false);
     }
@@ -866,7 +954,17 @@ export default function AdminPage() {
                                 {plan.label}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">{formatDate(u.plan_expiry_date)}</td>
+                            <td className="px-4 py-3 text-xs whitespace-nowrap">
+                              {u.plan === "free" ? (
+                                <span className="text-zinc-600">—</span>
+                              ) : u.plan_status === "expired" ? (
+                                <span className="text-red-400 font-bold">EXPIRED</span>
+                              ) : u.plan_status === "expiring_soon" ? (
+                                <span className="text-yellow-400">{formatDate(u.plan_expiry_date)}</span>
+                              ) : (
+                                <span className="text-zinc-500">{formatDate(u.plan_expiry_date)}</span>
+                              )}
+                            </td>
                             <td className="px-4 py-3 text-zinc-500 text-xs whitespace-nowrap">{timeAgo(u.last_login_at)}</td>
                             <td className="px-4 py-3 text-zinc-400 text-xs font-medium">{u.login_count || 0}</td>
                             <td className="px-4 py-3">
@@ -889,6 +987,19 @@ export default function AdminPage() {
                                     <button onClick={() => { setSelectedUser(u); fetchUserActivity(u.id); setActionsDropdown(null); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-zinc-300 hover:bg-zinc-800 transition-colors">
                                       <Eye className="w-3.5 h-3.5" /> View Details
                                     </button>
+                                    <button onClick={() => { setPlanModalUser(u); setPlanModalMode("assign"); setActionsDropdown(null); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-purple-400 hover:bg-zinc-800 transition-colors">
+                                      <Crown className="w-3.5 h-3.5" /> Change Plan
+                                    </button>
+                                    {u.plan !== "free" && (
+                                      <button onClick={() => { setPlanModalUser(u); setPlanModalMode("extend"); setActionsDropdown(null); }} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-blue-400 hover:bg-zinc-800 transition-colors">
+                                        <Clock className="w-3.5 h-3.5" /> Extend Plan
+                                      </button>
+                                    )}
+                                    {u.plan !== "free" && (
+                                      <button onClick={() => handleRevokePlan(u.id)} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-orange-400 hover:bg-zinc-800 transition-colors">
+                                        <XCircle className="w-3.5 h-3.5" /> Revoke Plan
+                                      </button>
+                                    )}
                                     {!u.is_banned && u.is_active && (
                                       <button onClick={() => handleUserAction(u.id, "suspend")} className="w-full flex items-center gap-2 px-3 py-2 text-xs text-yellow-400 hover:bg-zinc-800 transition-colors">
                                         <UserMinus className="w-3.5 h-3.5" /> Suspend
@@ -971,9 +1082,17 @@ export default function AdminPage() {
                           <span className="text-zinc-500">Logins: <strong className="text-zinc-300">{u.login_count || 0}</strong></span>
                         </div>
                         <div className="flex gap-2 pt-1 flex-wrap">
-                          <button onClick={() => setSelectedUser(u)} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors min-h-[36px] inline-flex items-center justify-center gap-1">
+                          <button onClick={() => { setSelectedUser(u); fetchUserActivity(u.id); }} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-zinc-800/50 text-zinc-400 hover:text-white transition-colors min-h-[36px] inline-flex items-center justify-center gap-1">
                             <Eye className="w-3 h-3" /> View
                           </button>
+                          <button onClick={() => { setPlanModalUser(u); setPlanModalMode("assign"); }} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-purple-500/10 text-purple-400 min-h-[36px] inline-flex items-center justify-center gap-1">
+                            <Crown className="w-3 h-3" /> Plan
+                          </button>
+                          {u.plan !== "free" && (
+                            <button onClick={() => { setPlanModalUser(u); setPlanModalMode("extend"); }} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-blue-500/10 text-blue-400 min-h-[36px] inline-flex items-center justify-center gap-1">
+                              <Clock className="w-3 h-3" /> Extend
+                            </button>
+                          )}
                           {!u.is_banned && u.is_active && (
                             <button onClick={() => handleUserAction(u.id, "suspend")} className="py-1.5 px-3 rounded-lg text-[10px] font-bold bg-yellow-500/10 text-yellow-400 min-h-[36px] inline-flex items-center justify-center gap-1">
                               <UserMinus className="w-3 h-3" /> Suspend
@@ -1490,6 +1609,93 @@ export default function AdminPage() {
                 ))}
               </div>
 
+              {/* Plan Info */}
+              <div className="space-y-3">
+                <h3 className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Plan Information</h3>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="p-3 rounded-xl bg-zinc-800/30">
+                    <p className="text-[10px] text-zinc-500">Current Plan</p>
+                    <p className="text-sm font-medium text-white">{PLAN_CONFIG[selectedUser.plan]?.label}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-zinc-800/30">
+                    <p className="text-[10px] text-zinc-500">Status</p>
+                    <p className={`text-sm font-medium ${selectedUser.plan_status === 'expired' ? 'text-red-400' : selectedUser.plan_status === 'expiring_soon' ? 'text-yellow-400' : 'text-emerald-400'}`}>
+                      {selectedUser.plan_status === 'expired' ? 'Expired' : selectedUser.plan_status === 'expiring_soon' ? 'Expiring Soon' : 'Active'}
+                    </p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-zinc-800/30">
+                    <p className="text-[10px] text-zinc-500">Plan Started</p>
+                    <p className="text-sm font-medium text-white">{formatDateTime(selectedUser.plan_started_at)}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-zinc-800/30">
+                    <p className="text-[10px] text-zinc-500">Plan Expires</p>
+                    <p className="text-sm font-medium text-white">{formatDateTime(selectedUser.plan_expiry_date)}</p>
+                  </div>
+                  <div className="p-3 rounded-xl bg-zinc-800/30">
+                    <p className="text-[10px] text-zinc-500">Source</p>
+                    <p className="text-sm font-medium text-white capitalize">{selectedUser.plan_source || 'none'}</p>
+                  </div>
+                  {selectedUser.plan_payment_id && (
+                    <div className="p-3 rounded-xl bg-zinc-800/30">
+                      <p className="text-[10px] text-zinc-500">Payment ID</p>
+                      <p className="text-xs font-mono text-zinc-400 truncate">{selectedUser.plan_payment_id}</p>
+                    </div>
+                  )}
+                </div>
+                {/* Quick plan actions */}
+                <div className="flex gap-2 pt-2">
+                  <button onClick={() => { setPlanModalUser(selectedUser); setPlanModalMode("assign"); }} className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-purple-500/10 text-purple-400 hover:bg-purple-500/20 transition-colors">
+                    Change Plan
+                  </button>
+                  {selectedUser.plan !== "free" && (
+                    <>
+                      <button onClick={() => { setPlanModalUser(selectedUser); setPlanModalMode("extend"); }} className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 transition-colors">
+                        Extend Plan
+                      </button>
+                      <button onClick={() => handleRevokePlan(selectedUser.id)} className="flex-1 py-2 px-3 rounded-lg text-xs font-bold bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors">
+                        Revoke Plan
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Plan History */}
+              {userDetail?.plan_history && userDetail.plan_history.length > 0 && (
+                <div className="space-y-3">
+                  <h3 className="text-xs text-zinc-500 font-medium uppercase tracking-wider">Plan History</h3>
+                  <div className="space-y-2 max-h-48 overflow-y-auto">
+                    {userDetail.plan_history.map((item: any, idx: number) => {
+                      const isAssign = item.details?.action === 'assign_plan';
+                      const isExtend = item.details?.action === 'extend_plan';
+                      const isRevoke = item.details?.action === 'revoke_plan';
+                      const isPurchase = item.event === 'plan_purchase';
+                      const isUpgrade = item.event === 'plan_upgrade';
+
+                      let label = item.event;
+                      let desc = '';
+                      if (isAssign) { label = 'Plan Assigned'; desc = `${item.details.old_plan} → ${item.details.new_plan} (${item.details.duration_days}d)`; }
+                      else if (isExtend) { label = 'Plan Extended'; desc = `+${item.details.extra_days} days`; }
+                      else if (isRevoke) { label = 'Plan Revoked'; desc = `${item.details.old_plan} → free`; }
+                      else if (isPurchase) { label = 'Plan Purchased'; desc = `Plan: ${item.details.plan}`; }
+                      else if (isUpgrade) { label = 'Plan Upgraded'; desc = `${item.details.previous_plan} → ${item.details.plan}`; }
+                      else if (item.details?.action) { label = `Admin: ${item.details.action}`; }
+
+                      return (
+                        <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-800/30">
+                          <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${isRevoke ? 'bg-red-400' : 'bg-emerald-400'}`} />
+                          <div className="min-w-0">
+                            <p className="text-xs font-medium text-white">{label}</p>
+                            {desc && <p className="text-[10px] text-zinc-500">{desc}</p>}
+                            <p className="text-[10px] text-zinc-600">{formatDateTime(item.date)}</p>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               {/* Actions */}
               <div>
                 <p className="text-xs text-zinc-500 font-medium uppercase tracking-wider mb-3">Actions</p>
@@ -1597,6 +1803,91 @@ export default function AdminPage() {
                   Delete User (Soft Delete)
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Assign Plan Modal */}
+      {planModalMode === "assign" && planModalUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">Change Plan</h2>
+              <button onClick={() => { setPlanModalUser(null); setPlanModalMode(null); }} className="text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-sm text-zinc-400">Change plan for <strong className="text-white">{planModalUser.email}</strong></p>
+            <p className="text-xs text-zinc-600">Current: {PLAN_CONFIG[planModalUser.plan]?.label}</p>
+
+            <div>
+              <label className="text-xs text-zinc-500 font-medium">Select Plan</label>
+              <div className="grid grid-cols-2 gap-2 mt-2">
+                {(["free", "plus", "pro", "enterprise"] as const).map((p) => {
+                  const cfg = PLAN_CONFIG[p];
+                  const priceMap: Record<string, string> = { free: "Free", plus: "₹499/mo", pro: "₹999/mo", enterprise: "₹4,999/mo" };
+                  return (
+                    <button key={p} onClick={() => setPlanForm({...planForm, plan: p})} className={`p-3 rounded-xl border text-left transition-colors ${planForm.plan === p ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-700 bg-zinc-800/30 hover:border-zinc-600'}`}>
+                      <div className="flex items-center gap-2">
+                        <cfg.icon className={`w-4 h-4 ${cfg.color}`} />
+                        <span className="text-xs font-bold text-white">{cfg.label}</span>
+                      </div>
+                      <p className="text-[10px] text-zinc-500 mt-1">{priceMap[p]}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {planForm.plan !== "free" && (
+              <div>
+                <label className="text-xs text-zinc-500 font-medium">Duration (days)</label>
+                <div className="flex gap-2 mt-2">
+                  {[7, 30, 90, 365].map((d) => (
+                    <button key={d} onClick={() => setPlanForm({...planForm, duration_days: d})} className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold transition-colors ${planForm.duration_days === d ? 'bg-purple-500/20 text-purple-400 border border-purple-500/30' : 'bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}>
+                      {d}d
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => { setPlanModalUser(null); setPlanModalMode(null); }} className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-zinc-800 text-zinc-400 hover:text-white transition-colors">Cancel</button>
+              <button onClick={() => handleAssignPlan(planModalUser.id)} disabled={actionLoading} className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-purple-500 text-white hover:bg-purple-600 disabled:opacity-50 transition-colors">
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply Plan'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Extend Plan Modal */}
+      {planModalMode === "extend" && planModalUser && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-md space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold text-white">Extend Plan</h2>
+              <button onClick={() => { setPlanModalUser(null); setPlanModalMode(null); }} className="text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
+            </div>
+            <p className="text-sm text-zinc-400">Extend <strong className="text-white">{planModalUser.email}</strong>'s {PLAN_CONFIG[planModalUser.plan]?.label} plan</p>
+            <p className="text-xs text-zinc-600">Current expiry: {formatDateTime(planModalUser.plan_expiry_date)}</p>
+
+            <div>
+              <label className="text-xs text-zinc-500 font-medium">Extra Days</label>
+              <div className="flex gap-2 mt-2">
+                {[7, 14, 30, 90, 365].map((d) => (
+                  <button key={d} onClick={() => setExtendForm({extra_days: d})} className={`flex-1 py-2 px-2 rounded-lg text-xs font-bold transition-colors ${extendForm.extra_days === d ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-zinc-800/50 text-zinc-400 border border-zinc-700 hover:border-zinc-600'}`}>
+                    {d}d
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button onClick={() => { setPlanModalUser(null); setPlanModalMode(null); }} className="flex-1 py-2.5 rounded-xl text-sm font-medium bg-zinc-800 text-zinc-400 hover:text-white transition-colors">Cancel</button>
+              <button onClick={() => handleExtendPlan(planModalUser.id)} disabled={actionLoading} className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-blue-500 text-white hover:bg-blue-600 disabled:opacity-50 transition-colors">
+                {actionLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : `Extend ${extendForm.extra_days} Days`}
+              </button>
             </div>
           </div>
         </div>
