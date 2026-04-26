@@ -381,7 +381,7 @@ def resend_verification(req: ResendReq, db: Session = Depends(get_db)):
 
 # ─── Login ────────────────────────────────────────────────────────────────────
 @router.post("/login")
-def login(req: LoginReq, response: Response, db: Session = Depends(get_db)):
+def login(req: LoginReq, request: Request, response: Response, db: Session = Depends(get_db)):
     # Rate limit check
     if not _check_login_rate_limit(req.email.lower()):
         raise HTTPException(

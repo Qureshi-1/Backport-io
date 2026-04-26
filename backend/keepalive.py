@@ -10,7 +10,7 @@ It pings /health and / on the main backend service.
 
 import os
 import logging
-import requests
+import httpx
 
 BACKEND_URL = os.environ.get("BACKEND_URL", "")
 if not BACKEND_URL:
@@ -27,9 +27,9 @@ def ping(endpoint: str, timeout: int = 15) -> bool:
     """Ping a backend endpoint and return True if successful."""
     url = f"{BACKEND_URL}{endpoint}"
     try:
-        resp = requests.get(url, timeout=timeout)
+        resp = httpx.get(url, timeout=timeout)
         if resp.status_code == 200:
-            log.info("✓ %s → %d (%.1fs)", endpoint, resp.status_code, resp.elapsed.total_seconds())
+            log.info("✓ %s → %d", endpoint, resp.status_code)
             return True
         else:
             log.warning("✗ %s → %d", endpoint, resp.status_code)

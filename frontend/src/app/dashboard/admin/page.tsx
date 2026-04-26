@@ -1244,7 +1244,7 @@ export default function AdminPage() {
                                 {eventCfg.label}
                               </span>
                             </td>
-                            <td className="px-4 py-3 text-zinc-500 text-xs font-mono max-w-[300px] truncate" title={log.details}>
+                            <td className="px-4 py-3 text-zinc-500 text-xs font-mono max-w-[300px] truncate" title={typeof log.details === 'string' ? log.details : JSON.stringify(log.details)}>
                               {detailsText}
                             </td>
                             <td className="px-4 py-3 text-zinc-500 text-xs font-mono">{log.ip_address || "--"}</td>
@@ -1259,9 +1259,9 @@ export default function AdminPage() {
                 <div className="lg:hidden divide-y divide-zinc-800/50">
                   {auditLogs.map((log) => {
                     const eventCfg = EVENT_TYPE_CONFIG[log.event_type] || { label: log.event_type, color: "text-zinc-400", bg: "bg-zinc-800/60" };
-                    let detailsText = log.details || "";
+                    let detailsText: string = typeof log.details === 'string' ? log.details : JSON.stringify(log.details);
                     try {
-                      const parsed = JSON.parse(log.details);
+                      const parsed = JSON.parse(detailsText);
                       detailsText = JSON.stringify(parsed, null, 2);
                     } catch {
                       // not JSON

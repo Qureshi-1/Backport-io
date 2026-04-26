@@ -184,8 +184,8 @@ def send_welcome_email(to: str, name: str = "") -> bool:
 
 def send_feedback_notification(feedback_type: str, message: str, user_email: str, user_name: str = "") -> bool:
     """Send a notification email to the admin when a user submits feedback or bug report."""
-    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.dev")
-    if not admin_to or admin_to == "admin@backport.dev":
+    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.in")
+    if not admin_to:
         logger.warning("ADMIN_EMAIL not properly configured — skipping feedback notification")
         return False
 
@@ -259,8 +259,8 @@ def send_feedback_notification(feedback_type: str, message: str, user_email: str
 
 def send_contact_sales_email(name: str, email: str, company: str, message: str) -> bool:
     """Send an email to the admin when someone fills the Contact Sales form."""
-    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.dev")
-    if not admin_to or admin_to == "admin@backport.dev":
+    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.in")
+    if not admin_to:
         logger.warning("ADMIN_EMAIL not properly configured — skipping contact sales email")
         return False
 

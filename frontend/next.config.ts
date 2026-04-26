@@ -39,6 +39,8 @@ const connectDomains = [
 if (additionalConnectDomains) {
   connectDomains.push(...additionalConnectDomains.split(",").map(d => d.trim()).filter(Boolean));
 }
+// Add wss:// variants for WebSocket connections
+connectDomains.push(...connectDomains.filter(d => d.startsWith("https://")).map(d => d.replace("https://", "wss://")));
 
 const nextConfig: NextConfig = {
   output: "standalone",
