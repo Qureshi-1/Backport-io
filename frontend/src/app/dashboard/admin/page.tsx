@@ -1869,7 +1869,7 @@ export default function AdminPage() {
               <h2 className="text-lg font-bold text-white">Extend Plan</h2>
               <button onClick={() => { setPlanModalUser(null); setPlanModalMode(null); }} className="text-zinc-500 hover:text-white"><X className="w-5 h-5" /></button>
             </div>
-            <p className="text-sm text-zinc-400">Extend <strong className="text-white">{planModalUser.email}</strong>'s {PLAN_CONFIG[planModalUser.plan]?.label} plan</p>
+            <p className="text-sm text-zinc-400">Extend <strong className="text-white">{planModalUser.email}</strong>&apos;s {PLAN_CONFIG[planModalUser.plan]?.label} plan</p>
             <p className="text-xs text-zinc-600">Current expiry: {formatDateTime(planModalUser.plan_expiry_date)}</p>
 
             <div>
