@@ -5,6 +5,7 @@ import sys
 import os
 import pytest
 import logging
+import httpx
 from unittest.mock import patch, MagicMock
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
@@ -60,7 +61,7 @@ class TestPingSuccess:
         mock_resp.status_code = 200
         mock_resp.elapsed.total_seconds.return_value = 0.123
 
-        with patch("keepalive.requests.get", return_value=mock_resp):
+        with patch("keepalive.httpx.get", return_value=mock_resp):
             result = keepalive_module.ping("/health")
         assert result is True
 
@@ -72,7 +73,7 @@ class TestPingNon200:
         mock_resp = MagicMock()
         mock_resp.status_code = 503
 
-        with patch("keepalive.requests.get", return_value=mock_resp):
+        with patch("keepalive.httpx.get", return_value=mock_resp):
             result = keepalive_module.ping("/health")
         assert result is False
 
@@ -80,7 +81,7 @@ class TestPingNon200:
         mock_resp = MagicMock()
         mock_resp.status_code = 500
 
-        with patch("keepalive.requests.get", return_value=mock_resp):
+        with patch("keepalive.httpx.get", return_value=mock_resp):
             result = keepalive_module.ping("/")
         assert result is False
 
@@ -89,12 +90,12 @@ class TestPingConnectionError:
     """ping() returns False on connection errors and timeouts."""
 
     def test_ping_returns_false_on_connection_error(self, keepalive_module):
-        with patch("keepalive.requests.get", side_effect=ConnectionError("refused")):
+        with patch("keepalive.httpx.get", side_effect=ConnectionError("refused")):
             result = keepalive_module.ping("/health")
         assert result is False
 
     def test_ping_returns_false_on_timeout(self, keepalive_module):
-        with patch("keepalive.requests.get", side_effect=TimeoutError("timed out")):
+        with patch("keepalive.httpx.get", side_effect=httpx.TimeoutException("timed out")):
             result = keepalive_module.ping("/health")
         assert result is False
 
@@ -111,7 +112,7 @@ class TestMain:
         mock_resp.status_code = 200
         mock_resp.elapsed.total_seconds.return_value = 0.05
 
-        with patch("keepalive.requests.get", return_value=mock_resp):
+        with patch("keepalive.httpx.get", return_value=mock_resp):
             with caplog.at_level(logging.INFO, logger="keepalive"):
                 keepalive_module.main()
 
@@ -134,7 +135,7 @@ class TestMain:
                 resp.status_code = 503
             return resp
 
-        with patch("keepalive.requests.get", side_effect=alternating_response):
+        with patch("keepalive.httpx.get", side_effect=alternating_response):
             with caplog.at_level(logging.WARNING, logger="keepalive"):
                 keepalive_module.main()
 

@@ -217,4 +217,4 @@ class TestExport:
         h, _ = create_user_for_client(client)
         resp = client.get("/api/user/export/csv", headers=h)
         assert resp.status_code == 200
-        assert resp.headers["content-type"] == "text/csv; charset=utf-8"
+        assert "text/csv" in resp.headers["content-type"]

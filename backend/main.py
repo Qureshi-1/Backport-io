@@ -225,33 +225,37 @@ async def startup():
                 logger.debug(f"Composite index skip: {e}")
 
         # ─── Log Retention Cleanup (background task) ────────────────────────
-        def _cleanup_old_logs():
-            """Delete logs older than 30 days to prevent database bloat."""
-            from models import ApiLog, Alert, HealthCheck
-            from datetime import datetime, timezone, timedelta
-            cutoff = datetime.now(timezone.utc) - timedelta(days=30)
-            try:
-                with SessionLocal() as db:
-                    deleted_logs = db.query(ApiLog).filter(ApiLog.created_at < cutoff).delete()
-                    deleted_alerts = db.query(Alert).filter(
-                        Alert.created_at < cutoff,
-                        Alert.is_read == True,
-                    ).delete()
-                    deleted_health = db.query(HealthCheck).filter(HealthCheck.checked_at < cutoff).delete()
-                    db.commit()
-                    if deleted_logs or deleted_alerts or deleted_health:
-                        print(f"🗑️ Log cleanup: removed {deleted_logs} logs, {deleted_alerts} alerts, {deleted_health} health checks older than 30 days")
-            except Exception as e:
-                print(f"⚠️ Log cleanup error: {e}")
+        # Skip in test mode to avoid SQLite thread-safety issues
+        _is_test = os.getenv("ENVIRONMENT") == "test"
 
-        def _schedule_log_cleanup():
-            _cleanup_old_logs()
-            _timer = threading.Timer(3600, _schedule_log_cleanup)  # Run every hour
-            _timer.daemon = True
-            _timer.start()
+        if not _is_test:
+            def _cleanup_old_logs():
+                """Delete logs older than 30 days to prevent database bloat."""
+                from models import ApiLog, Alert, HealthCheck
+                from datetime import datetime, timezone, timedelta
+                cutoff = datetime.now(timezone.utc) - timedelta(days=30)
+                try:
+                    with SessionLocal() as db:
+                        deleted_logs = db.query(ApiLog).filter(ApiLog.created_at < cutoff).delete()
+                        deleted_alerts = db.query(Alert).filter(
+                            Alert.created_at < cutoff,
+                            Alert.is_read == True,
+                        ).delete()
+                        deleted_health = db.query(HealthCheck).filter(HealthCheck.checked_at < cutoff).delete()
+                        db.commit()
+                        if deleted_logs or deleted_alerts or deleted_health:
+                            print(f"🗑️ Log cleanup: removed {deleted_logs} logs, {deleted_alerts} alerts, {deleted_health} health checks older than 30 days")
+                except Exception as e:
+                    print(f"⚠️ Log cleanup error: {e}")
 
-        _schedule_log_cleanup()
-        print("✅ Log retention cleanup started (30-day retention, hourly check)")
+            def _schedule_log_cleanup():
+                _cleanup_old_logs()
+                _timer = threading.Timer(3600, _schedule_log_cleanup)  # Run every hour
+                _timer.daemon = True
+                _timer.start()
+
+            _schedule_log_cleanup()
+            print("✅ Log retention cleanup started (30-day retention, hourly check)")
 
         # ─── Plan Expiry Checker (background task) ─────────────────────────
         def _check_plan_expirations():
@@ -309,25 +313,27 @@ async def startup():
             except Exception as e:
                 print(f"⚠️ Plan expiry check error: {e}")
 
-        def _schedule_plan_check():
-            _check_plan_expirations()
-            _timer = threading.Timer(21600, _schedule_plan_check)  # Check every 6 hours
-            _timer.daemon = True
-            _timer.start()
+        if not _is_test:
+            def _schedule_plan_check():
+                _check_plan_expirations()
+                _timer = threading.Timer(21600, _schedule_plan_check)  # Check every 6 hours
+                _timer.daemon = True
+                _timer.start()
 
-        _schedule_plan_check()
-        print("✅ Plan expiry checker started (6-hour interval)")
+            _schedule_plan_check()
+            print("✅ Plan expiry checker started (6-hour interval)")
 
     except Exception as e:
         print(f"⚠️  DB init warning: {e}")
 
-    # Start analytics engine
-    try:
-        from analytics import start_analytics
-        start_analytics()
-        print("✅ Analytics engine started")
-    except Exception as e:
-        print(f"⚠️  Analytics engine warning: {e}")
+    # Start analytics engine (skip in test mode to avoid SQLite thread-safety issues)
+    if os.getenv("ENVIRONMENT") != "test":
+        try:
+            from analytics import start_analytics
+            start_analytics()
+            print("✅ Analytics engine started")
+        except Exception as e:
+            print(f"⚠️  Analytics engine warning: {e}")
 
     # Log Env Check (Debug)
     from config import RESEND_API_KEY, FROM_EMAIL
@@ -338,12 +344,13 @@ async def startup():
 
     print(f"📧 FROM_EMAIL is set to: {FROM_EMAIL}")
 
-    # Start health monitoring background thread
-    try:
-        health_monitor.start_health_monitor()
-        print("✅ Health monitor started")
-    except Exception as e:
-        print(f"⚠️  Health monitor warning: {e}")
+    # Start health monitoring background thread (skip in test mode)
+    if os.getenv("ENVIRONMENT") != "test":
+        try:
+            health_monitor.start_health_monitor()
+            print("✅ Health monitor started")
+        except Exception as e:
+            print(f"⚠️  Health monitor warning: {e}")
 
 # ─── Security Headers Middleware ──────────────────────────────────────────────
 @app.middleware("http")
