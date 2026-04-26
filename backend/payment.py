@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+import json
+import hmac
+import hashlib
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 import time
@@ -293,6 +296,19 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
     user.plan_expires_at = datetime.now(timezone.utc) + timedelta(days=30)
     db.commit()
 
+    # Send payment receipt email
+    try:
+        from email_service import send_payment_receipt_email
+        send_payment_receipt_email(
+            to=user.email,
+            name=user.name or "",
+            plan=plan_id,
+            amount_inr=expected_amount,
+            payment_id=req.razorpay_payment_id,
+        )
+    except Exception as e:
+        print(f"⚠️ Payment receipt email error: {e}")
+
     # Track plan purchase / plan upgrade in audit logs
     try:
         from models import create_audit_log
@@ -321,3 +337,113 @@ def verify_payment(req: VerifyReq, user: User = Depends(get_current_user), db: S
         response["discount_percent"] = order_info.get("discount_percent", 0)
 
     return response
+
+
+# ─── Payment History ─────────────────────────────────────────────────────────
+@router.get("/history")
+def get_payment_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    """Get user's payment/plan history from audit logs."""
+    from models import AuditLog
+    logs = db.query(AuditLog).filter(
+        AuditLog.user_id == user.id,
+        AuditLog.event_type.in_(["plan_purchase", "plan_upgrade", "plan_cancel", "plan_expire"]),
+    ).order_by(AuditLog.created_at.desc()).limit(20).all()
+
+    history = []
+    for log in logs:
+        details = {}
+        try:
+            details = json.loads(log.details) if log.details else {}
+        except Exception:
+            pass
+        history.append({
+            "event": log.event_type,
+            "plan": details.get("plan", ""),
+            "amount": details.get("amount", 0),
+            "payment_id": details.get("payment_id", ""),
+            "previous_plan": details.get("previous_plan"),
+            "date": log.created_at.isoformat() if log.created_at else None,
+        })
+
+    return {"history": history}
+
+
+# ─── Razorpay Webhook Handler ────────────────────────────────────────────────
+@router.post("/webhook")
+async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
+    """Handle Razorpay webhook events for server-side payment confirmation."""
+    if not rzp_client:
+        raise HTTPException(status_code=503, detail="Payment system not available")
+
+    body = await request.body()
+    signature = request.headers.get("X-Razorpay-Signature", "")
+
+    if not signature:
+        raise HTTPException(status_code=400, detail="Missing signature")
+
+    # Verify webhook signature
+    expected_sig = hmac.new(
+        RAZORPAY_KEY_SECRET.encode(),
+        body,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(signature, expected_sig):
+        raise HTTPException(status_code=400, detail="Invalid webhook signature")
+
+    try:
+        event = json.loads(body)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid payload")
+
+    event_type = event.get("event", "")
+    payment_entity = event.get("payload", {}).get("payment", {}).get("entity", {})
+    payment_id = payment_entity.get("id", "")
+    order_id = payment_entity.get("order_id", "")
+    payment_status = payment_entity.get("status", "")
+    amount = payment_entity.get("amount", 0)
+    notes = payment_entity.get("notes", {})
+    user_email = notes.get("email", "")
+
+    print(f"📩 Razorpay webhook: {event_type} | payment={payment_id} | status={payment_status}")
+
+    if event_type == "payment.captured" and payment_status == "captured":
+        # Find user by order notes or payment_id
+        user = None
+        if notes.get("user_id"):
+            user = db.query(User).filter(User.id == int(notes["user_id"])).first()
+        if not user and user_email:
+            user = db.query(User).filter(User.email == user_email).first()
+        if not user:
+            # Try finding by payment_id
+            user = db.query(User).filter(User.plan_payment_id == payment_id).first()
+
+        if user:
+            plan_id = notes.get("plan", "pro")
+            # Only upgrade if user is on free or lower plan
+            if plan_id in ["plus", "pro", "enterprise"]:
+                plan_hierarchy = {"free": 0, "plus": 1, "pro": 2, "enterprise": 3}
+                current_rank = plan_hierarchy.get(user.plan, 0)
+                new_rank = plan_hierarchy.get(plan_id, 0)
+                if new_rank > current_rank:
+                    previous_plan = user.plan
+                    user.plan = plan_id
+                    user.plan_started_at = datetime.now(timezone.utc)
+                    user.plan_payment_id = payment_id
+                    user.plan_source = "payment"
+                    user.plan_expires_at = datetime.now(timezone.utc) + timedelta(days=30)
+                    db.commit()
+
+                    # Audit log
+                    try:
+                        from models import create_audit_log
+                        _event_type = "plan_upgrade" if previous_plan != "free" else "plan_purchase"
+                        create_audit_log(db, user_id=user.id, email=user.email,
+                                        event_type=_event_type,
+                                        details={"plan": plan_id, "payment_id": payment_id, "amount": amount, "source": "webhook"})
+                    except Exception as e:
+                        print(f"⚠️ Audit log error on webhook: {e}")
+
+                    print(f"✅ Webhook: Upgraded {user.email} to {plan_id}")
+
+    return {"status": "received"}

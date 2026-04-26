@@ -2,7 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { fetchApi } from "@/lib/api";
 import { useUser } from "@/lib/user-context";
-import { Loader2, CheckCircle2, ArrowRight, ShieldCheck, Zap, Layers, ChevronDown, AlertTriangle, Tag, X, Gift, Sparkles } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowRight, ShieldCheck, Zap, Layers, ChevronDown, AlertTriangle, Tag, X, Gift, Sparkles, Receipt, CreditCard } from "lucide-react";
 import Script from "next/script";
 import { motion, AnimatePresence } from "framer-motion";
 import { PRICING, detectUserCurrency, formatPrice, ALL_CURRENCIES, type CurrencyCode } from "@/lib/currency";
@@ -18,6 +18,17 @@ export default function BillingPage() {
   const [showCurrencyPicker, setShowCurrencyPicker] = useState(false);
   const [rzpLoaded, setRzpLoaded] = useState(false);
   const [verifying, setVerifying] = useState(false);
+
+  // Payment history state
+  const [paymentHistory, setPaymentHistory] = useState<Array<{
+    id: number;
+    date: string;
+    event_type: string;
+    plan_name: string;
+    amount: string;
+    currency: string;
+  }>>([]);
+  const [historyLoading, setHistoryLoading] = useState(true);
 
   // Promo code state
   const [promoCode, setPromoCode] = useState("");
@@ -52,6 +63,22 @@ export default function BillingPage() {
       if (user?.plan) setCurrentPlan(user.plan);
     }
   }, [user?.plan]);
+
+  // Fetch payment history
+  useEffect(() => {
+    if (userLoading || !user) return;
+    setHistoryLoading(true);
+    fetchApi("/api/billing/history")
+      .then((data) => {
+        setPaymentHistory(Array.isArray(data) ? data : data?.history || []);
+      })
+      .catch(() => {
+        // Silently fail - payment history is non-critical
+      })
+      .finally(() => {
+        setHistoryLoading(false);
+      });
+  }, [user, userLoading]);
 
   // If user is loaded but plan is still empty, fetch directly
   useEffect(() => {
@@ -582,6 +609,91 @@ export default function BillingPage() {
           <button onClick={() => setError("")} className="text-rose-400/60 hover:text-rose-400 ml-4 text-lg leading-none">&times;</button>
         </motion.div>
       )}
+
+      {/* ─── Payment History ─── */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="glass-card rounded-2xl p-5 sm:p-6 relative overflow-hidden"
+      >
+        <div className="absolute -top-10 -right-10 w-40 h-40 bg-[#6BA9FF]/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex items-center gap-2 mb-6 relative z-10">
+          <Receipt className="w-4 h-4 text-[#6BA9FF]" />
+          <h3 className="text-[11px] font-headline tracking-[0.6em] font-black uppercase text-white">
+            Payment History
+          </h3>
+        </div>
+
+        {historyLoading ? (
+          <div className="space-y-3 relative z-10">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex items-center gap-4 p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl animate-pulse">
+                <div className="w-24 h-3 bg-white/[0.06] rounded" />
+                <div className="w-16 h-6 bg-white/[0.06] rounded-md" />
+                <div className="flex-1 h-3 bg-white/[0.06] rounded" />
+                <div className="w-20 h-3 bg-white/[0.06] rounded" />
+              </div>
+            ))}
+          </div>
+        ) : paymentHistory.length === 0 ? (
+          <div className="text-center py-12 relative z-10">
+            <CreditCard className="w-10 h-10 text-zinc-700 mx-auto mb-3" />
+            <p className="text-zinc-500 text-sm">No payment history yet.</p>
+            <p className="text-zinc-600 text-xs mt-1">Your transactions will appear here after your first purchase.</p>
+          </div>
+        ) : (
+          <div className="space-y-2 relative z-10 max-h-96 overflow-y-auto no-scrollbar">
+            {paymentHistory.map((entry) => (
+              <div
+                key={entry.id}
+                className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-white/[0.02] border border-white/[0.04] rounded-xl hover:bg-white/[0.04] transition-colors"
+              >
+                {/* Date */}
+                <div className="min-w-0 flex-shrink-0">
+                  <p className="text-xs text-zinc-400 font-mono whitespace-nowrap">
+                    {new Date(entry.date).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </p>
+                </div>
+
+                {/* Event type badge */}
+                <span className={`flex-shrink-0 px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-widest border ${
+                  entry.event_type === "purchase"
+                    ? "bg-[#04e184]/10 text-[#04e184] border-[#04e184]/20"
+                    : entry.event_type === "upgrade"
+                      ? "bg-[#6BA9FF]/10 text-[#6BA9FF] border-[#6BA9FF]/20"
+                      : entry.event_type === "refund"
+                        ? "bg-[#ffd700]/10 text-[#ffd700] border-[#ffd700]/20"
+                        : "bg-white/5 text-zinc-400 border-white/10"
+                }`}>
+                  {entry.event_type}
+                </span>
+
+                {/* Plan name */}
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-white font-medium truncate">
+                    {entry.plan_name}
+                  </p>
+                </div>
+
+                {/* Amount */}
+                <div className="flex-shrink-0 text-right">
+                  <p className={`text-sm font-bold ${
+                    entry.event_type === "refund" ? "text-[#ffd700]" : "text-white"
+                  }`}>
+                    {entry.event_type === "refund" ? "-" : ""}{entry.currency === "INR" ? "₹" : "$"}{parseFloat(entry.amount).toFixed(2)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </motion.div>
 
       {/* Footer Artifact */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-6 sm:pt-8 opacity-40">

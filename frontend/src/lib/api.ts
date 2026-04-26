@@ -122,6 +122,39 @@ export async function fetchApi(endpoint: string, options: RequestInit = {}, retr
       resetColdStart();
 
       if (res.status === 401) {
+        // Try to refresh the token before logging out
+        try {
+          const refreshRes = await fetchWithTimeout(`${API_URL}/api/auth/refresh`, {
+            method: "POST",
+            credentials: "include",
+          });
+          if (refreshRes.ok) {
+            // Token refreshed successfully, retry the original request
+            const retryRes = await fetchWithTimeout(`${API_URL}${endpoint}`, {
+              ...options,
+              headers,
+              credentials: "include",
+            });
+            resetColdStart();
+            if (retryRes.status === 401) {
+              auth.logout();
+              throw new Error("Unauthorized");
+            }
+            const contentType = retryRes.headers.get("content-type");
+            if (contentType && contentType.includes("application/json")) {
+              const data = await retryRes.json();
+              if (!retryRes.ok) throw new Error(extractErrorMessage(data));
+              return data;
+            }
+            if (!retryRes.ok) {
+              const text = await retryRes.text();
+              throw new Error(text || "API Error");
+            }
+            return retryRes;
+          }
+        } catch {
+          // Refresh failed, proceed with logout
+        }
         auth.logout();
         throw new Error("Unauthorized");
       }

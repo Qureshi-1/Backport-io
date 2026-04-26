@@ -731,11 +731,11 @@ def get_monitoring_summary(admin: User = Depends(get_current_admin), db: Session
     ).scalar()
     avg_latency_today = round(avg_latency) if avg_latency else 0
 
-    # P95 latency (approximate from top 5%)
+    # P95 latency (approximate: sort ascending, take 95th percentile)
     all_latencies = db.query(ApiLog.latency_ms).filter(
         ApiLog.created_at >= today_start
-    ).order_by(ApiLog.latency_ms.desc()).limit(100).all()
-    p95_latency = all_latencies[int(len(all_latencies) * 0.05)][0] if all_latencies and len(all_latencies) > 1 else 0
+    ).order_by(ApiLog.latency_ms.asc()).limit(100).all()
+    p95_latency = all_latencies[int(len(all_latencies) * 0.95)][0] if all_latencies and len(all_latencies) > 1 else 0
 
     return {
         "circuits": {
