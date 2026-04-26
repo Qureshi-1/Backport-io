@@ -47,3 +47,31 @@ Stage Summary:
 - All CI errors fixed: Backend Tests and CI Passed jobs now pass
 - 5 files modified: main.py, integrations.py, webhooks.py, test_keepalive.py, test_user.py
 - Committed as ce76390 and pushed to origin/main
+---
+Task ID: 1
+Agent: main
+Task: Admin panel full plan management update
+
+Work Log:
+- Analyzed current admin panel (backend admin.py + frontend page.tsx)
+- Backend: Added 4 new API endpoints to admin.py:
+  - GET /api/admin/users/{user_id} — detailed user info with plan_history
+  - PATCH /api/admin/users/{user_id}/plan — assign/change plan by user_id
+  - POST /api/admin/users/{user_id}/extend-plan — extend plan by user_id
+  - POST /api/admin/users/{user_id}/revoke-plan — revoke plan by user_id
+- Backend: Enhanced GET /api/admin/users to return plan_status, plan_started_at, plan_source, plan_payment_id
+- Frontend: Added plan management UI to admin page:
+  - Plan management modals (assign with plan selector + duration, extend with days picker)
+  - User detail modal with plan info section (current plan, status, dates, source, payment ID)
+  - User detail modal with plan history timeline
+  - Actions dropdown: Change Plan, Extend Plan, Revoke Plan buttons
+  - Plan expiry column with EXPIRED/expiring-soon status indicators
+- All 443 backend tests passing
+- Next.js frontend build clean (zero errors)
+- Pushed to GitHub: commit 49a7fd4
+
+Stage Summary:
+- Full admin control over user plans: assign Plus/Pro/Enterprise with custom duration, extend existing plans, revoke plans
+- Every plan change tracked with audit logs
+- User detail view shows complete plan history timeline
+- Zero CI errors
