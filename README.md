@@ -32,9 +32,16 @@
 
 ## What is Backport?
 
-Backport is a **production-grade API Gateway** that sits in front of any backend service. It provides enterprise-level security, performance optimization, and full observability — without requiring any SDK, code changes, or complex configuration. Simply point your API traffic through Backport and instantly gain **WAF protection, rate limiting, intelligent caching, request analytics, circuit breakers, and more**.
+Backport is an **open-source API Gateway** that sits in front of any backend service. It provides security features, performance optimization, and observability — without requiring any SDK, code changes, or complex configuration. Point your API traffic through Backport to gain **WAF protection, rate limiting, intelligent caching, request analytics, circuit breakers, and more**.
 
-> Think of it as a Cloudflare for APIs — but self-hosted, fully open-source (MIT), and deployable in under 30 seconds.
+> A self-hosted, MIT-licensed API gateway built with Python and FastAPI.
+
+### Project Status
+
+- 🧪 **Early-stage project** — actively developed and open to feedback
+- 📜 **MIT licensed** — fully open source
+- 🏠 **Self-hosted version** — ideal for development and small projects
+- ☁️ **Managed cloud** — available at [backport.in](https://backport.in) for production use
 
 ---
 
@@ -238,21 +245,17 @@ docker compose up -d
 
 ---
 
-## Comparison with Kong / Tyk / AWS API Gateway
+## When to Choose Backport
 
-| Feature | Backport | Kong | Tyk | AWS API Gateway |
-|---|---|---|---|---|
-| **Open Source** | Full (MIT) | Partial (Enterprise upsell) | Partial (Enterprise upsell) | No |
-| **Self-Hosted** | Easy — single binary | Complex — Lua plugins, DB required | Complex — MongoDB, Redis required | No |
-| **WAF Built-in** | Regex + Custom rules | Plugin only | Plugin only | Separate WAF service |
-| **Caching** | Redis / In-memory | Plugin | Plugin | Built-in |
-| **Analytics** | Real-time dashboard | Plugin (limited) | Built-in | CloudWatch only |
-| **Rate Limiting** | Per-plan, per-endpoint | Plugin | Plugin | Built-in |
-| **Mock Endpoints** | Built-in | No | No | No |
-| **Custom WAF Rules** | User-defined regex | No | Limited | No |
-| **Circuit Breaker** | Built-in | Plugin | Plugin | No |
-| **Setup Time** | 30 seconds | ~30 minutes | ~30 minutes | ~1 hour |
-| **Pricing** | Free forever | Free (limited) + Enterprise | Free (limited) + Enterprise | Pay per request |
+Backport is a good fit if you:
+
+- Want a **simple, self-hosted API gateway** you can run yourself
+- Need **built-in WAF rules and rate limiting** without installing plugins
+- Prefer an **MIT-licensed, fully open-source** solution
+- Are building **small to medium projects** and want an easy setup
+- Value a **Python/FastAPI stack** over Go-based or JVM-based alternatives
+
+Backport is **not** a replacement for Kong, Tyk, or AWS API Gateway in large-scale enterprise deployments. Those projects have years of production battle-testing, large ecosystems, and features we're still building toward. We encourage you to evaluate all options and choose what fits your needs.
 
 ---
 
@@ -268,8 +271,8 @@ docker compose up -d
 | **Scaling** | Auto-scales with your traffic | Scale your own infrastructure |
 | **Rate Limits** | Persistent across restarts | In-memory (resets on restart) |
 | **Analytics** | Persistent history, real-time WebSocket | In-memory (resets on restart) |
-| **Cost** | Free tier + paid plans ($5.99–$11.99/mo) | Free forever — your infra costs only |
-| **Enterprise** | Contact sales for SLA, SSO, dedicated support | Free forever, community support |
+| **Cost** | Free tier + paid plans ($5.99–$11.99/mo) | Free (open source) — your infrastructure costs only |
+| **Enterprise** | Contact sales for SLA, SSO, dedicated support | Free (open source), community support |
 
 > **Recommendation:** Use **Managed Cloud** for production — persistent data, Redis caching, and zero ops. Use **Self-Hosted** for development, testing, or air-gapped environments.
 
