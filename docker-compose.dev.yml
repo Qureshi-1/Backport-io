@@ -1,0 +1,40 @@
+# ── Backport — Development Docker Compose ─────────────────────────────────
+# Usage: docker compose -f docker-compose.dev.yml up -d
+# Includes: PostgreSQL, Redis (no backend — run backend locally for hot reload)
+
+services:
+  # ── PostgreSQL Database ─────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: backport
+      POSTGRES_PASSWORD: backport_dev_password
+      POSTGRES_DB: backport
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U backport -d backport"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Redis (Caching + Rate Limiting) ────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_dev_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_dev_data:
+  redis_dev_data:
