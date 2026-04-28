@@ -388,7 +388,7 @@ const FEATURES = [
   },
   {
     title: "Custom WAF Rules",
-    desc: "Go beyond the built-in 17 security patterns. Write your own regex rules to block specific threats unique to your API. Cloudflare charges $20/month for this — Backport includes it.",
+    desc: "Define your own regex-based firewall rules with per-endpoint control and severity levels.",
     icon: Shield,
     color: "#A2BDDB",
   },
@@ -504,7 +504,7 @@ export default function Home() {
     },
     {
       q: "How is this different from Cloudflare?",
-      a: "Cloudflare is a CDN — it sits in front of your entire website and provides generic security. Backport is purpose-built for APIs. Cloudflare does not let you transform API responses or mock endpoints. Custom WAF rules on Cloudflare require their $20/month Pro plan. Backport gives you response transformation, API mocking, custom WAF rules, and webhooks starting at \u20b9499/month ($6). No DNS changes, no complex setup.",
+      a: "Cloudflare is a powerful CDN and security platform — great for websites and DNS. Backport is focused specifically on API management: response transformation, API mocking, and custom WAF rules that are API-specific. If you need a CDN, use Cloudflare. If you need API-specific tooling, Backport complements it well.",
     },
     {
       q: "What happens when my request limit is reached?",
@@ -512,7 +512,7 @@ export default function Home() {
     },
     {
       q: "Is this production-ready?",
-      a: "Backport is built for production from day one — MIT licensed, fully open source, and auditable. Start with the free 3-month trial to evaluate it for your use case before committing.",
+      a: "Backport is MIT licensed and fully open source — you can audit every line of code. Start with the free 3-month trial on the managed cloud, or self-host and evaluate it for your use case.",
     },
   ];
 
@@ -629,7 +629,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.2 }}
             className="max-w-xl text-[#A2BDDB]/50 text-base sm:text-lg leading-relaxed mb-10"
           >
-            Backport is the only API gateway that lets you transform responses, mock
+            Backport is an API gateway that lets you transform responses, mock
             APIs, and add custom security rules — without changing your backend code.
             Point your clients to Backport. That&apos;s it.
           </motion.p>
@@ -932,7 +932,7 @@ export default function Home() {
             {[
               {
                 title: "Indie developers",
-                desc: "You are building an API and need basic protection. You do not want to spend hours configuring Cloudflare or setting up nginx rules. You want to ship, not do ops.",
+                desc: "You are building an API and need basic protection. You need protection without spending hours configuring nginx rules or deploying complex infrastructure. You want to ship, not do ops.",
                 icon: Code2,
               },
               {
