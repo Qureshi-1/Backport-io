@@ -1,31 +1,27 @@
-'use client'
+import { Navbar } from '@/components/landing/navbar'
+import { Hero } from '@/components/landing/hero'
+import { Features } from '@/components/landing/features'
+import { HowItWorks } from '@/components/landing/how-it-works'
+import { Stats } from '@/components/landing/stats'
+import { Pricing } from '@/components/landing/pricing'
+import { Testimonials } from '@/components/landing/testimonials'
+import { CTA } from '@/components/landing/cta'
+import { Footer } from '@/components/landing/footer'
 
 export default function Home() {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      minHeight: '100vh',
-      gap: '2rem',
-      padding: '1rem'
-    }}>
-      <div style={{
-        position: 'relative',
-        width: '6rem',
-        height: '6rem'
-      }}>
-        <img
-          src="/logo.svg"
-          alt="Z.ai Logo"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'contain'
-          }}
-        />
-      </div>
+    <div className="min-h-screen flex flex-col">
+      <Navbar />
+      <main className="flex-1">
+        <Hero />
+        <Features />
+        <HowItWorks />
+        <Stats />
+        <Pricing />
+        <Testimonials />
+        <CTA />
+      </main>
+      <Footer />
     </div>
   )
 }

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,19 +8,70 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  businessName  String?
+  taxId         String?
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  country       String?
+  bankName      String?
+  bankAccount   String?
+  bankIfsc      String?
+  defaultCurrency String @default("INR")
+  defaultTaxRate Float  @default(18.0)
+  autoRemind    Boolean  @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  clients       Client[]
+  invoices      Invoice[]
 }
 
-model Post {
-  id        String   @id @default(cuid())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Client {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  company   String?
+  email     String
+  phone     String?
+  city      String?
+  country   String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id          String       @id @default(cuid())
+  userId      String
+  clientId    String
+  invoiceNumber String
+  status      String       @default("draft")
+  dueDate     DateTime
+  subtotal    Float
+  taxRate     Float        @default(18.0)
+  taxAmount   Float
+  total       Float
+  notes       String?
+  paidAt      DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client      Client       @relation(fields: [clientId], references: [id])
+  items       InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Float
+  rate        Float
+  amount      Float
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
 }
