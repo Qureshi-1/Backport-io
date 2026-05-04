@@ -5,7 +5,7 @@
 | Detail | Value |
 |--------|-------|
 | **Project** | Backport - Enterprise-Grade API Gateway |
-| **Type** | SaaS / Self-Hostable API Gateway |
+| **Type** | SaaS API Gateway |
 | ** Asking Price** | $2,000 (OBO) |
 | **Domains Included** | backport.in + backport.io |
 | **Tech Stack** | FastAPI + Next.js 16 + TypeScript + Prisma + Tailwind CSS 4 |
@@ -62,7 +62,7 @@
 - API security is a rapidly growing market ($5B+ by 2028)
 - Developer tools and API infrastructure are in high demand
 - Backport's positioning against Cloudflare as "API-first" is a strong differentiator
-- Self-hostable + SaaS dual model appeals to both enterprises and indie developers
+- SaaS model appeals to both enterprises and indie developers
 
 ---
 

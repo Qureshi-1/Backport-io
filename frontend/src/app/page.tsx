@@ -512,7 +512,7 @@ export default function Home() {
     },
     {
       q: "Is this production-ready?",
-      a: "Backport is MIT licensed and fully open source — you can audit every line of code. Start with the free 3-month trial on the managed cloud, or self-host and evaluate it for your use case.",
+      a: "Backport offers a free 3-month trial with full API gateway features. Start protecting your APIs in under 30 seconds.",
     },
   ];
 
@@ -668,7 +668,7 @@ export default function Home() {
           <p className="text-xs text-[#A2BDDB]/25 uppercase tracking-[0.2em] font-medium mb-8">Why developers choose Backport</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { title: "No Vendor Lock-in", desc: "MIT licensed. Self-hostable. Your data stays yours." },
+              { title: "Full Control", desc: "Enterprise-grade API security with transparent pricing. Your data stays yours." },
               { title: "30-Second Setup", desc: "Sign up, get your API key, point your traffic. Done." },
               { title: "Built for APIs", desc: "Not a generic CDN. Purpose-built for API protection and management." },
             ].map((item) => (
@@ -688,7 +688,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {[
             { value: "17+", label: "WAF Patterns" },
-            { value: "MIT", label: "Open Source" },
+            { value: "99.9%", label: "Uptime SLA" },
             { value: "<5ms", label: "Overhead" },
             { value: "30s", label: "Setup Time" },
           ].map((stat) => (
@@ -1094,45 +1094,23 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          OPEN SOURCE + COMMUNITY CTA
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="max-w-5xl mx-auto">
-          <FadeIn>
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-3xl p-8 sm:p-12 text-center relative overflow-hidden">
-              <div className="absolute inset-0 bg-dot-grid-subtle opacity-20 pointer-events-none" />
-              <div className="relative z-10">
-                <SectionBadge color="#6BA9FF">Open Source</SectionBadge>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-4">
-                  MIT Licensed. Fully Auditable.
-                </h2>
-                <p className="max-w-lg mx-auto text-[#A2BDDB]/50 text-sm sm:text-base leading-relaxed mb-8">
-                  Backport is open source. Audit the code, self-host on your own servers, or contribute features. Report bugs, request features, and help shape the roadmap. Every issue and pull request matters.
-                </p>
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                  <Link
-                    href="/auth/signup"
-                    className="bg-[#04e184] hover:bg-white text-black px-8 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2"
-                  >
-                    Get Started Free <ArrowRight className="w-4 h-4" />
-                  </Link>
-                  <Link
-                    href="https://github.com/Qureshi-1/Backport-io"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-[#A2BDDB] hover:text-white px-8 py-3.5 rounded-xl font-semibold border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 flex items-center gap-2"
-                  >
-                    <GithubIcon className="w-4 h-4" />
-                    Star on GitHub
-                  </Link>
-                </div>
-                <p className="text-xs text-[#A2BDDB]/25 mt-6">
-                  No vendor lock-in. Self-hostable. Free tier available with no credit card.
-                </p>
-              </div>
-            </div>
-          </FadeIn>
+      {/* GET STARTED CTA */}
+      <section className="relative py-24 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <SectionBadge color="#04e184">Get Started</SectionBadge>
+          <h2 className="text-3xl md:text-4xl font-bold text-white mt-4 mb-4">
+            Ready to Secure Your APIs?
+          </h2>
+          <p className="text-[#A2BDDB] text-lg mb-8 max-w-2xl mx-auto">
+            Start your free trial today. No credit card required. Full WAF protection, rate limiting, and analytics in 30 seconds.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link href="/auth/signup" className="bg-[#04e184] text-black px-8 py-3 rounded-lg font-semibold hover:bg-[#03c974] transition-colors">Start Free Trial</Link>
+            <Link href="/docs" className="border border-[#A2BDDB] text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors">Read Docs</Link>
+          </div>
+          <p className="text-[#A2BDDB]/50 text-sm mt-6">
+            No vendor lock-in. Cancel anytime.
+          </p>
         </div>
       </section>
 
@@ -1211,7 +1189,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-xs text-[#A2BDDB]/20 mt-6">
-              MIT licensed &middot; Open source &middot; Self-hostable
+              Enterprise-grade &middot; 30-Second Setup &middot; No Vendor Lock-in
             </p>
           </FadeIn>
         </div>

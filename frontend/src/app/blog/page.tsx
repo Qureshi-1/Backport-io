@@ -7,13 +7,13 @@ import { useState } from "react";
 
 const POSTS = [
   {
-    title: "Why We Built Backport: An Open-Source API Gateway for Developers Who Just Want to Ship",
-    description: "The story behind Backport — why we built an open-source API gateway, how it works, and how you can start protecting your API in 30 seconds.",
+    title: "Why We Built Backport: An API Gateway for Developers Who Just Want to Ship",
+    description: "The story behind Backport — why we built an API gateway, how it works, and how you can start protecting your API in 30 seconds.",
     date: "April 10, 2026",
     author: "Sohail Qureshi",
     readTime: "4 min read",
     slug: "why-we-built-backport",
-    tag: "Open Source",
+    tag: "Security",
     image: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=800",
     featured: true,
   },
@@ -41,7 +41,7 @@ const POSTS = [
   },
 ];
 
-const CATEGORIES = ["All", "Security", "Performance", "Open Source"];
+const CATEGORIES = ["All", "Security", "Performance"];
 
 export default function BlogPage() {
   const [selectedCategory, setSelectedCategory] = useState("All");

@@ -49,12 +49,12 @@ _redoc_url = "/redoc" if os.getenv("ENVIRONMENT") != "production" else None
 
 app = FastAPI(
     title="Backport API Gateway",
-    description="Open-source API Gateway providing enterprise-grade security — WAF, Rate Limiting, LRU Caching & Idempotency — with zero code changes to your backend.",
+    description="Enterprise-grade API Gateway providing WAF, Rate Limiting, LRU Caching & Idempotency — with zero code changes to your backend.",
     version="2.0.0",
     docs_url=_docs_url,
     redoc_url=_redoc_url,
     contact={"name": "Backport", "url": "https://backport.in", "email": "support@backportio.com"},
-    license_info={"name": "MIT", "url": "https://opensource.org/licenses/MIT"},
+    license_info={"name": "Proprietary", "url": "https://backport.in/terms"},
 )
 
 @app.on_event("startup")

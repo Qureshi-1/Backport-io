@@ -275,7 +275,7 @@ export const FAQ = () => {
     },
     {
       q: "Is this production-ready?",
-      a: "Backport is built for production from day one — MIT licensed, fully open source, and auditable. Start with the free 3-month trial to evaluate it for your use case.",
+      a: "Backport is built for production from day one — enterprise-grade with full API protection. Start with the free 3-month trial to evaluate it for your use case.",
     },
   ];
 

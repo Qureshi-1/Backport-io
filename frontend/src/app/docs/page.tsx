@@ -27,7 +27,7 @@ const NAV_SECTIONS = [
     { href: "#response-transformation", label: "Response Transform" },
     { href: "#api-mocking", label: "API Mocking" },
     { href: "#webhooks", label: "Webhooks" },
-    { href: "#self-hosting", label: "Self-Hosting" },
+    { href: "#deployment", label: "Deployment" },
   ]},
 ];
 
@@ -163,7 +163,7 @@ export default function DocsPage() {
               <span className="text-[#04e184]">Documentation</span>
             </h1>
             <p className="max-w-2xl text-[#A2BDDB]/60 leading-relaxed text-base sm:text-lg">
-              Backport is an open-source API gateway that adds WAF, rate limiting,
+              Backport is an API gateway that adds WAF, rate limiting,
               caching &amp; idempotency to any backend. Sign up, set your target URL,
               and start proxying — no code changes needed.
             </p>
@@ -944,24 +944,20 @@ curl -X POST https://backport.in/api/user/mocks \\
             </ul>
           </section>
 
-          {/* Self-Hosting with Docker */}
-          <section id="self-hosting" className="mb-20">
+          {/* Deployment with Docker */}
+          <section id="deployment" className="mb-20">
             <div className="flex items-center gap-3 mb-8">
               <Server className="w-5 h-5 text-[#6BA9FF]" />
               <h2
                 className="text-2xl font-bold text-white"
                 style={{ fontFamily: 'var(--font-space-grotesk), "Space Grotesk", sans-serif' }}
               >
-                Self-Hosting with Docker
+                Deployment with Docker
               </h2>
             </div>
             <p className="text-[#A2BDDB]/60 mb-6 leading-relaxed">
-              If you prefer full control over your infrastructure, Backport can be self-hosted
-              using Docker and Docker Compose. Self-hosting gives you the entire gateway
-              stack running on your own servers, with no vendor lock-in and no usage limits.
-              The self-hosted version includes all features — WAF, rate limiting, caching,
-              idempotency, response transformation, API mocking, and webhooks. Setup takes
-              less than five minutes with the provided docker-compose configuration.
+              Backport can be deployed using Docker and Docker Compose for full control over your infrastructure. This gives you the entire gateway stack running on your own servers.
+              Setup takes less than five minutes with the provided docker-compose configuration.
             </p>
 
             <h3 className="text-lg font-semibold text-white mb-4">Docker Compose setup</h3>
@@ -1035,13 +1031,11 @@ docker compose down`}</CodeBlockRaw>
 
             <div className="bg-white/[0.02] border-l-2 border-[#FBBF24]/20 p-4 rounded-r-lg">
               <p className="text-[#A2BDDB]/50 text-sm">
-                <strong className="text-[#FBBF24]">License:</strong> Backport is released under the{" "}
-                <strong className="text-white">MIT License</strong>. You are free to use, modify,
-                and distribute it for personal and commercial purposes. See the{" "}
-                <Link href="https://github.com/Qureshi-1/Backport-io" target="_blank" className="text-[#04e184] underline underline-offset-2">
-                  GitHub repository
-                </Link>{" "}
-                for the full license text and contributing guidelines.
+                <strong className="text-[#FBBF24]">License:</strong> Backport is released under a{" "}
+                <strong className="text-white">Proprietary License</strong>. For deployment and licensing details, contact{" "}
+                <a href="mailto:sales@backport.in" className="text-[#04e184] underline underline-offset-2">
+                  sales@backport.in
+                </a>.
               </p>
             </div>
           </section>

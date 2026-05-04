@@ -33,7 +33,7 @@ const FOOTER_LINKS = [
     title: "Company",
     links: [
       { name: "About", href: "/about" },
-      { name: "Open Source", href: "https://github.com/Qureshi-1/Backport-io", external: true },
+      { name: "GitHub", href: "https://github.com/Qureshi-1/Backport-io", external: true },
       { name: "Contact", href: "/about" },
     ],
   },

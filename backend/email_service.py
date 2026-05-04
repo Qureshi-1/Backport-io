@@ -80,7 +80,7 @@ def send_verification_email(to: str, token: str) -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           If you didn't create a Backport account, you can safely ignore this email.<br>
-          © 2026 Backport • MIT Licensed • Made with ❤️ in India
+          © 2026 Backport • Made with ❤️ in India
         </p>
       </div>
     </body>
@@ -127,7 +127,7 @@ def send_password_reset_email(to: str, token: str) -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           If you didn't request a password reset, you can safely ignore this email.<br>
-          © 2026 Backport • MIT Licensed • Made with ❤️ in India
+          © 2026 Backport • Made with ❤️ in India
         </p>
       </div>
     </body>
@@ -173,7 +173,7 @@ def send_welcome_email(to: str, name: str = "") -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           Need help? Reply to this email or visit our docs.<br>
-          © 2026 Backport • MIT Licensed
+          © 2026 Backport. All Rights Reserved.
         </p>
       </div>
     </body>
@@ -218,7 +218,7 @@ def send_login_notification_email(to: str, ip: str, time_str: str = "") -> bool:
         </p>
         <hr style="border: none; border-top: 1px solid #27272a; margin: 20px 0 0;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
-          © 2026 Backport • MIT Licensed
+          © 2026 Backport. All Rights Reserved.
         </p>
       </div>
     </body>
@@ -275,7 +275,7 @@ def send_payment_receipt_email(to: str, name: str, plan: str, amount_inr: int, p
           Manage Billing →
         </a>
         <hr style="border: none; border-top: 1px solid #27272a; margin: 24px 0 0;">
-        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport • MIT Licensed</p>
+        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport. All Rights Reserved.</p>
       </div>
     </body>
     </html>
@@ -314,7 +314,7 @@ def send_plan_expiry_reminder(to: str, name: str, plan: str, expiry_date: str) -
           Renew Plan →
         </a>
         <hr style="border: none; border-top: 1px solid #27272a; margin: 24px 0 0;">
-        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport • MIT Licensed</p>
+        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport. All Rights Reserved.</p>
       </div>
     </body>
     </html>

@@ -127,7 +127,7 @@ Full lifecycle management for API keys:
 - **No Backend Changes**: Add an `X-API-Key` header, that's it
 - **No DNS Changes**: Unlike Cloudflare, no domain DNS reconfiguration needed
 - **<5ms Overhead**: Minimal latency added to proxied requests
-- **Self-Hostable**: Full source code, deploy anywhere
+- **Deployable**: Deploy on your own infrastructure or use managed hosting
 
 ---
 
@@ -143,4 +143,4 @@ Full lifecycle management for API keys:
 | Auto API Docs | Yes | No | Plugin | Yes |
 | No DNS Changes | Yes | No | N/A | N/A |
 | Starting Price | Free | Free | $0 (OSS) | $3.50/mo |
-| Self-Hostable | Yes | No | Yes | No |
+| Deployable | Yes | No | Yes | No |

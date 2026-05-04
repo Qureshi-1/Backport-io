@@ -27,7 +27,7 @@ export default function SignupPage() {
               <div className="space-y-6">
                 <span className="inline-flex items-center gap-3 px-4 py-2 bg-white/5 border border-white/10 text-[#04e184] text-[10px] tracking-[0.4em] font-bold uppercase rounded-full">
                   <div className="h-2 w-2 rounded-full bg-[#04e184] animate-pulse" />
-                  Open Source
+                  Enterprise Grade
                 </span>
                 <h1 className="text-7xl font-black tracking-tight leading-[0.85] text-white">
                   Ship your API <br />

@@ -25,7 +25,7 @@ export default function Terms() {
         <div className="space-y-10">
           <section>
             <h2 className="text-2xl font-semibold text-white mb-3">1. Acceptance of Terms</h2>
-            <p className="leading-relaxed text-[#A2BDDB]/50">By creating an account or using the Backport API Gateway service (&quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, do not use the Service. These terms apply to the hosted cloud service available at backport.in, not to the open-source code itself.</p>
+            <p className="leading-relaxed text-[#A2BDDB]/50">By creating an account or using the Backport API Gateway service (&quot;Service&quot;), you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, do not use the Service. These terms apply to the hosted cloud service available at backport.in.</p>
           </section>
 
           <section>
@@ -116,9 +116,8 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-3">9. Open Source</h2>
-            <p className="leading-relaxed text-[#A2BDDB]/50">The core Backport software is open source under the MIT license and available on{" "}
-              <a href="https://github.com/Qureshi-1/Backport-io" target="_blank" rel="noopener noreferrer" className="text-[#04e184] hover:underline">GitHub</a>. These Terms of Service govern the hosted cloud service (Backport Cloud), not your use of the open-source code under the MIT license. You are free to fork, modify, and self-host the open-source version without these restrictions.</p>
+            <h2 className="text-2xl font-semibold text-white mb-3">9. Source Code</h2>
+            <p className="leading-relaxed text-[#A2BDDB]/50">The Backport software is proprietary and confidential. Unauthorized copying, distribution, or modification is prohibited. For source code access inquiries, contact <a href="mailto:sales@backport.in" className="text-[#04e184] hover:underline">sales@backport.in</a>.</p>
           </section>
 
           <section>

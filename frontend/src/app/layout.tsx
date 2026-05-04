@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://backport.in'),
   title: 'Backport — Enterprise-Grade API Gateway',
   description: 'Protect and accelerate any backend with enterprise-grade WAF, rate limiting, intelligent caching, idempotency, response transformation, and API mocking. No SDK. No code changes. Free to start.',
-  keywords: ['API Gateway', 'Rate Limiting', 'WAF', 'Web Application Firewall', 'Caching', 'API Security', 'Open Source', 'Response Transformation', 'API Mocking', 'Idempotency'],
+  keywords: ['API Gateway', 'Rate Limiting', 'WAF', 'Web Application Firewall', 'Caching', 'API Security', 'Response Transformation', 'API Mocking', 'Idempotency'],
   authors: [{ name: 'Backport' }],
   openGraph: {
     title: 'Backport – Enterprise-Grade API Gateway',
@@ -109,7 +109,7 @@ export default function RootLayout({
               ],
               "programmingLanguage": ["Python", "TypeScript"],
               "isAccessibleForFree": true,
-              "license": "https://opensource.org/licenses/MIT"
+              "license": "https://backport.in/terms"
             })
           }}
         />

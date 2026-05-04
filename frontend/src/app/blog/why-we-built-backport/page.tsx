@@ -5,23 +5,23 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Why We Built Backport: An Open-Source API Gateway | Backport Blog",
-  description: "The story behind Backport — why we built an open-source API gateway, how it works, and how you can start protecting your API in 30 seconds without any code changes.",
+  title: "Why We Built Backport: An API Gateway | Backport Blog",
+  description: "The story behind Backport — why we built an API gateway, how it works, and how you can start protecting your API in 30 seconds without any code changes.",
   openGraph: {
-    title: "Why We Built Backport: An Open-Source API Gateway",
-    description: "An open-source API gateway with WAF, rate limiting, caching, and analytics. Built for developers who want to ship, not do ops.",
+    title: "Why We Built Backport: An API Gateway",
+    description: "An API gateway with WAF, rate limiting, caching, and analytics. Built for developers who want to ship, not do ops.",
     url: "https://backport.in/blog/why-we-built-backport",
     siteName: "Backport",
     type: "article",
     publishedTime: "2026-04-10",
     authors: ["Sohail Qureshi"],
-    tags: ["Open Source", "API Gateway", "WAF", "Rate Limiting", "Backport"],
+    tags: ["API Gateway", "WAF", "Rate Limiting", "Backport"],
     images: [{ url: "https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Why We Built Backport: An Open-Source API Gateway",
-    description: "The story behind Backport — an open-source API gateway for developers.",
+    title: "Why We Built Backport: An API Gateway",
+    description: "The story behind Backport — an API gateway for developers.",
     images: ["https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200"],
   },
   alternates: { canonical: "https://backport.in/blog/why-we-built-backport" },
@@ -42,7 +42,7 @@ export default function WhyWeBuiltBackport() {
         <header className="mb-12">
           <div className="flex items-center gap-4 mb-6">
             <span className="px-3 py-1 rounded-full bg-[#04e184]/[0.08] text-[#04e184] text-sm font-medium">
-              Open Source
+              Developer Tools
             </span>
             <span className="text-[#A2BDDB]/30 flex items-center gap-1">
               <Clock className="w-4 h-4" /> 4 min read
@@ -50,7 +50,7 @@ export default function WhyWeBuiltBackport() {
           </div>
 
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            Why We Built Backport: An Open-Source API Gateway for Developers
+            Why We Built Backport: An API Gateway for Developers
           </h1>
 
           <div className="flex items-center gap-6 text-[#A2BDDB]/40">
@@ -69,7 +69,7 @@ export default function WhyWeBuiltBackport() {
         <div className="aspect-video rounded-2xl bg-zinc-900 mb-12 overflow-hidden">
           <img
             src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?w=1200"
-            alt="Open source code on screen"
+            alt="API gateway dashboard"
             className="w-full h-full object-cover opacity-80"
           />
         </div>
@@ -135,14 +135,14 @@ export default function WhyWeBuiltBackport() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-white mt-12 mb-6">Why Open Source</h2>
+          <h2 className="text-2xl font-bold text-white mt-12 mb-6">Why We Built Backport</h2>
 
           <p className="text-[#A2BDDB]/50 leading-relaxed mb-6">
-            API security should not be locked behind enterprise paywalls. Every developer, whether building a side project or a production API, deserves protection from SQL injection, XSS, and abusive clients. By making Backport open source (MIT license), we ensure that the core security engine is transparent, auditable, and free for everyone.
+            API security should not be locked behind enterprise paywalls. Every developer, whether building a side project or a production API, deserves protection from SQL injection, XSS, and abusive clients. Backport provides enterprise-grade protection with a generous free tier, so you can ship with confidence.
           </p>
 
           <p className="text-[#A2BDDB]/50 leading-relaxed mb-6">
-            The hosted version on Vercel + Render provides the dashboard, analytics, and team features for developers who want a managed experience. But the core proxy engine, WAF patterns, and rate limiting logic are all open source and self-hostable.
+            The hosted version provides a full dashboard, real-time analytics, and team features. The gateway engine runs with minimal overhead, ensuring your APIs stay fast while staying protected.
           </p>
 
           <h2 className="text-2xl font-bold text-white mt-12 mb-6">The Tech Stack</h2>
@@ -169,7 +169,7 @@ Deploy:    Vercel (frontend) + Render (backend)`}
           </p>
 
           <p className="text-[#A2BDDB]/50 leading-relaxed mb-6">
-            If you are building an API and want protection without the complexity, give Backport a try. The free plan includes core gateway features (WAF, rate limiting, caching, idempotency, and dashboard analytics) for 3 months, no credit card required. And if you are a developer who wants to contribute, the code is on GitHub under the MIT license. We welcome pull requests, bug reports, and feature suggestions.
+            If you are building an API and want protection without complexity, give Backport a try. The free plan includes core gateway features (WAF, rate limiting, caching, and dashboard analytics) for 3 months, no credit card required.
           </p>
         </div>
 

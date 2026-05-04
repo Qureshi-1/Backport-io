@@ -4,7 +4,7 @@
 
 Backport can be deployed in multiple ways depending on your needs:
 
-1. **Docker Compose** (Recommended for self-hosting)
+1. **Docker Compose** (Recommended for production)
 2. **Vercel + Railway** (Frontend on Vercel, Backend on Railway)
 3. **Vercel + AWS EC2** (Frontend on Vercel, Backend on EC2)
 4. **Full Docker on VPS** (Single server deployment)
