@@ -91,7 +91,7 @@ class ConnectionManager:
         try:
             loop = asyncio.get_event_loop()
             if loop.is_running():
-                asyncio.ensure_future(self.broadcast_to_user(user_id, message), loop=loop)
+                asyncio.run_coroutine_threadsafe(self.broadcast_to_user(user_id, message), loop=loop)
             else:
                 loop.run_until_complete(self.broadcast_to_user(user_id, message))
         except RuntimeError:
