@@ -105,7 +105,7 @@ def create_api_key(data: ApiKeyCreate, user: User = Depends(get_current_user), d
         db.commit()
         db.refresh(new_key)
         return {"status": "success", "key": new_key.key}
-    except Exception as e:
+    except Exception:
         import traceback
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Failed to create API key. Please try again.")
@@ -142,7 +142,7 @@ def get_user_logs(user: User = Depends(get_current_user), db: Session = Depends(
                     'status_code': row[3], 'latency_ms': row[4],
                     'was_cached': row[5], 'created_at': row[6],
                 }))
-        except Exception as e2:
+        except Exception:
             raise HTTPException(status_code=500, detail="Could not fetch logs")
 
     result = []
@@ -267,13 +267,20 @@ def get_latency_distribution(user: User = Depends(get_current_user), db: Session
     ).all()
 
     for (lat,) in logs:
-        if lat < 50: buckets['0-50ms'] += 1
-        elif lat < 100: buckets['50-100ms'] += 1
-        elif lat < 250: buckets['100-250ms'] += 1
-        elif lat < 500: buckets['250-500ms'] += 1
-        elif lat < 1000: buckets['500ms-1s'] += 1
-        elif lat < 3000: buckets['1s-3s'] += 1
-        else: buckets['3s+'] += 1
+        if lat < 50:
+            buckets['0-50ms'] += 1
+        elif lat < 100:
+            buckets['50-100ms'] += 1
+        elif lat < 250:
+            buckets['100-250ms'] += 1
+        elif lat < 500:
+            buckets['250-500ms'] += 1
+        elif lat < 1000:
+            buckets['500ms-1s'] += 1
+        elif lat < 3000:
+            buckets['1s-3s'] += 1
+        else:
+            buckets['3s+'] += 1
 
     return buckets
 
@@ -365,7 +372,7 @@ def replay_request(log_id: int, user: User = Depends(get_current_user), db: Sess
         }
     except httpx.TimeoutException:
         return {"status_code": 504, "latency_ms": 0, "response": {"error": "Gateway Timeout"}, "original_latency_ms": log.latency_ms}
-    except Exception as e:
+    except Exception:
         return {"status_code": 502, "latency_ms": 0, "response": {"error": "Internal error"}, "original_latency_ms": log.latency_ms}
 
 # ─── Test Connection ────────────────────────────────────────────────────
@@ -404,13 +411,13 @@ def export_logs_json(user: User = Depends(get_current_user), db: Session = Depen
 
     return [
         {
-            "id": l.id, "method": l.method, "path": l.path,
-            "status_code": l.status_code, "latency_ms": l.latency_ms,
-            "was_cached": l.was_cached, "ip_address": l.ip_address,
-            "query_params": l.query_params,
-            "created_at": l.created_at.isoformat() if l.created_at else ""
+            "id": entry.id, "method": entry.method, "path": entry.path,
+            "status_code": entry.status_code, "latency_ms": entry.latency_ms,
+            "was_cached": entry.was_cached, "ip_address": entry.ip_address,
+            "query_params": entry.query_params,
+            "created_at": entry.created_at.isoformat() if entry.created_at else ""
         }
-        for l in logs
+        for entry in logs
     ]
 
 @router.get("/export/csv")
@@ -427,8 +434,8 @@ def export_logs_csv(user: User = Depends(get_current_user), db: Session = Depend
     output = io.StringIO()
     writer = _csv.writer(output)
     writer.writerow(["id", "method", "path", "status_code", "latency_ms", "was_cached", "ip_address", "created_at"])
-    for l in logs:
-        writer.writerow([l.id, l.method, l.path, l.status_code, l.latency_ms, l.was_cached, l.ip_address or "", l.created_at])
+    for entry in logs:
+        writer.writerow([entry.id, entry.method, entry.path, entry.status_code, entry.latency_ms, entry.was_cached, entry.ip_address or "", entry.created_at])
 
     csv_content = output.getvalue()
     return StreamingResponse(
@@ -494,7 +501,6 @@ def inspect_log(log_id: int, user: User = Depends(get_current_user), db: Session
 def delete_account(request: Request, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     """Self-service account deletion. Soft-deletes user and all their data (GDPR)."""
     from models import AuditLog, ApiLog, ApiKey, Alert, HealthCheck, Integration
-    from sqlalchemy import text
     
     # Track in audit logs before deletion
     try:

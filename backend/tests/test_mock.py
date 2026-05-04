@@ -4,7 +4,6 @@ Mock endpoint tests — get_mock_response, CRUD, toggle, method filtering.
 import sys
 import os
 import json
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from mock import get_mock_response, MockEndpoint, VALID_HTTP_METHODS

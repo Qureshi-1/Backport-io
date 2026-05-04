@@ -3,7 +3,6 @@ Teams tests — slugify, role hierarchy, CRUD, invite, remove member.
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from teams import (
@@ -12,7 +11,6 @@ from teams import (
     VALID_ROLES,
 )
 from tests.test_helpers import create_user_for_client
-from config import ADMIN_SECRET
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -176,7 +174,7 @@ class TestTeamsAPI:
         create_resp = client.post("/api/teams", json={"name": "RM Team"}, headers=h_owner)
         team_id = create_resp.json()["team"]["id"]
 
-        invite_resp = client.post(f"/api/teams/{team_id}/invite",
+        _invite_resp = client.post(f"/api/teams/{team_id}/invite",
                                   json={"email": member_email}, headers=h_owner)
 
         # Get the user_id from the team members

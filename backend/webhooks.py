@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import logging
 from datetime import datetime, timezone
-from typing import Optional, List, Dict, Any
+from typing import List
 
 import httpx
 from fastapi import APIRouter, Depends, HTTPException
@@ -116,7 +116,7 @@ def _deliver_webhook(webhook_id: int, url: str, secret: str, event_type: str, pa
 
         status_code = None
         response_body = None
-        success = False
+        _success = False
 
         # Retry with exponential backoff: 1s, 5s, 15s
         retry_delays = [1, 5, 15]
@@ -135,7 +135,7 @@ def _deliver_webhook(webhook_id: int, url: str, secret: str, event_type: str, pa
                     status_code = resp.status_code
                     response_body = resp.text[:4096] if resp.text else None
                     if status_code < 500:
-                        success = True
+                        _success = True
                         break
                     # 5xx errors are retryable
                     if attempt < len(retry_delays):

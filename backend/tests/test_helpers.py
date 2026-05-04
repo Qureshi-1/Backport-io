@@ -68,7 +68,6 @@ def create_user_for_client(client, email=None, is_admin=False):
     This avoids signup rate limiting issues.
     """
     from database import SessionLocal
-    from sqlalchemy.orm import sessionmaker
     import secrets
     import bcrypt
     from models import User, ApiKey

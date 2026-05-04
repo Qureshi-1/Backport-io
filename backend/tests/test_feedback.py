@@ -6,7 +6,6 @@ import os
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from config import ADMIN_SECRET
 from tests.test_helpers import create_user_for_client
 
 

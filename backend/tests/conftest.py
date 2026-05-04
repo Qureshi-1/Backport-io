@@ -22,7 +22,7 @@ from fastapi.testclient import TestClient
 # Ensure backend directory is in path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
-from database import Base, SessionLocal
+from database import Base
 
 
 # ─── In-memory test database ──────────────────────────────────────────────────

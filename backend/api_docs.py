@@ -1,12 +1,11 @@
 import json as _json
 import logging
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func, distinct
-from models import User, ApiLog, ApiEndpoint
+from models import User, ApiEndpoint
 from dependencies import get_current_user, get_db
 
 logger = logging.getLogger("backport")

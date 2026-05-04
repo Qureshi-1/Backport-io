@@ -140,7 +140,7 @@ def send_welcome_email(to: str, name: str = "") -> bool:
     """Send a welcome email after verification."""
     dashboard_url = f"{FRONTEND_URL}/dashboard"
     safe_name = html.escape(name or to.split("@")[0])
-    html = f"""
+    html_body = f"""
     <!DOCTYPE html>
     <html>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -179,7 +179,7 @@ def send_welcome_email(to: str, name: str = "") -> bool:
     </body>
     </html>
     """
-    return send_email(to, f"Welcome to {APP_NAME} — you're all set! 🚀", html)
+    return send_email(to, f"Welcome to {APP_NAME} — you're all set! 🚀", html_body)
 
 
 def send_login_notification_email(to: str, ip: str, time_str: str = "") -> bool:
@@ -188,7 +188,7 @@ def send_login_notification_email(to: str, ip: str, time_str: str = "") -> bool:
         from datetime import datetime, timezone
         time_str = datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC")
     safe_ip = html.escape(ip)
-    html = f"""
+    html_body = f"""
     <!DOCTYPE html>
     <html>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -224,7 +224,7 @@ def send_login_notification_email(to: str, ip: str, time_str: str = "") -> bool:
     </body>
     </html>
     """
-    return send_email(to, f"[Backport] New login from {safe_ip}", html)
+    return send_email(to, f"[Backport] New login from {safe_ip}", html_body)
 
 
 def send_payment_receipt_email(to: str, name: str, plan: str, amount_inr: int, payment_id: str) -> bool:
@@ -343,7 +343,7 @@ def send_feedback_notification(feedback_type: str, message: str, user_email: str
     type_colors = {"bug": "#ef4444", "feature": "#6366f1", "improvement": "#f59e0b", "general": "#10b981"}
     color = type_colors.get(feedback_type, "#10b981")
 
-    html = f"""
+    html_body = f"""
     <!DOCTYPE html>
     <html>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -394,7 +394,7 @@ def send_feedback_notification(feedback_type: str, message: str, user_email: str
     </body>
     </html>
     """
-    return send_email(admin_to, f"[Backport] New {type_label}: {safe_message[:60]}{'...' if len(safe_message) > 60 else ''}", html)
+    return send_email(admin_to, f"[Backport] New {type_label}: {safe_message[:60]}{'...' if len(safe_message) > 60 else ''}", html_body)
 
 
 def send_contact_sales_email(name: str, email: str, company: str, message: str) -> bool:
@@ -409,7 +409,7 @@ def send_contact_sales_email(name: str, email: str, company: str, message: str) 
     safe_company = html.escape(company) if company else 'Not specified'
     safe_message = html.escape(message)
 
-    html = f"""
+    html_body = f"""
     <!DOCTYPE html>
     <html>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -460,4 +460,4 @@ def send_contact_sales_email(name: str, email: str, company: str, message: str) 
     </body>
     </html>
     """
-    return send_email(admin_to, f"[Backport] Enterprise Inquiry from {safe_name} ({safe_company})", html)
+    return send_email(admin_to, f"[Backport] Enterprise Inquiry from {safe_name} ({safe_company})", html_body)

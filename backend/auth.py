@@ -7,8 +7,8 @@ import httpx
 import logging
 import threading
 from urllib.parse import urlencode
-from fastapi import APIRouter, Depends, HTTPException, Request, Response, status
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel, field_validator, Field
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta, timezone
@@ -483,8 +483,8 @@ def change_password(req: ChangePasswordReq, request: Request, response: Response
 @router.post("/refresh")
 def refresh_token(request: Request, response: Response, db: Session = Depends(get_db)):
     """Exchange a valid refresh token cookie for a new access token."""
-    from dependencies import REFRESH_COOKIE_NAME, REFRESH_COOKIE_MAX_AGE
-    from jose import JWTError, jwt
+    from dependencies import REFRESH_COOKIE_NAME
+    from jose import jwt
     
     refresh_token = request.cookies.get(REFRESH_COOKIE_NAME)
     if not refresh_token:
@@ -615,7 +615,7 @@ def get_ws_token(request: Request, response: Response, db: Session = Depends(get
     The main HttpOnly cookie JWT is not readable by JavaScript,
     so the frontend needs this endpoint to get a token for WebSocket URLs.
     The token is short-lived (5 minutes) and only valid for WS connections."""
-    from dependencies import get_current_user, _extract_token_from_cookie
+    from dependencies import _extract_token_from_cookie
     token = _extract_token_from_cookie(request)
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
@@ -645,7 +645,7 @@ def get_ws_token(request: Request, response: Response, db: Session = Depends(get
 def check_auth(request: Request, db: Session = Depends(get_db)):
     """Verify the current session/cookie. Returns user info if authenticated, 401 if not.
     Frontend uses this to check login status on page load."""
-    from dependencies import get_current_user, _extract_token_from_cookie
+    from dependencies import _extract_token_from_cookie
     token = _extract_token_from_cookie(request)
     if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")

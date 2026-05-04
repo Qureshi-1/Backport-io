@@ -12,7 +12,6 @@ from custom_waf import (
     _validate_regex,
     _serialize_rule,
     check_custom_waf,
-    CustomWafRule,
     WafRuleCreate,
     WafRuleUpdate,
 )
@@ -27,25 +26,21 @@ class TestRegexValidation:
 
     def test_valid_regex(self):
         # Import inside test to avoid any circular import issues in CI
-        from custom_waf import _validate_regex
         assert _validate_regex(r"\d{4}") is True
         assert _validate_regex(r"(?i)admin") is True
         assert _validate_regex(r"[a-zA-Z0-9]+") is True
         assert _validate_regex(r".*") is True
 
     def test_invalid_regex(self):
-        from custom_waf import _validate_regex
         assert _validate_regex(r"[invalid") is False
         assert _validate_regex(r"(?P<name)") is False
         assert _validate_regex(r"*star") is False
         assert _validate_regex(r"+plus") is False
 
     def test_empty_regex(self):
-        from custom_waf import _validate_regex
         assert _validate_regex("") is True  # empty string is valid regex
 
     def test_complex_regex(self):
-        from custom_waf import _validate_regex
         assert _validate_regex(r"(?:^|\s)admin(?:\s|$)") is True
         assert _validate_regex(r"https?://[^\s]+") is True
 

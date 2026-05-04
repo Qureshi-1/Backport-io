@@ -8,7 +8,7 @@ from urllib.parse import urlparse
 from fastapi import APIRouter, Request, Response, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from dependencies import get_proxy_user, get_db, get_effective_plan
-from models import User, ApiLog
+from models import ApiLog
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +40,6 @@ async def close_shared_client():
 
 # ─── UNIFIED CACHE (Redis/Upstash + in-memory fallback) ───────────────────────
 from cache import cache as _cache
-import json as _json
 
 # Keep minimal in-memory stores for non-serializable data (response headers)
 _lru_headers: dict = {}       # { cache_key: (timestamp, headers) }
@@ -142,7 +141,7 @@ def _is_url_safe(url: str) -> tuple[bool, str]:
             ip = ipaddress.ip_address(sockaddr[0])
             for network in BLOCKED_IP_RANGES:
                 if ip in network:
-                    return False, f"Access to internal/private IP addresses is not allowed"
+                    return False, "Access to internal/private IP addresses is not allowed"
     except socket.gaierror:
         return False, f"Could not resolve hostname '{hostname}'"
     except Exception:
@@ -532,7 +531,7 @@ async def proxy_route(request: Request, path: str, background_tasks: BackgroundT
 
         background_tasks.add_task(save_log, user.id, api_key_obj.id, request.method, f"/{path}", 504, latency, False, ip_address=ip_address, request_headers=request_headers_str, request_body=body_bytes.decode('utf-8', errors='replace')[:65536], query_params=query_params_str)
         raise HTTPException(status_code=504, detail="Gateway Timeout: Backend did not respond within 30 seconds")
-    except Exception as e:
+    except Exception:
         latency = int((time.time() - start_time) * 1000)
 
         # Record failure in circuit breaker

@@ -3,14 +3,12 @@ Dependencies tests — get_current_user, get_proxy_user, get_current_admin auth.
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from dependencies import (
     _extract_token_from_cookie,
     _extract_token_from_header,
     COOKIE_NAME,
-    get_current_admin,
 )
 from tests.test_helpers import create_user_for_client
 

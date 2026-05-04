@@ -4,7 +4,6 @@ Transform tests — apply_transformations and all action functions.
 import sys
 import os
 import json
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from transform import (
@@ -214,7 +213,7 @@ class TestTransformAPI:
             "config": {"key": "processed_at", "value": "2025-01-01"},
         }, headers=h)
         assert resp.status_code == 200
-        rule_id = resp.json()["rule"]["id"]
+        _rule_id = resp.json()["rule"]["id"]
 
         resp = client.get("/api/transforms", headers=h)
         assert resp.status_code == 200

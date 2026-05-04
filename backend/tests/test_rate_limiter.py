@@ -5,7 +5,6 @@ Tests the PLAN_RATE_LIMITS config and rate limit enforcement flow.
 import sys
 import os
 import time
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from proxy import PLAN_RATE_LIMITS, _cache

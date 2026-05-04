@@ -21,6 +21,9 @@ dist/
 build/
 *.egg
 
+# Ruff cache
+.ruff_cache/
+
 # Node.js
 node_modules/
 /.pnp

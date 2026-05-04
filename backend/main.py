@@ -11,11 +11,21 @@ from fastapi.exceptions import RequestValidationError
 from starlette.middleware.gzip import GZipMiddleware
 from sqlalchemy import text
 from database import engine, Base, SessionLocal
-import models
-import auth, user, payment, feedback, proxy, admin
-import transform, mock, custom_waf, webhooks
-import health_monitor, circuit_breaker
-import teams, endpoint_config, ws, integrations
+import auth
+import user
+import payment
+import feedback
+import proxy
+import admin
+import transform
+import mock
+import custom_waf
+import webhooks
+import health_monitor
+import teams
+import endpoint_config
+import ws
+import integrations
 import api_docs
 from config import CORS_ORIGINS, ADMIN_EMAIL, SECRET_KEY
 

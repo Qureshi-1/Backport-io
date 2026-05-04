@@ -3,7 +3,6 @@ Endpoint Config tests — match_endpoint_config helper and CRUD endpoints.
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from endpoint_config import match_endpoint_config

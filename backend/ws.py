@@ -62,7 +62,7 @@ class ConnectionManager:
                 payload = json.dumps(message)
                 if hasattr(ws, 'send_text') and not ws.client_state.disconnected:
                     try:
-                        loop = asyncio.get_running_loop()
+                        _loop = asyncio.get_running_loop()
                         # We're already in an async context
                         await ws.send_text(payload)
                     except RuntimeError:

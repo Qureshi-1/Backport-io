@@ -3,9 +3,9 @@ import threading
 import json
 import logging
 from datetime import datetime, timezone, timedelta
-from typing import Optional, List, Dict
+from typing import Optional, Dict
 from sqlalchemy.orm import Session
-from sqlalchemy import func, text
+from sqlalchemy import func
 
 logger = logging.getLogger("backport")
 
@@ -220,8 +220,8 @@ class AnalyticsEngine:
 
             for (user_id, method, path), log_entries in groups.items():
                 total = len(log_entries)
-                success = sum(1 for l in log_entries if l.status_code < 400)
-                avg_lat = int(sum(l.latency_ms for l in log_entries) / max(total, 1))
+                success = sum(1 for entry in log_entries if entry.status_code < 400)
+                avg_lat = int(sum(entry.latency_ms for entry in log_entries) / max(total, 1))
                 success_rate = int((success / max(total, 1)) * 100)
 
                 # Collect unique request headers
@@ -338,12 +338,18 @@ class AnalyticsEngine:
         ).all()
         
         for (lat,) in recent_logs:
-            if lat < 50: latency_buckets['0-50ms'] += 1
-            elif lat < 100: latency_buckets['50-100ms'] += 1
-            elif lat < 250: latency_buckets['100-250ms'] += 1
-            elif lat < 500: latency_buckets['250-500ms'] += 1
-            elif lat < 1000: latency_buckets['500ms-1s'] += 1
-            else: latency_buckets['1s+'] += 1
+            if lat < 50:
+                latency_buckets['0-50ms'] += 1
+            elif lat < 100:
+                latency_buckets['50-100ms'] += 1
+            elif lat < 250:
+                latency_buckets['100-250ms'] += 1
+            elif lat < 500:
+                latency_buckets['250-500ms'] += 1
+            elif lat < 1000:
+                latency_buckets['500ms-1s'] += 1
+            else:
+                latency_buckets['1s+'] += 1
         
         # Recent alerts
         recent_alerts = db.query(Alert).filter(

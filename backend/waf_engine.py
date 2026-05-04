@@ -15,7 +15,6 @@ Usage:
 """
 
 import re
-import time
 import threading
 import logging
 from enum import Enum

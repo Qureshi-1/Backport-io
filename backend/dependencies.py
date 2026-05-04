@@ -3,7 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from jose import JWTError, jwt
 from database import SessionLocal
-from config import SECRET_KEY, ALGORITHM, FRONTEND_URL, TOKEN_EXPIRE_MINUTES
+from config import SECRET_KEY, ALGORITHM, TOKEN_EXPIRE_MINUTES
 from models import User, ApiKey
 
 security = HTTPBearer(auto_error=False)

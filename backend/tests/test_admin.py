@@ -3,7 +3,6 @@ Admin tests — stats, bootstrap, delete user, update plan.
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from config import ADMIN_SECRET

@@ -42,7 +42,6 @@ from database import Base           # noqa: E402
 
 # Core models (models.py — already includes User, ApiKey, Feedback, ApiLog,
 # Team, TeamMember, EndpointConfig, Alert, HealthCheck, ApiEndpoint, Integration)
-import models                       # noqa: E402
 
 # Feature-module models (each file defines additional Base-derived tables)
 import transform                    # noqa: F401,E402  — TransformationRule

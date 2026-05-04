@@ -20,7 +20,7 @@ import threading
 import logging
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone
 from typing import Optional
 
 logger = logging.getLogger(__name__)

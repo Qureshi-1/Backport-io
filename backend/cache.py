@@ -14,8 +14,6 @@ Usage:
 
 import os
 import time
-import json
-import asyncio
 import threading
 
 # ─── In-Memory LRU Store (fallback when no Redis) ──────────────────────────────

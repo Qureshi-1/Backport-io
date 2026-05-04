@@ -11,7 +11,6 @@ import razorpay
 from models import User
 from dependencies import get_current_user, get_db, get_effective_plan
 from config import RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET
-import secrets
 
 router = APIRouter(prefix="/api/billing", tags=["billing"])
 
@@ -229,8 +228,8 @@ def create_order(req: CreateOrderReq, user: User = Depends(get_current_user)):
     except HTTPException:
         # Re-raise HTTP exceptions (e.g., promo code limit reached)
         raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to create payment order. Please try again.")
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to create payment order. Please try again.")
 
 
 @router.post("/verify")
@@ -399,7 +398,7 @@ async def razorpay_webhook(request: Request, db: Session = Depends(get_db)):
     event_type = event.get("event", "")
     payment_entity = event.get("payload", {}).get("payment", {}).get("entity", {})
     payment_id = payment_entity.get("id", "")
-    order_id = payment_entity.get("order_id", "")
+    _order_id = payment_entity.get("order_id", "")
     payment_status = payment_entity.get("status", "")
     amount = payment_entity.get("amount", 0)
     notes = payment_entity.get("notes", {})

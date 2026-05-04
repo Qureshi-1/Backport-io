@@ -215,6 +215,7 @@ def list_users(
     total = query.count()
     users = query.offset((page - 1) * limit).limit(limit).all()
 
+    now = datetime.now(timezone.utc)
     result = []
     for u in users:
         api_key_count = db.query(func.count(ApiKey.id)).filter(ApiKey.user_id == u.id).scalar() or 0
@@ -1033,7 +1034,6 @@ def get_system_metrics(admin: User = Depends(get_current_admin)):
     now = _time.time()
 
     # Try to get process-level metrics
-    import os as _os
     import sys as _sys
 
     try:

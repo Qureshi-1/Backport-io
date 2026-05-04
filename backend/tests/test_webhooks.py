@@ -6,7 +6,6 @@ import os
 import hashlib
 import hmac
 import json
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from webhooks import (

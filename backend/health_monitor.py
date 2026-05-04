@@ -14,11 +14,10 @@ from typing import Optional
 
 logger = logging.getLogger(__name__)
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import func
 
-from database import SessionLocal, Base, engine
+from database import SessionLocal
 from models import User, HealthCheck, Alert
 from dependencies import get_current_user, get_db
 
@@ -168,7 +167,7 @@ def _check_alerts(db: Session, user_id: int, current_status: str, backend_url: s
             alert = Alert(
                 user_id=user_id,
                 alert_type="backend_recovered",
-                message=f"Backend recovered: health check now passing",
+                message="Backend recovered: health check now passing",
                 severity="warning",
                 timestamp=datetime.now(timezone.utc),
                 details='{"status": "recovered", "response_time_ms": ' + str(response_time_ms or 0) + '}',

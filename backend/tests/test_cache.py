@@ -7,7 +7,7 @@ import time
 import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from cache import MemoryCache, _memory_store, MAX_MEMORY_ENTRIES
+from cache import MemoryCache, _memory_store
 
 
 @pytest.fixture(autouse=True)

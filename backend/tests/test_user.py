@@ -3,7 +3,6 @@ User tests — profile, settings update, API key CRUD, logs, analytics.
 """
 import sys
 import os
-import pytest
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from tests.test_helpers import create_user_for_client
@@ -108,7 +107,7 @@ class TestAPIKeys:
     def test_delete_api_key(self, client):
         h, _ = create_user_for_client(client)
         # First create an extra key (user already has one from signup)
-        create_resp = client.post("/api/user/keys", json={"name": "Extra Key"}, headers=h)
+        _create_resp = client.post("/api/user/keys", json={"name": "Extra Key"}, headers=h)
 
         # List keys to find one to delete
         keys = client.get("/api/user/keys", headers=h).json()
