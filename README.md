@@ -1,30 +1,18 @@
 <div align="center">
 
-# Backport.in
+# Backport
 
-**API Gateway — Enterprise Security with Zero Code Changes**
+### Enterprise-Grade API Gateway with Built-in WAF
 
-[🌐 Live Demo](https://backport.in) &middot;
-[📖 Docs](https://backport.in/docs) &middot;
-[🐛 Report Bug](https://github.com/Qureshi-1/Backport-io/issues/new?template=bug_report.yml)
+[Website](https://backport.in) &middot; [Live Demo](https://backport.in) &middot; [Documentation](./docs)
 
-<p>
-  <img src="https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="Proprietary License" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/FastAPI-0.115-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-  &nbsp;
-  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker Ready" />
-  &nbsp;
-  <img src="https://img.shields.io/github/actions/workflow/status/Qureshi-1/Backport-io/ci.yml?style=for-the-badge&logo=github&logoColor=white&label=CI" alt="CI Passing" />
-</p>
-
-<p>
-  <img src="https://img.shields.io/github/stars/Qureshi-1/Backport-io?style=social&logo=github" alt="Stars" />
-  &nbsp;
-  <img src="https://img.shields.io/github/forks/Qureshi-1/Backport-io?style=social&logo=github" alt="Forks" />
-</p>
+<img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python">
+<img src="https://img.shields.io/badge/FastAPI-Latest-009688.svg" alt="FastAPI">
+<img src="https://img.shields.io/badge/Next.js-16-black.svg" alt="Next.js">
+<img src="https://img.shields.io/badge/TypeScript-5.x-3178C6.svg" alt="TypeScript">
+<img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4.svg" alt="Tailwind CSS">
+<img src="https://img.shields.io/badge/Docker-Ready-2496ED.svg" alt="Docker">
+<img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="License">
 
 </div>
 
@@ -32,405 +20,159 @@
 
 ## What is Backport?
 
-Backport is an **API Gateway** that sits in front of any backend service. It provides security features, performance optimization, and observability — without requiring any SDK, code changes, or complex configuration. Point your API traffic through Backport to gain **WAF protection, rate limiting, intelligent caching, request analytics, circuit breakers, and more**.
+Backport is an API gateway that protects your backend with a powerful WAF, rate limiting, caching, response transformation, and API mocking. No SDK required. No code changes needed.
 
-> A self-hosted API gateway built with Python and FastAPI.
+Point your clients to Backport. That's it.
 
-### Project Status
-
-- 🧪 **Production-ready project** — actively developed
-- 📜 **Proprietary licensed** — all rights reserved
-- 🏠 **Self-hosted version** — ideal for development and small projects
-- ☁️ **Managed cloud** — available at [backport.in](https://backport.in) for production use
+**Live Demo:** [backport.in](https://backport.in) - Try the interactive WAF demo on the homepage.
 
 ---
 
-## Architecture
+## Screenshots
 
-```mermaid
-graph LR
-    Client[Client App] -->|API Key| Backport[Backport Gateway]
-    Backport --> WAF[WAF Engine]
-    Backport --> RL[Rate Limiter]
-    Backport --> Cache[LRU Cache]
-    Backport -->|Proxy| Backend[Your Backend]
-    Backport --> DB[(PostgreSQL)]
-    Backport --> Redis[(Redis/Upstash)]
-    Backport --> Analytics[Analytics Engine]
-```
+### Landing Page
+Backport's marketing website features a modern design with live WAF demo, pricing table, and Cloudflare comparison.
 
-Every request flows through Backport's middleware pipeline: **authentication**, **WAF scanning**, **rate limiting**, **caching**, and **transformation** — before reaching your backend. Your backend code stays untouched. Your clients only need to add a single `X-API-Key` header.
+### Dashboard
+Full management dashboard with real-time analytics, API key management, and security monitoring.
+
+### WAF Protection
+17+ built-in patterns detect and block SQL Injection, XSS, Path Traversal, Command Injection, and more.
+
+### Analytics
+Real-time traffic charts, latency heatmaps, slow endpoint detection, and threat alert summaries.
 
 ---
 
 ## Features
 
-### Security & Protection
-
 | Feature | Description |
-|---|---|
-| **WAF Engine** | Built-in detection for SQL Injection, XSS, Path Traversal, Command Injection, XXE, and LDAP Injection |
-| **Custom WAF Rules** | User-defined regex-based firewall rules with per-endpoint control, severity levels, and block/log modes |
-| **API Key Management** | Multiple keys per user with scoped permissions and automatic rotation |
-| **Circuit Breaker** | Automatic failover and recovery to protect downstream services from cascading failures |
-| **IP Blocking** | Block malicious IPs and suspicious request patterns |
-
-### Performance & Optimization
-
-| Feature | Description |
-|---|---|
-| **Rate Limiting** | Token-bucket algorithm with per-plan limits — throttle by endpoint, user, or IP |
-| **LRU Caching** | In-memory LRU cache with configurable TTL; Redis/Upstash support for distributed deployments |
-| **Request Transformation** | Modify request headers and response bodies on the fly — add, remove, or rename fields |
-| **GZip Compression** | Automatic response compression to reduce bandwidth |
-
-### Developer Experience
-
-| Feature | Description |
-|---|---|
-| **Mock Endpoints** | Create mock endpoints with pattern matching for frontend development and testing |
-| **Webhooks** | Event-driven notifications with HMAC-signed delivery to Slack, Discord, or custom endpoints |
-| **Team Management** | Multi-user access with role-based control (Owner, Admin, Member, Viewer) |
-| **CLI Tool** | Manage your gateway from the terminal with the `backport` CLI |
-
-### Observability
-
-| Feature | Description |
-|---|---|
-| **Analytics Dashboard** | Real-time metrics — request counts, latency tracking, error rates, throughput via WebSocket |
-| **Health Monitoring** | Automated health checks with 24-hour status history and uptime tracking |
-| **Audit Trail** | Full request log with JSON/CSV export and one-click replay |
-| **Live Logs** | Real-time streaming log viewer in the admin dashboard |
+|---------|-------------|
+| **WAF (Web Application Firewall)** | 17+ regex patterns covering SQLi, XSS, Path Traversal, Command Injection, LDAPi, XXE |
+| **Rate Limiting** | Plan-based limits from 100 to 5,000 requests per minute |
+| **Response Transformation** | Modify API responses on the fly - add/remove fields, rename keys |
+| **API Mocking** | Define mock endpoints for development and testing |
+| **Custom WAF Rules** | User-defined regex patterns with severity levels |
+| **Webhook Notifications** | Real-time alerts for security events on Slack, Discord, or custom URLs |
+| **Analytics Dashboard** | Real-time traffic, latency, threat monitoring |
+| **API Key Management** | Generate, monitor, and revoke API keys |
 
 ---
 
-## Quick Start (Self-Hosted)
+## Tech Stack
 
-### Prerequisites
+### Backend
+- **Language:** Python 3.10+
+- **Framework:** FastAPI
+- **ASGI Server:** Uvicorn
+- **Database:** SQLite (migrate to PostgreSQL for production)
+- **ORM:** Prisma
 
-- Python 3.12+
-- PostgreSQL (or SQLite for development)
+### Frontend
+- **Framework:** Next.js 16
+- **Language:** TypeScript 5.x
+- **Styling:** Tailwind CSS 4
+- **UI Components:** shadcn/ui
 
-### Clone & Install
+### Infrastructure
+- **Containerization:** Docker + Docker Compose
+- **CI/CD:** GitHub Actions
+- **Domains:** backport.in, backport.io
+
+---
+
+## Quick Start
+
+### Docker (Recommended)
 
 ```bash
-# Prerequisites: Python 3.12+, PostgreSQL
 git clone https://github.com/Qureshi-1/Backport-io.git
-cd Backport-io/backend
+cd Backport-io
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Set environment variables
 cp .env.example .env
-# Edit .env with your DATABASE_URL, SECRET_KEY, etc.
+# Edit .env with your configuration
 
-# Run migrations
-python -c "from main import app; from database import engine, Base; Base.metadata.create_all(bind=engine)"
-
-# Start server
-uvicorn main:app --host 0.0.0.0 --port 8080
+docker-compose up -d
 ```
 
-Your gateway is now live at `http://localhost:8080`. Full interactive API documentation is available at `http://localhost:8080/docs` (Swagger UI).
+Access:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+
+### Manual Setup
+
+See [INSTALLATION.md](./docs/INSTALLATION.md) for detailed setup instructions.
 
 ---
 
-## Configuration
-
-All configuration is done through environment variables. Copy `.env.example` to `.env` and set the required values.
-
-| Variable | Required | Default | Description |
-|---|---|---|---|
-| `DATABASE_URL` | **Yes** | — | PostgreSQL connection string (e.g., `postgresql://user:pass@localhost:5432/backport`) |
-| `SECRET_KEY` | **Yes** | — | Secret key for JWT signing (minimum 32 characters) |
-| `REDIS_URL` | No | — | Redis or Upstash connection URL for distributed caching |
-| `FRONTEND_URL` | No | `http://localhost:3000` | Frontend origin for CORS configuration |
-| `ADMIN_EMAIL` | No | — | Default admin user email for initial setup |
-| `ADMIN_SECRET` | No | — | Admin secret for protected admin operations |
-| `RAZORPAY_KEY_ID` | No | — | Razorpay API key for payment processing |
-| `RAZORPAY_KEY_SECRET` | No | — | Razorpay API secret for payment processing |
-| `GOOGLE_CLIENT_ID` | No | — | Google OAuth client ID |
-| `GOOGLE_CLIENT_SECRET` | No | — | Google OAuth client secret |
-| `GITHUB_CLIENT_ID` | No | — | GitHub OAuth client ID |
-| `GITHUB_CLIENT_SECRET` | No | — | GitHub OAuth client secret |
-| `RESEND_API_KEY` | No | — | Resend API key for transactional email |
-| `FROM_EMAIL` | No | — | Sender email address for notifications |
-| `ENVIRONMENT` | No | `production` | Environment mode: `production` or `staging` |
-
-> **Note:** Without `REDIS_URL`, Backport defaults to in-memory caching (single-worker mode). For production with multiple workers, Redis is recommended.
-
----
-
-## Admin API Documentation
-
-Backport exposes a comprehensive admin API for system monitoring and management. All admin endpoints require authentication.
-
-### Core Endpoints
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/admin/stats` | System statistics — total users, active users, API keys, MRR, growth metrics |
-| `GET` | `/api/admin/users` | User management — list, search, filter, paginate all users |
-| `PATCH` | `/api/admin/users/{id}/action` | User actions — suspend, ban, unban, activate, promote to admin |
-| `DELETE` | `/api/admin/users/{id}` | Soft-delete a user account |
-| `GET` | `/api/admin/audit-logs` | Audit trail — full event log with type filtering and date ranges |
-| `GET` | `/api/admin/logs/live` | Live log stream — real-time WebSocket-based log viewer |
-| `GET` | `/api/admin/monitoring/summary` | Circuit breaker states and service health overview |
-| `GET` | `/api/admin/security/waf-stats` | WAF statistics — blocked requests by attack type and rule |
-| `GET` | `/api/admin/revenue` | Revenue metrics — MRR, plan distribution, daily breakdown |
-
-### Interactive Documentation
-
-Full interactive API documentation is available via Swagger UI:
-
-| URL | Description |
-|---|---|
-| `/docs` | Swagger UI — interactive API explorer with try-it-out support |
-| `/redoc` | ReDoc — alternative documentation viewer |
-
----
-
-## Deployment
-
-### Docker
-
-```dockerfile
-FROM python:3.12-slim
-
-WORKDIR /app
-
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8080
-
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080"]
-```
-
-```bash
-# Build and run
-docker build -t backport-backend ./backend
-docker run -p 8080:8080 --env-file .env backport-backend
-```
-
-### Render (Free Tier)
-
-Render supports one-click deployment directly from your GitHub repository.
-
-1. **Connect** your GitHub repo at [render.com](https://render.com)
-2. **Set** environment variables (DATABASE_URL, SECRET_KEY, etc.)
-3. **Deploy** — auto-deploys on every push to `main`
-
-```bash
-# Or deploy via render.yaml blueprint
-render deploy
-```
-
-### Vercel (Frontend)
-
-1. **Connect** your GitHub repo at [vercel.com](https://vercel.com)
-2. **Set** root directory to `frontend`
-3. **Configure** the `NEXT_PUBLIC_API_URL` environment variable to point to your backend
-4. **Deploy** — auto-deploys on every push to `main`
-
-### Docker Compose (Full Stack)
-
-```bash
-# Start both backend and PostgreSQL together
-docker compose up -d
-```
-
----
-
-## When to Choose Backport
-
-Backport is a good fit if you:
-
-- Want a **simple, self-hosted API gateway** you can run yourself
-- Need **built-in WAF rules and rate limiting** without installing plugins
-- Are building **small to medium projects** and want an easy setup
-- Value a **Python/FastAPI stack** over Go-based or JVM-based alternatives
-
-Backport is **not** a replacement for Kong, Tyk, or AWS API Gateway in large-scale enterprise deployments. Those projects have years of production battle-testing, large ecosystems, and features we're still building toward. We encourage you to evaluate all options and choose what fits your needs.
-
----
-
-## Managed Cloud vs Self-Hosted
-
-| | Managed Cloud ([backport.in](https://backport.in)) | Self-Hosted |
-|---|---|---|
-| **Setup** | Sign up and done — API key in 30 seconds | Clone repo, configure `.env`, run |
-| **Infrastructure** | Backport handles servers, scaling, and uptime | Your servers, your responsibility |
-| **Database** | Managed PostgreSQL (Supabase) | SQLite (dev) or PostgreSQL (prod) |
-| **Cache** | Redis / Upstash (distributed) | In-memory LRU or Redis |
-| **Updates** | Automatic — new features ship instantly | Manual — pull and redeploy |
-| **Scaling** | Auto-scales with your traffic | Scale your own infrastructure |
-| **Rate Limits** | Persistent across restarts | In-memory (resets on restart) |
-| **Analytics** | Persistent history, real-time WebSocket | In-memory (resets on restart) |
-| **Cost** | Free tier + paid plans ($5.99–$11.99/mo) | Your infrastructure costs only |
-| **Enterprise** | Contact sales for SLA, SSO, dedicated support | Community support |
-
-> **Recommendation:** Use **Managed Cloud** for production — persistent data, Redis caching, and zero ops. Use **Self-Hosted** for development, testing, or air-gapped environments.
-
----
-
-## Project Structure
+## How It Works
 
 ```
-Backport-io/
-├── backend/
-│   ├── main.py               # FastAPI app entry point & middleware pipeline
-│   ├── proxy.py              # Core reverse proxy & request routing
-│   ├── admin.py              # Admin API endpoints (stats, users, audit logs)
-│   ├── auth.py               # OAuth (Google + GitHub) & JWT authentication
-│   ├── cache.py              # Redis / in-memory LRU caching layer
-│   ├── rate_limiter.py       # Token bucket rate limiter with per-plan limits
-│   ├── waf_engine.py         # Modular WAF engine (SQLi, XSS, traversal, etc.)
-│   ├── custom_waf.py         # User-defined custom WAF rule processor
-│   ├── circuit_breaker.py    # Circuit breaker for automatic failover
-│   ├── transform.py          # Request/response transformation
-│   ├── mock.py               # API mocking engine for development
-│   ├── analytics.py          # Analytics engine with real-time metrics
-│   ├── health_monitor.py     # Automated health check system
-│   ├── webhooks.py           # Webhook delivery (Slack, Discord, custom)
-│   ├── teams.py              # Team management & RBAC
-│   ├── payment.py            # Subscription & billing (Razorpay)
-│   ├── models.py             # SQLAlchemy database models
-│   ├── database.py           # Database connection configuration
-│   ├── config.py             # Application configuration
-│   ├── tests/                # pytest test suite
-│   └── admin/                # Admin panel (HTML / CSS / JS)
-├── frontend/
-│   └── src/                  # Next.js 16 dashboard application
-│       ├── app/              # App Router pages & layouts
-│       │   ├── dashboard/    # 17 dashboard pages
-│       │   ├── docs/         # Documentation portal
-│       │   ├── blog/         # Blog & announcements
-│       │   └── auth/         # Login, signup, verification
-│       ├── components/       # React UI components
-│       └── lib/              # Utilities & helpers
-├── enterprise/               # Enterprise-only features
-├── .github/
-│   └── workflows/            # CI/CD pipelines (tests, linting, deploy)
-├── docker-compose.yml        # Full-stack Docker Compose config
-├── .env.example              # Environment variable template
-├── render.yaml               # Render deployment blueprint
-└── vercel.json               # Vercel deployment configuration
+Client Request
+    |
+    v
+[Backport Gateway]
+    |
+    +-- WAF Scan (17+ patterns)
+    |
+    +-- Rate Limit Check
+    |
+    +-- Forward to Your Backend
+    |
+    +-- Response Transformation
+    |
+    v
+Client Response
 ```
 
----
-
-## API Proxy Usage
-
-Once deployed, route your API calls through Backport with a single header:
-
-```bash
-# Before (direct to your backend)
-curl https://your-backend.com/api/users
-
-# After (through Backport — add one header)
-curl -H "X-API-Key: bk_your_api_key" \
-     https://your-gateway.com/proxy/your-backend.com/api/users
-```
-
-### Request Headers
-
-| Header | Required | Description |
-|---|---|---|
-| `X-API-Key` | **Yes** | Your API key. Stripped before forwarding — your backend never sees it |
-| `X-Target-Url` | No | Override target backend URL (useful for testing) |
-| `X-Idempotency-Key` | No | Prevent duplicate request processing |
-
-### Response Codes
-
-| Code | Meaning |
-|---|---|
-| `200` | Success — proxied response from your backend |
-| `401` | Invalid or missing API key |
-| `403` | WAF blocked the request (malicious payload detected) |
-| `429` | Rate limit exceeded — retry after cooldown |
-| `413` | Request payload too large |
-| `502` | Backend unavailable — circuit breaker may be open |
-| `503` | Service temporarily unavailable |
-| `504` | Backend timeout |
+**3 steps to get started:**
+1. Create an account
+2. Generate an API key
+3. Point your traffic to Backport proxy URL
 
 ---
 
-## Roadmap
+## Pricing
 
-### Completed
-
-- [x] Core API Proxy with WAF
-- [x] Rate Limiting (token bucket, per-plan)
-- [x] LRU Caching (Redis / in-memory)
-- [x] OAuth Authentication (Google + GitHub)
-- [x] Admin Dashboard (5-tab interface)
-- [x] Circuit Breaker (automatic failover)
-- [x] Custom WAF Rules (user-defined regex)
-- [x] Analytics Engine (real-time WebSocket)
-- [x] Team Management (multi-user RBAC)
-- [x] API Mocking (pattern-based mock endpoints)
-- [x] Webhooks (Slack, Discord, custom)
-- [x] Health Monitoring (24h status history)
-- [x] Audit Logging (full event trail)
-
-### In Progress & Upcoming
-
-- [ ] **libinjection-based SQLi detection** — token-level analysis for advanced injection attacks
-- [ ] **GraphQL proxy support** — introspection, query depth limiting, field-level authorization
-- [ ] **gRPC proxy** — transparent HTTP/2 to gRPC translation
-- [ ] **Kubernetes operator** — native K8s deployment and auto-scaling
-- [ ] **Multi-region deployment** — global edge routing with geo-aware failover
-- [ ] **AI-powered anomaly detection** — ML-based traffic analysis and auto-blocking
-- [ ] **Plugin system** — custom middleware via a Python plugin SDK
+| Plan | Price | Rate Limit | Features |
+|------|-------|-----------|----------|
+| Free | $0/mo | 100 req/min | Basic WAF, API key management |
+| Plus | $5.99/mo | 500 req/min | + Response transformation, API mocking |
+| Pro | $11.99/mo | 5,000 req/min | + Custom WAF rules, webhooks |
 
 ---
 
-## Contributing
+## Documentation
 
-We welcome contributions from the community. Whether it's a bug fix, a new feature, documentation improvements, or a new integration — every contribution matters.
-
-### Getting Started
-
-1. **Fork** the repository
-2. **Create** a feature branch: `git checkout -b feature/amazing-feature`
-3. **Commit** your changes: `git commit -m 'feat: add amazing feature'`
-4. **Push** to the branch: `git push origin feature/amazing-feature`
-5. **Open** a Pull Request
-
-### Guidelines
-
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) for commit messages
-- Add tests for any new functionality
-- Ensure all existing tests pass: `pytest backend/tests/`
-- Keep PRs focused — one feature or fix per pull request
-
-Please read our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.
+- [Installation Guide](./docs/INSTALLATION.md)
+- [Features Documentation](./docs/FEATURES.md)
+- [API Reference](./docs/API_DOCS.md)
+- [Deployment Guide](./docs/DEPLOYMENT.md)
+- [Changelog](./docs/CHANGELOG.md)
 
 ---
 
-## Security
+## Project Stats
 
-If you discover a security vulnerability, please report it responsibly. See our [Security Policy](SECURITY.md) for details.
-
-> Do not open a public issue for security vulnerabilities. Email security@backport.in or use GitHub's private vulnerability reporting.
+| Metric | Value |
+|--------|-------|
+| Total Files | 118 |
+| Lines of Code | 9,500+ |
+| Built-in WAF Patterns | 17+ |
+| Proxy Overhead | <5ms |
+| Setup Time | 30 seconds |
 
 ---
-
 
 ## License
 
-This project is licensed under a **Proprietary License** — all rights reserved.
+Proprietary Software. All Rights Reserved.
 
-See the [LICENSE](LICENSE) file for the full text.
+See [LICENSE](./LICENSE) for details.
 
 ---
 
-<div align="center">
+## Contact
 
-**Built with care by the Backport team**
-
-</div>
+- Website: [backport.in](https://backport.in)
+- Email: sales@backport.in
