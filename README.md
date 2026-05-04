@@ -2,14 +2,14 @@
 
 # Backport.in
 
-**Open-Source API Gateway — Enterprise Security with Zero Code Changes**
+**API Gateway — Enterprise Security with Zero Code Changes**
 
 [🌐 Live Demo](https://backport.in) &middot;
 [📖 Docs](https://backport.in/docs) &middot;
 [🐛 Report Bug](https://github.com/Qureshi-1/Backport-io/issues/new?template=bug_report.yml)
 
 <p>
-  <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="MIT License" />
+  <img src="https://img.shields.io/badge/License-Proprietary-red?style=for-the-badge&logo=opensourceinitiative&logoColor=white" alt="Proprietary License" />
   &nbsp;
   <img src="https://img.shields.io/badge/Python-3.12-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python 3.12" />
   &nbsp;
@@ -32,14 +32,14 @@
 
 ## What is Backport?
 
-Backport is an **open-source API Gateway** that sits in front of any backend service. It provides security features, performance optimization, and observability — without requiring any SDK, code changes, or complex configuration. Point your API traffic through Backport to gain **WAF protection, rate limiting, intelligent caching, request analytics, circuit breakers, and more**.
+Backport is an **API Gateway** that sits in front of any backend service. It provides security features, performance optimization, and observability — without requiring any SDK, code changes, or complex configuration. Point your API traffic through Backport to gain **WAF protection, rate limiting, intelligent caching, request analytics, circuit breakers, and more**.
 
-> A self-hosted, MIT-licensed API gateway built with Python and FastAPI.
+> A self-hosted API gateway built with Python and FastAPI.
 
 ### Project Status
 
-- 🧪 **Early-stage project** — actively developed and open to feedback
-- 📜 **MIT licensed** — fully open source
+- 🧪 **Production-ready project** — actively developed
+- 📜 **Proprietary licensed** — all rights reserved
 - 🏠 **Self-hosted version** — ideal for development and small projects
 - ☁️ **Managed cloud** — available at [backport.in](https://backport.in) for production use
 
@@ -251,7 +251,6 @@ Backport is a good fit if you:
 
 - Want a **simple, self-hosted API gateway** you can run yourself
 - Need **built-in WAF rules and rate limiting** without installing plugins
-- Prefer an **MIT-licensed, fully open-source** solution
 - Are building **small to medium projects** and want an easy setup
 - Value a **Python/FastAPI stack** over Go-based or JVM-based alternatives
 
@@ -271,8 +270,8 @@ Backport is **not** a replacement for Kong, Tyk, or AWS API Gateway in large-sca
 | **Scaling** | Auto-scales with your traffic | Scale your own infrastructure |
 | **Rate Limits** | Persistent across restarts | In-memory (resets on restart) |
 | **Analytics** | Persistent history, real-time WebSocket | In-memory (resets on restart) |
-| **Cost** | Free tier + paid plans ($5.99–$11.99/mo) | Free (open source) — your infrastructure costs only |
-| **Enterprise** | Contact sales for SLA, SSO, dedicated support | Free (open source), community support |
+| **Cost** | Free tier + paid plans ($5.99–$11.99/mo) | Your infrastructure costs only |
+| **Enterprise** | Contact sales for SLA, SSO, dedicated support | Community support |
 
 > **Recommendation:** Use **Managed Cloud** for production — persistent data, Redis caching, and zero ops. Use **Self-Hosted** for development, testing, or air-gapped environments.
 
@@ -421,29 +420,10 @@ If you discover a security vulnerability, please report it responsibly. See our 
 
 ---
 
+
 ## License
 
-This project is licensed under the **MIT License**.
-
-```
-MIT License
-
-Copyright (c) 2024 Backport.io
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-```
+This project is licensed under a **Proprietary License** — all rights reserved.
 
 See the [LICENSE](LICENSE) file for the full text.
 
@@ -452,11 +432,5 @@ See the [LICENSE](LICENSE) file for the full text.
 <div align="center">
 
 **Built with care by the Backport team**
-
-[Star us on GitHub](https://github.com/Qureshi-1/Backport-io) — it helps the project grow!
-
-<a href="https://github.com/Qureshi-1/Backport-io">
-  <img src="https://img.shields.io/github/stars/Qureshi-1/Backport-io?style=social" alt="Stars" />
-</a>
 
 </div>
