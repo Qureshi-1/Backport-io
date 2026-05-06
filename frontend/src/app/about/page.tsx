@@ -84,10 +84,10 @@ export default function About() {
         {/* Source Code */}
         <h2 className="text-2xl font-bold text-white mt-16 mb-6">Open Source</h2>
         <p className="text-[#A2BDDB]/60 leading-relaxed mb-16">
-          Backport is 100% open-source under the MIT License. You can self-host it, modify it, and contribute to it. The full source code is available on{" "
-          <a href="https://github.com/Qureshi-1/Backport-io" target="_blank" rel="noopener noreferrer" className="text-[#04e184] hover:underline">
+          Backport is 100% open-source under the MIT License. You can self-host it, modify it, and contribute to it. The full source code is available on 
+          <Link href="https://github.com/Qureshi-1/Backport-io" className="text-[#04e184] hover:underline">
             GitHub
-          </a>.
+          </Link>.
         </p>
       </div>
       <Footer />

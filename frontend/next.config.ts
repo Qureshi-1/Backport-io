@@ -1,3 +1,4 @@
+import path from "path";
 import type { NextConfig } from "next";
 
 const securityHeaders = [
@@ -44,6 +45,9 @@ connectDomains.push(...connectDomains.filter(d => d.startsWith("https://")).map(
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  turbopack: {
+    root: path.resolve(process.cwd(), ".."),
+  },
   async headers() {
     return [
       {
