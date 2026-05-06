@@ -952,66 +952,38 @@ curl -X POST https://backport.in/api/user/mocks \\
                 className="text-2xl font-bold text-white"
                 style={{ fontFamily: 'var(--font-space-grotesk), "Space Grotesk", sans-serif' }}
               >
-                Deployment with Docker
+                Getting Started
               </h2>
             </div>
             <p className="text-[#A2BDDB]/60 mb-6 leading-relaxed">
-              Backport can be deployed using Docker and Docker Compose for full control over your infrastructure. This gives you the entire gateway stack running on your own servers.
-              Setup takes less than five minutes with the provided docker-compose configuration.
+              Backport is a managed cloud service — sign up, get your API key, and start protecting your backend in under 30 seconds. No infrastructure setup required.
+              The cloud handles everything — deployment, scaling, and monitoring — so you can focus on building your API.
             </p>
 
-            <h3 className="text-lg font-semibold text-white mb-4">Docker Compose setup</h3>
-            <CodeBlockRaw className="mb-6">{`# docker-compose.yml
-version: "3.8"
+            <h3 className="text-lg font-semibold text-white mb-4">Quick Setup</h3>
+            <CodeBlockRaw className="mb-6">{`# 1. Sign up at backport.in and create an account
 
-services:
-  backport:
-    image: ghcr.io/qureshi-1/backport:latest
-    ports:
-      - "3000:3000"
-    environment:
-      - DATABASE_URL=postgresql://user:pass@db:5432/backport
-      - JWT_SECRET=your-super-secret-jwt-key
-      - NEXT_PUBLIC_API_URL=http://localhost:3000
-      - REDIS_URL=redis://cache:6379
-      - NODE_ENV=production
-    depends_on:
-      - db
-      - cache
-    restart: unless-stopped
+# 2. Generate your API key from the dashboard
+# Your key will look like: bk_live_xxxxxxxxxxxx
 
-  db:
-    image: postgres:16-alpine
-    environment:
-      - POSTGRES_USER=user
-      - POSTGRES_PASSWORD=pass
-      - POSTGRES_DB=backport
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    restart: unless-stopped
+# 3. Point your traffic to Backport
+curl https://backport.in/proxy/your-endpoint \\
+  -H "X-API-Key: bk_live_xxxxxxxxxxxx"
 
-  cache:
-    image: redis:7-alpine
-    volumes:
-      - redisdata:/data
-    restart: unless-stopped
+# That's it — your API is now protected by WAF, rate limiting, and more!`}</CodeBlockRaw>
 
-volumes:
-  pgdata:
-  redisdata:`}</CodeBlockRaw>
-
-            <h3 className="text-lg font-semibold text-white mb-4">Environment variables</h3>
+            <h3 className="text-lg font-semibold text-white mb-4">Dashboard Configuration</h3>
             <div className="border border-white/[0.06] overflow-hidden rounded-xl mb-6">
               <div className="bg-white/[0.02] border-b border-white/[0.04] px-6 py-3 flex gap-8">
-                <span className="text-xs uppercase tracking-wider text-[#A2BDDB]/30 font-semibold">Variable</span>
+                <span className="text-xs uppercase tracking-wider text-[#A2BDDB]/30 font-semibold">Setting</span>
                 <span className="text-xs uppercase tracking-wider text-[#A2BDDB]/30 font-semibold">Description</span>
               </div>
               {[
-                { env: "DATABASE_URL", desc: "PostgreSQL connection string for persistent storage", color: "text-[#04e184]" },
-                { env: "JWT_SECRET", desc: "Secret key for signing JWT auth tokens — use a strong random string", color: "text-[#04e184]" },
-                { env: "NEXT_PUBLIC_API_URL", desc: "Public URL of your API gateway instance (used for CORS and email links)", color: "text-[#A2BDDB]" },
-                { env: "REDIS_URL", desc: "Redis connection string for caching and session storage", color: "text-[#A2BDDB]" },
-                { env: "NODE_ENV", desc: "Set to production for optimized builds, development for debugging", color: "text-[#A2BDDB]" },
+                { env: "Backend URL", desc: "Your upstream API URL that Backport proxies requests to", color: "text-[#04e184]" },
+                { env: "API Key", desc: "Generated from dashboard — authenticate all requests through Backport", color: "text-[#04e184]" },
+                { env: "WAF", desc: "Enable/disable Web Application Firewall (SQLi, XSS, path traversal protection)", color: "text-[#A2BDDB]" },
+                { env: "Rate Limiting", desc: "Set requests per minute based on your plan (100/500/5,000+)", color: "text-[#A2BDDB]" },
+                { env: "Caching", desc: "Enable LRU caching for GET requests to reduce backend load", color: "text-[#A2BDDB]" },
               ].map((row) => (
                 <div key={row.env} className="flex gap-8 items-center px-6 py-4 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.02] transition-colors">
                   <code className={`${row.color} bg-white/[0.04] px-2.5 py-1 font-mono text-xs w-44 flex-shrink-0 rounded-lg`}>{row.env}</code>
@@ -1019,15 +991,6 @@ volumes:
                 </div>
               ))}
             </div>
-
-            <CodeBlockRaw className="mb-6">{`# Start the gateway
-docker compose up -d
-
-# View logs
-docker compose logs -f backport
-
-# Stop the gateway
-docker compose down`}</CodeBlockRaw>
 
             <div className="bg-white/[0.02] border-l-2 border-[#FBBF24]/20 p-4 rounded-r-lg">
               <p className="text-[#A2BDDB]/50 text-sm">

@@ -32,57 +32,21 @@ Backport is an **open-source API gateway** that protects your backend with a pow
 
 ---
 
-## Quick Start (5 Minutes)
+## Quick Start (30 Seconds)
 
-### Option 1: Docker (Recommended - 2 minutes)
+### Sign up and start using Backport
+
+1. **Create your account** at [backport.in](https://backport.in)
+2. **Generate an API key** from the dashboard
+3. **Point your traffic** to Backport:
 
 ```bash
-# 1. Clone the repo
-git clone https://github.com/Qureshi-1/Backport-io.git
-cd Backport-io
-
-# 2. Copy environment file
-cp .env.example .env
-
-# 3. Start everything
-docker-compose up -d
-
-# 4. Access
-# Frontend: http://localhost:3000
-# Backend:  http://localhost:8000
+# That's it!
+curl https://backport.in/proxy/users \
+  -H "X-API-Key: bk_your_key_here"
 ```
 
-### Option 2: Manual Setup (5 minutes)
-
-**Backend:**
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # or venv\Scripts\activate on Windows
-pip install -r requirements.txt
-cp .env.example .env  # Edit DATABASE_URL and other vars
-python main.py
-# Backend runs on http://localhost:8000
-```
-
-**Frontend:**
-```bash
-cd frontend
-npm install
-cp .env.example .env.local  # Edit NEXT_PUBLIC_BACKEND_URL
-npm run dev
-# Frontend runs on http://localhost:3000
-```
-
-### Option 3: Cloud (Vercel + Render)
-
-1. Fork this repo
-2. Deploy frontend to [Vercel](https://vercel.com) — auto-detected
-3. Deploy backend to [Render](https://render.com) — select "Web Service"
-4. Set environment variables in both platforms
-5. Done!
-
-See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
+For Python, JavaScript, and other language examples, see the [API Reference](./docs/API_DOCS.md).
 
 ---
 

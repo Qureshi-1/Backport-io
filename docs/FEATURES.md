@@ -127,7 +127,7 @@ Full lifecycle management for API keys:
 - **No Backend Changes**: Add an `X-API-Key` header, that's it
 - **No DNS Changes**: Unlike Cloudflare, no domain DNS reconfiguration needed
 - **<5ms Overhead**: Minimal latency added to proxied requests
-- **Deployable**: Deploy on your own infrastructure or use managed hosting
+- **Deployable**: Managed cloud hosting — sign up and start using immediately
 
 ---
 
