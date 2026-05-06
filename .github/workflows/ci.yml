@@ -2,12 +2,12 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches-ignore: [main]
   pull_request:
     # Run on all PRs regardless of target branch
   workflow_call:
     # Allow this workflow to be called by deploy workflows
-    
+
 
 concurrency:
   group: ci-${{ github.ref }}-${{ github.event_name == 'push' && 'push' || github.event_name == 'pull_request' && 'pr' || 'call' }}
@@ -152,15 +152,15 @@ jobs:
     steps:
       - name: Check all jobs passed
         run: |
-          if [[ "${{ needs.backend-lint.result }}" != "success" || \
-                "${{ needs.backend-tests.result }}" != "success" || \
-                "${{ needs.frontend-checks.result }}" != "success" || \
-                "${{ needs.cli-build.result }}" != "success" ]]; then
-            echo "::error::One or more CI jobs failed"
-            echo "  backend-lint:    ${{ needs.backend-lint.result }}"
-            echo "  backend-tests:   ${{ needs.backend-tests.result }}"
-            echo "  frontend-checks: ${{ needs.frontend-checks.result }}"
-            echo "  cli-build:       ${{ needs.cli-build.result }}"
-            exit 1
-          fi
+          RESULTS=(${{ needs.backend-lint.result }} ${{ needs.backend-tests.result }} ${{ needs.frontend-checks.result }} ${{ needs.cli-build.result }})
+          for r in "${RESULTS[@]}"; do
+            if [[ "$r" == "failure" ]]; then
+              echo "::error::One or more CI jobs failed"
+              echo "  backend-lint:    ${{ needs.backend-lint.result }}"
+              echo "  backend-tests:   ${{ needs.backend-tests.result }}"
+              echo "  frontend-checks: ${{ needs.frontend-checks.result }}"
+              echo "  cli-build:       ${{ needs.cli-build.result }}"
+              exit 1
+            fi
+          done
           echo "All CI checks passed!"
