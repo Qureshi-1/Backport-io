@@ -12,7 +12,7 @@ Backport is an open-source API gateway and reverse proxy designed to sit in fron
 
 ### Is Backport really free?
 
-Yes. The core open-source project is released under the **MIT License**, which means you can self-host it forever — for personal projects, in production, or within your organization — at no cost. There is also a managed cloud offering at `backport.in` that includes a free 3-month trial period, after which paid plans are available for users who prefer a fully managed experience without the overhead of self-hosting.
+Yes. The core open-source project is released under the **MIT License**. The managed cloud at `backport.in` includes a free 3-month trial period, after which paid plans are available. All source code is available on GitHub for review and contributions.
 
 ### Do I need to change my backend code?
 
@@ -26,15 +26,9 @@ Cloudflare is primarily a CDN and DNS provider that sits at the edge of your net
 
 Kong is a powerful enterprise API gateway built on top of NGINX/OpenResty, typically deployed within Kubernetes clusters and managed by dedicated DevOps teams. It has a steep learning curve and requires infrastructure investment. Backport is built on **Python (FastAPI)** and is designed to be lightweight — you can go from zero to running in under 30 seconds with a single `docker-compose up` command. Backport prioritizes developer experience with a web-based dashboard, one-click configuration for WAF and rate limiting, and no Kubernetes requirement. For teams that need enterprise-grade complexity, Kong is a solid choice; for everyone else, Backport gets the job done with far less friction.
 
-### Can I self-host Backport?
+### Can I run Backport on my own infrastructure?
 
-Absolutely. Backport is designed for easy self-hosting with three deployment options:
-
-- **Docker Compose (2 minutes):** Clone the repo and run `docker-compose up`. Everything — backend, frontend, and database — starts together.
-- **Manual setup (5 minutes):** Install Python 3.10+, set your environment variables, install dependencies with `pip install -r requirements.txt`, and run the FastAPI server.
-- **Vercel + Render (10 minutes):** Deploy the Next.js frontend to Vercel and the FastAPI backend to Render for a fully serverless, zero-maintenance setup.
-
-All configuration is done through environment variables and the web dashboard — no config files to edit manually.
+Backport is a managed cloud service — sign up and start using it immediately without any infrastructure setup. The full source code is MIT-licensed and available on GitHub for review, auditing, and contributions.
 
 ---
 
@@ -134,7 +128,7 @@ client.Do(req)
 Yes, there are two approaches:
 
 - **Direct proxy URL:** Use the Backport proxy URL as-is (e.g., `https://backport.in/proxy/your-path`). This is the fastest option and requires no DNS changes.
-- **Custom domain (CNAME):** Point a subdomain (e.g., `api.yoursite.com`) to Backport using a CNAME record. On the managed cloud, custom domains are configured from the dashboard under Settings → Domains. For self-hosted setups, you can place Backport behind your own reverse proxy (NGINX, Caddy) and map it to any domain you control.
+- **Custom domain (CNAME):** Point a subdomain (e.g., `api.yoursite.com`) to Backport using a CNAME record. Custom domains are configured from the dashboard under Settings → Domains.
 
 ### How do I enable the WAF?
 
@@ -172,11 +166,11 @@ Backport's managed cloud offers four tiers designed to scale with your usage:
 | **Pro** | 5,000 req/min | $79/mo | Growing startups, high-traffic applications |
 | **Enterprise** | Unlimited | Custom | Large organizations, compliance requirements |
 
-All plans include full access to WAF, rate limiting, caching, response transformation, API mocking, webhooks, and analytics. The primary differentiator is the request throughput limit. Self-hosted users have no artificial rate limits — your throughput is bounded only by your own infrastructure.
+All plans include full access to WAF, rate limiting, caching, response transformation, API mocking, webhooks, and analytics. The primary differentiator is the request throughput limit.
 
 ### Can I cancel anytime?
 
-Yes. There are no long-term contracts or lock-in periods. You can cancel your subscription at any time from the dashboard (Settings → Billing → Cancel Plan). When you cancel, your plan remains active until the end of the current billing period, after which your account reverts to the Free tier. Your data, API keys, and configuration are preserved — you can upgrade again at any time without losing anything. If you're self-hosting, there is nothing to cancel — you own the software outright under the MIT license.
+Yes. There are no long-term contracts or lock-in periods. You can cancel your subscription at any time from the dashboard (Settings → Billing → Cancel Plan). When you cancel, your plan remains active until the end of the current billing period, after which your account reverts to the Free tier. Your data, API keys, and configuration are preserved — you can upgrade again at any time without losing anything.
 
 ### Do you have overage charges?
 

@@ -124,11 +124,11 @@ const features: { label: string; backport: CellValue; kong: CellValue; tyk: Cell
     cloudflare: { text: "Free (limited)", kind: "neutral" },
   },
   {
-    label: "Self-Host Option",
-    backport: { text: "Self-host + Cloud", kind: "highlight" },
+    label: "Cloud-Managed",
+    backport: { text: "Managed Cloud", kind: "highlight" },
     kong: { text: "Self-host + Enterprise", kind: "partial" },
     tyk: { text: "Self-host + Cloud", kind: "partial" },
-    cloudflare: { text: "Cloud only", kind: "no" },
+    cloudflare: { text: "Cloud only", kind: "yes" },
   },
 ];
 
@@ -274,7 +274,7 @@ export default function ComparePage() {
               },
               {
                 title: "MIT licensed — free forever",
-                desc: "Self-host with unlimited requests. No feature gating, no enterprise paywalls for core functionality. The full source code is available on GitHub.",
+                desc: "MIT licensed open-source project. Full source code available on GitHub. No feature gating, no enterprise paywalls for core functionality.",
                 accent: true,
               },
               {
@@ -315,8 +315,8 @@ export default function ComparePage() {
               <span className="text-[#04e184]">30 Seconds</span>
             </h2>
             <p className="text-[#A2BDDB]/50 mb-8 max-w-md mx-auto leading-relaxed">
-              Free plan available. No credit card required. Self-host or use the
-              cloud — your choice.
+              Free plan available. No credit card required. Get started in
+              seconds.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

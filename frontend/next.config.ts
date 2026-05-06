@@ -36,7 +36,7 @@ const connectDomains = [
   apiUrl,
   "https://api.razorpay.com",
 ];
-// Add user-specified extra domains (for self-hosting, append comma-separated URLs)
+// Add user-specified extra domains (comma-separated URLs for additional API endpoints)
 if (additionalConnectDomains) {
   connectDomains.push(...additionalConnectDomains.split(",").map(d => d.trim()).filter(Boolean));
 }

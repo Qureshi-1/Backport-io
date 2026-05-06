@@ -27,7 +27,7 @@ export default function About() {
 
         <div className="bg-[#04e184]/[0.04] border border-[#04e184]/10 px-5 py-4 rounded-xl mb-16">
           <p className="text-[#A2BDDB]/60 text-sm">
-            <strong className="text-[#04e184]">Backport is open-source and production-ready.</strong> It is actively maintained, and available for self-hosting with full source code on GitHub. Check the{" "}
+            <strong className="text-[#04e184]">Backport is open-source and production-ready.</strong> It is actively maintained with full source code on GitHub. Check the{" "}
             <Link href="/changelog" className="text-[#04e184] hover:underline">changelog</Link> for what&apos;s new.
           </p>
         </div>
@@ -84,7 +84,7 @@ export default function About() {
         {/* Source Code */}
         <h2 className="text-2xl font-bold text-white mt-16 mb-6">Open Source</h2>
         <p className="text-[#A2BDDB]/60 leading-relaxed mb-16">
-          Backport is 100% open-source under the MIT License. You can self-host it, modify it, and contribute to it. The full source code is available on 
+          Backport is 100% open-source under the MIT License. The full source code is available on 
           <Link href="https://github.com/Qureshi-1/Backport-io" className="text-[#04e184] hover:underline">
             GitHub
           </Link>.

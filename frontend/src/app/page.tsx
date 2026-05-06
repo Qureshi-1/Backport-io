@@ -512,7 +512,7 @@ export default function Home() {
     },
     {
       q: "Is this production-ready?",
-      a: "Backport is production-ready. Self-host with Docker for free, forever — no limits, no trial. The managed cloud tier includes a free 3-month trial with full API gateway features.",
+      a: "Backport is production-ready with a free 3-month trial. The managed cloud includes full API gateway features — WAF, rate limiting, caching, response transformation, and analytics.",
     },
   ];
 
@@ -715,16 +715,16 @@ export default function Home() {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">Get Started in 30 Seconds</h2>
           <p className="text-[#A2BDDB]/50 mb-10 text-center max-w-2xl mx-auto">
-            Self-host Backport with Docker. No signup required. No limits.
+            Sign up, get your API key, and point your traffic to Backport. No credit card required.
           </p>
           <div className="bg-[#0c1017] border border-white/[0.06] rounded-xl p-6 font-mono text-sm overflow-x-auto">
-            <div className="text-[#A2BDDB]/40 mb-3"># Clone and start</div>
-            <div><span className="text-[#89ddff]">git clone</span> https://github.com/Qureshi-1/Backport-io.git</div>
-            <div><span className="text-[#89ddff]">cd</span> Backport-io</div>
-            <div><span className="text-[#89ddff]">cp</span> .env.example .env</div>
-            <div className="mt-3"><span className="text-[#89ddff]">docker-compose</span> up -d</div>
-            <div className="mt-3 text-[#A2BDDB]/40"># Frontend: http://localhost:3000</div>
-            <div className="text-[#A2BDDB]/40"># Backend:  http://localhost:8000</div>
+            <div className="text-[#A2BDDB]/40 mb-3"># 1. Create your account</div>
+            <div>Sign up at <span className="text-[#04e184]">backport.in</span></div>
+            <div className="mt-3 text-[#A2BDDB]/40"># 2. Generate an API key from the dashboard</div>
+            <div>Your key: <span className="text-[#c3e88d]">bk_live_xxxxxxxxxxxx</span></div>
+            <div className="mt-3 text-[#A2BDDB]/40"># 3. Point your traffic</div>
+            <div><span className="text-[#89ddff]">curl</span> https://backport.in/proxy/users \</div>
+            <div>  -H <span className="text-[#c3e88d]">"X-API-Key: bk_live_xxxxxxxxxxxx"</span></div>
           </div>
         </div>
       </section>
@@ -742,7 +742,7 @@ export default function Home() {
               </h2>
               <p className="text-[#A2BDDB]/50 text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
                 Backport is and will always be open source. No feature gates, no telemetry, no vendor lock-in. 
-                Self-host with unlimited requests, or use the managed cloud. The choice is yours.
+                The full source code is available on GitHub for review and contributions.
               </p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link

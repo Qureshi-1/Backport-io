@@ -24,7 +24,7 @@
 
 ## What is Backport?
 
-Backport is an **open-source API gateway** that protects your backend with a powerful WAF, rate limiting, caching, response transformation, and API mocking. No SDK required. No code changes needed. MIT Licensed. Self-host or use the cloud.
+Backport is an **open-source API gateway** that protects your backend with a powerful WAF, rate limiting, caching, response transformation, and API mocking. No SDK required. No code changes needed. MIT Licensed.
 
 **Point your clients to Backport. That's it.**
 
@@ -104,7 +104,7 @@ See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
                  └─────────────────────────────────────────────┘
 
                  Deploy: Docker (2 min) | Vercel + Render | Any VPS
-                 License: MIT | Self-host free forever | No vendor lock-in
+                 License: MIT | No vendor lock-in | Open Source
 ```
 
 ## Video Tutorial
@@ -202,7 +202,7 @@ Client Response
 ```
 
 **3 steps to get started:**
-1. Sign up (or self-host)
+1. Sign up at [backport.in](https://backport.in)
 2. Generate an API key
 3. Point your traffic to Backport proxy URL
 
@@ -238,22 +238,20 @@ const data = await res.json();
 
 ---
 
-## Self-Hosting
+## Deployment
 
-Backport is designed to be easy to self-host. You get full control over your data, no vendor lock-in, and unlimited requests.
+Backport is a managed cloud service — sign up and start using it immediately. No infrastructure to set up or maintain.
 
-| Method | Time | Difficulty |
-|--------|------|-----------|
-| Docker Compose | 2 min | Easy |
-| Manual (Python + Node) | 5 min | Easy |
-| Vercel + Render | 10 min | Easy |
-| VPS with Docker | 15 min | Medium |
+| Platform | Purpose |
+|----------|--------|
+| Vercel | Frontend hosting |
+| Render | Backend API |
 
-See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for step-by-step guides for each method.
+See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
 
 ---
 
-## Pricing (Cloud)
+## Pricing
 
 | Plan | Price | Rate Limit | Features |
 |------|-------|-----------|----------|
@@ -262,7 +260,7 @@ See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for step-by-step guides for each metho
 | Pro | $11.99/mo | 5,000 req/min | + Custom WAF rules, webhooks |
 | Enterprise | Custom | Unlimited | + SLA, team features, dedicated support |
 
-**Self-hosted?** Unlimited everything. Free forever. MIT License.
+**Open Source:** MIT Licensed. Contribute on [GitHub](https://github.com/Qureshi-1/Backport-io).
 
 ---
 

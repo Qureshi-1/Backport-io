@@ -1,6 +1,6 @@
 # Troubleshooting
 
-Common issues and their solutions for self-hosted and cloud users of Backport. If you don't find your issue here, check the [API Reference](./api-reference.md) or open an issue on GitHub.
+Common issues and their solutions for Backport cloud users. If you don't find your issue here, check the [API Reference](./api-reference.md) or open an issue on GitHub.
 
 ---
 
@@ -56,7 +56,7 @@ Backport cannot connect to your backend server. This means the proxy received yo
 
 2. **Ensure your backend is running and healthy.** Try making a direct request to your backend URL (bypassing Backport) using `curl` or your browser. If it's down, start or restart your backend service.
 
-3. **Check for CORS issues on your backend.** If your backend returns CORS headers, ensure it accepts requests from Backport's domain. For self-hosted setups, Backport typically forwards from the same origin, so CORS should not be an issue — but if your backend explicitly whitelists origins, you may need to add Backport's URL.
+3. **Check for CORS issues on your backend.** If your backend returns CORS headers, ensure it accepts requests from Backport's domain (`backport.in`). If your backend explicitly whitelists origins, you may need to add Backport's URL.
 
 4. **Check network connectivity.** If your backend is on a private network, ensure the machine running Backport can reach it. Test with `curl` from the Backport server itself.
 
@@ -91,7 +91,7 @@ Requests are being rejected with an authentication error despite providing your 
 
 4. **Check for typos.** API keys are long strings — copy and paste directly from the dashboard rather than typing manually. Watch for trailing whitespace or missing characters.
 
-5. **Verify the key matches the environment.** If you're using both a cloud instance and a self-hosted instance, remember that API keys are not shared between them. Each instance maintains its own key store.
+5. **Verify the key matches the environment.** API keys are environment-specific. If you have multiple Backport instances, remember that each maintains its own key store.
 
 ---
 
@@ -111,7 +111,7 @@ Your frontend application is failing to make requests to the Backport proxy due 
 
    Separate multiple origins with commas. Include the protocol (`https://`) and do not add a trailing slash.
 
-2. **For self-hosted setups**, check that your backend framework (Express, FastAPI, Django, etc.) has CORS middleware configured to accept the origin of your frontend application.
+2. **Check your backend framework** (Express, FastAPI, Django, etc.) has CORS middleware configured to accept the origin of your frontend application.
 
 3. **Verify the proxy is forwarding CORS headers.** Backport forwards CORS headers from your backend by default. If your backend doesn't set CORS headers, the browser will block the response. You can configure Backport to inject CORS headers by adding them in the response transformation rules.
 
@@ -220,7 +220,7 @@ Requests through Backport are taking noticeably longer than direct backend acces
 
 4. **Monitor the circuit breaker.** If your backend is intermittently failing, the circuit breaker may be routing traffic through a degraded path. Check Dashboard → Monitoring for circuit breaker status and review any open circuits.
 
-5. **Check network latency.** If you're self-hosting Backport on a different server/region than your backend, geographic distance adds latency. Co-locate Backport and your backend in the same region for optimal performance.
+5. **Check network latency.** If your backend is hosted in a different region, geographic distance adds latency. Co-locate your backend and use Backport's cloud for optimal performance.
 
 ---
 
