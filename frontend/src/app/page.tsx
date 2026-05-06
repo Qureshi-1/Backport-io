@@ -724,7 +724,7 @@ export default function Home() {
             <div>Your key: <span className="text-[#c3e88d]">bk_live_xxxxxxxxxxxx</span></div>
             <div className="mt-3 text-[#A2BDDB]/40"># 3. Point your traffic</div>
             <div><span className="text-[#89ddff]">curl</span> https://backport.in/proxy/users \</div>
-            <div>  -H <span className="text-[#c3e88d]">"X-API-Key: bk_live_xxxxxxxxxxxx"</span></div>
+            <div>  -H <span className="text-[#c3e88d]">&quot;X-API-Key: bk_live_xxxxxxxxxxxx&quot;</span></div>
           </div>
         </div>
       </section>
