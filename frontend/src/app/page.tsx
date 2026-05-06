@@ -512,7 +512,7 @@ export default function Home() {
     },
     {
       q: "Is this production-ready?",
-      a: "Backport offers a free 3-month trial with full API gateway features. Start protecting your APIs in under 30 seconds.",
+      a: "Backport is production-ready. Self-host with Docker for free, forever — no limits, no trial. The managed cloud tier includes a free 3-month trial with full API gateway features.",
     },
   ];
 
@@ -610,6 +610,16 @@ export default function Home() {
         </div>
 
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
+          {/* Category Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0 }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#04e184]/20 bg-[#04e184]/[0.06] mb-6"
+          >
+            <span className="text-[#04e184] text-sm font-medium">Open-Source API Gateway</span>
+          </motion.div>
+
           {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
@@ -654,7 +664,7 @@ export default function Home() {
               className="text-[#A2BDDB] hover:text-white px-8 py-3.5 rounded-xl font-semibold border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 flex items-center gap-2"
             >
               <GithubIcon className="w-4 h-4" />
-              View on GitHub
+              Star on GitHub
             </Link>
           </motion.div>
         </div>
@@ -668,7 +678,7 @@ export default function Home() {
           <p className="text-xs text-[#A2BDDB]/25 uppercase tracking-[0.2em] font-medium mb-8">Why developers choose Backport</p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { title: "Full Control", desc: "Enterprise-grade API security with transparent pricing. Your data stays yours." },
+              { title: "Full Control", desc: "Production-grade API security with transparent pricing. Your data stays yours." },
               { title: "30-Second Setup", desc: "Sign up, get your API key, point your traffic. Done." },
               { title: "Built for APIs", desc: "Not a generic CDN. Purpose-built for API protection and management." },
             ].map((item) => (
@@ -697,6 +707,25 @@ export default function Home() {
               <div className="text-xs sm:text-sm text-[#A2BDDB]/40">{stat.label}</div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* Quick Start */}
+      <section className="py-20 px-6">
+        <div className="max-w-4xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">Get Started in 30 Seconds</h2>
+          <p className="text-[#A2BDDB]/50 mb-10 text-center max-w-2xl mx-auto">
+            Self-host Backport with Docker. No signup required. No limits.
+          </p>
+          <div className="bg-[#0c1017] border border-white/[0.06] rounded-xl p-6 font-mono text-sm overflow-x-auto">
+            <div className="text-[#A2BDDB]/40 mb-3"># Clone and start</div>
+            <div><span className="text-[#89ddff]">git clone</span> https://github.com/Qureshi-1/Backport-io.git</div>
+            <div><span className="text-[#89ddff]">cd</span> Backport-io</div>
+            <div><span className="text-[#89ddff]">cp</span> .env.example .env</div>
+            <div className="mt-3"><span className="text-[#89ddff]">docker-compose</span> up -d</div>
+            <div className="mt-3 text-[#A2BDDB]/40"># Frontend: http://localhost:3000</div>
+            <div className="text-[#A2BDDB]/40"># Backend:  http://localhost:8000</div>
+          </div>
         </div>
       </section>
 
@@ -1228,7 +1257,7 @@ export default function Home() {
               </Link>
             </div>
             <p className="text-xs text-[#A2BDDB]/20 mt-6">
-              Enterprise-grade &middot; 30-Second Setup &middot; No Vendor Lock-in
+              Production-grade &middot; 30-Second Setup &middot; No Vendor Lock-in
             </p>
           </FadeIn>
         </div>

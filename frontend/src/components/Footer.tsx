@@ -158,7 +158,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-white/[0.04] py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[#A2BDDB]/20">
-            &copy; {new Date().getFullYear()} Backport. All rights reserved.
+            &copy; {new Date().getFullYear()} Backport. MIT License. Open Source.
           </p>
           <div className="flex items-center gap-4">
             <p className="text-xs text-[#A2BDDB]/15">

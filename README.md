@@ -2,9 +2,11 @@
 
 # ⚡ Backport
 
-### Open-Source API Gateway with Built-in WAF
+### Open-Source API Gateway — WAF, Rate Limiting, Caching & Analytics
 
-[Website](https://backport.in) · [Live Demo](https://backport.in) · [Documentation](./docs) · [Compare](https://backport.in/compare) · [Community](https://github.com/Qureshi-1/Backport-io/discussions)
+**Shield your API in 30 seconds. Zero code changes. MIT Licensed.**
+
+[Website](https://backport.in) · [Documentation](https://backport.in/docs) · [Compare](https://backport.in/compare) · [Community](https://github.com/Qureshi-1/Backport-io/discussions) · [Live Demo](https://backport.in)
 
 <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python">
 <img src="https://img.shields.io/badge/FastAPI-Latest-009688.svg" alt="FastAPI">
@@ -13,6 +15,7 @@
 <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4.svg" alt="Tailwind CSS">
 <img src="https://img.shields.io/badge/Docker-Ready-2496ED.svg" alt="Docker">
 <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+<img src="https://img.shields.io/badge/CI-All_Passed-success.svg" alt="CI">
 <img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome">
 
 </div>
@@ -83,11 +86,30 @@ See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
 
 ---
 
+## Architecture
+
+```
+┌──────────┐     ┌─────────────────────────────────────────────┐     ┌──────────────┐
+│  Client   │────>│              Backport Gateway               │────>│   Backend    │
+│  (Any)    │     │                                             │     │  (Your API)  │
+└──────────┘     │  ┌─────────┐ ┌─────┐ ┌──────┐ ┌─────┐ ┌───┐│     └──────────────┘
+                 │  │API Key  │→│ WAF │→│ Rate │→│Cache│→│API││
+                 │  │  Auth   │ │Scan │ │Limit │ │Check│ │Mock││
+                 │  └─────────┘ └─────┘ └──────┘ └─────┘ └───┘│
+                 │                                             │
+                 │  ┌──────────────┐ ┌────────────────────┐    │
+                 │  │  Transform   │ │  Webhooks & Alerts │    │
+                 │  │  Responses   │ │  (Slack/Discord)   │    │
+                 │  └──────────────┘ └────────────────────┘    │
+                 └─────────────────────────────────────────────┘
+
+                 Deploy: Docker (2 min) | Vercel + Render | Any VPS
+                 License: MIT | Self-host free forever | No vendor lock-in
+```
+
 ## Video Tutorial
 
-🎥 **Coming Soon** — A step-by-step video walkthrough of setting up Backport from zero to protecting your first API endpoint.
-
-In the meantime, follow the Quick Start above or check the [interactive docs](https://backport.in/docs).
+🎥 **Video coming soon!** In the meantime, follow the Quick Start above or check the [interactive docs](https://backport.in/docs) — setup takes under 2 minutes with Docker.
 
 ---
 

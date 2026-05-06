@@ -1031,10 +1031,10 @@ docker compose down`}</CodeBlockRaw>
 
             <div className="bg-white/[0.02] border-l-2 border-[#FBBF24]/20 p-4 rounded-r-lg">
               <p className="text-[#A2BDDB]/50 text-sm">
-                <strong className="text-[#FBBF24]">License:</strong> Backport is released under a{" "}
-                <strong className="text-white">Proprietary License</strong>. For deployment and licensing details, contact{" "}
-                <a href="mailto:sales@backport.in" className="text-[#04e184] underline underline-offset-2">
-                  sales@backport.in
+                <strong className="text-[#FBBF24]">License:</strong> Backport is open-source under the{" "}
+                <strong className="text-white">MIT License</strong>. View the full license on{" "}
+                <a href="https://github.com/Qureshi-1/Backport-io/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="text-[#04e184] underline underline-offset-2">
+                  GitHub
                 </a>.
               </p>
             </div>
