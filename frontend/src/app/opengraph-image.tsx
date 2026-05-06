@@ -62,7 +62,7 @@ export default async function Image() {
                   textTransform: "uppercase",
                 }}
               >
-                Enterprise API Gateway
+                Open-Source API Gateway
               </span>
             </div>
 
@@ -172,7 +172,7 @@ export default async function Image() {
               <div style={{ display: "flex", gap: 12 }}>
                 {[
                   { value: "<5ms", label: "OVERHEAD", color: "#2CE8C3" },
-                  { value: "PRO", label: "LICENSE", color: "#6BA9FF" },
+                  { value: "MIT", label: "LICENSE", color: "#6BA9FF" },
                   { value: "17+", label: "WAF RULES", color: "#EF4444" },
                 ].map((stat) => (
                   <div
@@ -206,7 +206,7 @@ export default async function Image() {
         >
           <div style={{ height: 3, width: 120, borderRadius: 2, background: "linear-gradient(90deg, #2CE8C3, #6BA9FF)" }} />
           <span style={{ fontSize: 13, color: "rgba(162,189,219,0.35)" }}>
-            Enterprise API Gateway · WAF · No SDK Required · 30 Second Setup
+            Open-Source API Gateway · MIT License · WAF · No SDK Required
           </span>
         </div>
       </div>

@@ -700,6 +700,45 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════════════
+          OPEN SOURCE + GITHUB
+      ═══════════════════════════════════════════════════ */}
+      <section className="py-16 sm:py-20 px-6 border-t border-white/[0.04]">
+        <div className="max-w-3xl mx-auto text-center">
+          <FadeIn>
+            <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8 sm:p-12">
+              <GithubIcon className="w-8 h-8 mx-auto mb-4 text-white/80" />
+              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+                100% Open Source. MIT Licensed.
+              </h2>
+              <p className="text-[#A2BDDB]/50 text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
+                Backport is and will always be open source. No feature gates, no telemetry, no vendor lock-in. 
+                Self-host with unlimited requests, or use the managed cloud. The choice is yours.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+                <Link
+                  href="https://github.com/Qureshi-1/Backport-io"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/[0.15] text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
+                >
+                  <GithubIcon className="w-4 h-4" />
+                  Star on GitHub
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/compare"
+                  className="inline-flex items-center gap-2 text-[#A2BDDB]/50 hover:text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
+                >
+                  Compare with Kong &amp; Tyk
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+            </div>
+          </FadeIn>
+        </div>
+      </section>
+
       {/* ═══════════════════════════════════════════════════════════════
           CLOUDFLARE COMPARISON
       ═══════════════════════════════════════════════════════════════ */}

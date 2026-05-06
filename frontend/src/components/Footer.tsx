@@ -24,6 +24,7 @@ const FOOTER_LINKS = [
     title: "Resources",
     links: [
       { name: "Blog", href: "/blog" },
+      { name: "Compare", href: "/compare" },
       { name: "API Reference", href: "/docs#proxy-endpoint" },
       { name: "Setup Guide", href: "/setup-guide" },
       { name: "Community", href: "https://github.com/Qureshi-1/Backport-io/discussions", external: true },

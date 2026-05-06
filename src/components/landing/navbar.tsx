@@ -29,7 +29,7 @@ export function Navbar() {
               <FileText className="w-4 h-4 text-white" />
             </div>
             <span className="text-xl font-bold text-foreground">
-              Invoice<span className="text-emerald-600">Flow</span>
+              Back<span className="text-emerald-600">port</span>
             </span>
           </Link>
 

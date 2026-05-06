@@ -14,6 +14,7 @@ const GITHUB_SVG = (
 const NAV_ITEMS = [
   { href: "/#features", label: "Features" },
   { href: "/#pricing", label: "Pricing" },
+  { href: "/compare", label: "Compare" },
   { href: "/docs", label: "Docs" },
   { href: "/blog", label: "Blog" },
   { href: "/changelog", label: "Changelog" },
@@ -83,6 +84,9 @@ export default function Header() {
           </div>
           <span className="text-base font-bold tracking-tight text-white">
             Backport
+          </span>
+          <span className="hidden sm:inline-flex items-center px-2 py-0.5 rounded-md bg-white/[0.04] border border-white/[0.08] text-[10px] font-bold uppercase tracking-wider text-[#A2BDDB]/40">
+            Open Source
           </span>
         </Link>
 

@@ -3,10 +3,10 @@
 import { FileText } from 'lucide-react'
 
 const footerLinks = {
-  Product: ['Features', 'Pricing', 'Integrations', 'API', 'Changelog'],
-  Company: ['About', 'Blog', 'Careers', 'Press', 'Contact'],
-  Resources: ['Documentation', 'Help Center', 'Community', 'Templates', 'Status'],
-  Legal: ['Privacy Policy', 'Terms of Service', 'Cookie Policy', 'GDPR'],
+  Product: ['Features', 'Pricing', 'Documentation', 'Changelog'],
+  Resources: ['Blog', 'API Reference', 'Setup Guide', 'Community'],
+  Company: ['About', 'GitHub', 'Contact'],
+  Legal: ['Privacy Policy', 'Terms of Service'],
 }
 
 export function Footer() {
@@ -20,11 +20,11 @@ export function Footer() {
                 <FileText className="w-4 h-4 text-white" />
               </div>
               <span className="text-xl font-bold">
-                Invoice<span className="text-emerald-600">Flow</span>
+                Back<span className="text-emerald-600">port</span>
               </span>
             </div>
             <p className="text-sm text-muted-foreground max-w-xs mb-6">
-              The smartest way to create, send, and track invoices. Get paid faster with AI-powered billing.
+              Open-source API gateway with WAF, rate limiting, caching, and response transformation. Protect your API in 30 seconds.
             </p>
             <div className="flex gap-4">
               {['X', 'Li', 'Gh', 'Yt'].map((social) => (
@@ -60,7 +60,7 @@ export function Footer() {
 
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} InvoiceFlow. All rights reserved.
+            © {new Date().getFullYear()} Backport. Open Source under MIT License.
           </p>
           <p className="text-sm text-muted-foreground">
             Made with 💚 for businesses worldwide

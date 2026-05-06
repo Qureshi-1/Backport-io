@@ -4,7 +4,7 @@
 
 ### Open-Source API Gateway with Built-in WAF
 
-[Website](https://backport.in) · [Live Demo](https://backport.in) · [Documentation](./docs) · [Community](https://github.com/Qureshi-1/Backport-io/discussions)
+[Website](https://backport.in) · [Live Demo](https://backport.in) · [Documentation](./docs) · [Compare](https://backport.in/compare) · [Community](https://github.com/Qureshi-1/Backport-io/discussions)
 
 <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python">
 <img src="https://img.shields.io/badge/FastAPI-Latest-009688.svg" alt="FastAPI">
@@ -250,7 +250,10 @@ See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for step-by-step guides for each metho
 - [Features Documentation](./docs/FEATURES.md) — All features explained
 - [API Reference](./docs/API_DOCS.md) — Full endpoint documentation
 - [Deployment Guide](./docs/DEPLOYMENT.md) — 4 deployment options
+- [FAQ](./docs/FAQ.md) — Frequently asked questions
+- [Troubleshooting](./docs/TROUBLESHOOTING.md) — Common issues and fixes
 - [Changelog](./docs/CHANGELOG.md) — Release notes
+- [Compare](https://backport.in/compare) — Backport vs Kong vs Tyk vs Cloudflare
 
 ---
 
