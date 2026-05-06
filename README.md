@@ -1,10 +1,10 @@
 <div align="center">
 
-# Backport
+# ⚡ Backport
 
-### Enterprise-Grade API Gateway with Built-in WAF
+### Open-Source API Gateway with Built-in WAF
 
-[Website](https://backport.in) &middot; [Live Demo](https://backport.in) &middot; [Documentation](./docs)
+[Website](https://backport.in) · [Live Demo](https://backport.in) · [Documentation](./docs) · [Community](https://github.com/Qureshi-1/Backport-io/discussions)
 
 <img src="https://img.shields.io/badge/Python-3.10+-blue.svg" alt="Python">
 <img src="https://img.shields.io/badge/FastAPI-Latest-009688.svg" alt="FastAPI">
@@ -12,7 +12,8 @@
 <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6.svg" alt="TypeScript">
 <img src="https://img.shields.io/badge/Tailwind_CSS-4-06B6D4.svg" alt="Tailwind CSS">
 <img src="https://img.shields.io/badge/Docker-Ready-2496ED.svg" alt="Docker">
-<img src="https://img.shields.io/badge/License-Proprietary-red.svg" alt="License">
+<img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+<img src="https://img.shields.io/badge/PRs-Welcome-brightgreen.svg" alt="PRs Welcome">
 
 </div>
 
@@ -20,18 +21,80 @@
 
 ## What is Backport?
 
-Backport is an API gateway that protects your backend with a powerful WAF, rate limiting, caching, response transformation, and API mocking. No SDK required. No code changes needed.
+Backport is an **open-source API gateway** that protects your backend with a powerful WAF, rate limiting, caching, response transformation, and API mocking. No SDK required. No code changes needed. MIT Licensed. Self-host or use the cloud.
 
-Point your clients to Backport. That's it.
+**Point your clients to Backport. That's it.**
 
 **Live Demo:** [backport.in](https://backport.in) - Try the interactive WAF demo on the homepage.
+
+---
+
+## Quick Start (5 Minutes)
+
+### Option 1: Docker (Recommended - 2 minutes)
+
+```bash
+# 1. Clone the repo
+git clone https://github.com/Qureshi-1/Backport-io.git
+cd Backport-io
+
+# 2. Copy environment file
+cp .env.example .env
+
+# 3. Start everything
+docker-compose up -d
+
+# 4. Access
+# Frontend: http://localhost:3000
+# Backend:  http://localhost:8000
+```
+
+### Option 2: Manual Setup (5 minutes)
+
+**Backend:**
+```bash
+cd backend
+python -m venv venv
+source venv/bin/activate  # or venv\Scripts\activate on Windows
+pip install -r requirements.txt
+cp .env.example .env  # Edit DATABASE_URL and other vars
+python main.py
+# Backend runs on http://localhost:8000
+```
+
+**Frontend:**
+```bash
+cd frontend
+npm install
+cp .env.example .env.local  # Edit NEXT_PUBLIC_BACKEND_URL
+npm run dev
+# Frontend runs on http://localhost:3000
+```
+
+### Option 3: Cloud (Vercel + Render)
+
+1. Fork this repo
+2. Deploy frontend to [Vercel](https://vercel.com) — auto-detected
+3. Deploy backend to [Render](https://render.com) — select "Web Service"
+4. Set environment variables in both platforms
+5. Done!
+
+See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for detailed instructions.
+
+---
+
+## Video Tutorial
+
+🎥 **Coming Soon** — A step-by-step video walkthrough of setting up Backport from zero to protecting your first API endpoint.
+
+In the meantime, follow the Quick Start above or check the [interactive docs](https://backport.in/docs).
 
 ---
 
 ## Screenshots
 
 ### Landing Page
-Backport's marketing website features a modern design with live WAF demo, pricing table, and Cloudflare comparison.
+Backport's website features a live WAF demo, pricing table, and Cloudflare comparison — all open-source.
 
 ### Dashboard
 Full management dashboard with real-time analytics, API key management, and security monitoring.
@@ -49,13 +112,18 @@ Real-time traffic charts, latency heatmaps, slow endpoint detection, and threat 
 | Feature | Description |
 |---------|-------------|
 | **WAF (Web Application Firewall)** | 17+ regex patterns covering SQLi, XSS, Path Traversal, Command Injection, LDAPi, XXE |
-| **Rate Limiting** | Plan-based limits from 100 to 5,000 requests per minute |
-| **Response Transformation** | Modify API responses on the fly - add/remove fields, rename keys |
+| **Rate Limiting** | Sliding-window limits from 100 to 5,000+ requests per minute by plan |
+| **Response Transformation** | Modify API responses on the fly — add/remove fields, rename keys |
 | **API Mocking** | Define mock endpoints for development and testing |
 | **Custom WAF Rules** | User-defined regex patterns with severity levels |
 | **Webhook Notifications** | Real-time alerts for security events on Slack, Discord, or custom URLs |
 | **Analytics Dashboard** | Real-time traffic, latency, threat monitoring |
 | **API Key Management** | Generate, monitor, and revoke API keys |
+| **LRU Caching** | In-memory cache for GET requests with configurable TTL |
+| **Idempotency Keys** | Prevent duplicate POST/PUT/PATCH requests (perfect for payments) |
+| **Team Management** | Invite team members, manage roles and permissions |
+| **Health Monitoring** | Automated backend health checks with alerting |
+| **Audit Logging** | Track all changes and actions across your account |
 
 ---
 
@@ -65,43 +133,23 @@ Real-time traffic charts, latency heatmaps, slow endpoint detection, and threat 
 - **Language:** Python 3.10+
 - **Framework:** FastAPI
 - **ASGI Server:** Uvicorn
-- **Database:** SQLite (migrate to PostgreSQL for production)
-- **ORM:** Prisma
+- **Database:** PostgreSQL (production) / SQLite (development)
+- **ORM:** SQLAlchemy
+- **HTTP Client:** httpx (async, connection pooling)
 
 ### Frontend
 - **Framework:** Next.js 16
 - **Language:** TypeScript 5.x
 - **Styling:** Tailwind CSS 4
 - **UI Components:** shadcn/ui
+- **Animations:** Framer Motion
 
 ### Infrastructure
 - **Containerization:** Docker + Docker Compose
 - **CI/CD:** GitHub Actions
+- **Frontend Hosting:** Vercel
+- **Backend Hosting:** Render
 - **Domains:** backport.in, backport.io
-
----
-
-## Quick Start
-
-### Docker (Recommended)
-
-```bash
-git clone https://github.com/Qureshi-1/Backport-io.git
-cd Backport-io
-
-cp .env.example .env
-# Edit .env with your configuration
-
-docker-compose up -d
-```
-
-Access:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
-
-### Manual Setup
-
-See [INSTALLATION.md](./docs/INSTALLATION.md) for detailed setup instructions.
 
 ---
 
@@ -113,42 +161,96 @@ Client Request
     v
 [Backport Gateway]
     |
+    +-- API Key Authentication
+    |
     +-- WAF Scan (17+ patterns)
     |
-    +-- Rate Limit Check
+    +-- Rate Limit Check (sliding window)
+    |
+    +-- Idempotency Check
+    |
+    +-- Cache Check (LRU, optional)
     |
     +-- Forward to Your Backend
     |
-    +-- Response Transformation
+    +-- Response Transformation (optional)
     |
     v
 Client Response
 ```
 
 **3 steps to get started:**
-1. Create an account
+1. Sign up (or self-host)
 2. Generate an API key
 3. Point your traffic to Backport proxy URL
 
 ---
 
-## Pricing
+## Example Usage
+
+### cURL
+```bash
+curl https://backport.in/proxy/users \
+  -H "X-API-Key: bk_your_key_here"
+```
+
+### Python
+```python
+import requests
+
+resp = requests.get(
+    "https://backport.in/proxy/users",
+    headers={"X-API-Key": "bk_your_key"}
+)
+print(resp.json())
+```
+
+### JavaScript
+```javascript
+const res = await fetch(
+  "https://backport.in/proxy/users",
+  { headers: { "X-API-Key": "bk_your_key" } }
+);
+const data = await res.json();
+```
+
+---
+
+## Self-Hosting
+
+Backport is designed to be easy to self-host. You get full control over your data, no vendor lock-in, and unlimited requests.
+
+| Method | Time | Difficulty |
+|--------|------|-----------|
+| Docker Compose | 2 min | Easy |
+| Manual (Python + Node) | 5 min | Easy |
+| Vercel + Render | 10 min | Easy |
+| VPS with Docker | 15 min | Medium |
+
+See [DEPLOYMENT.md](./docs/DEPLOYMENT.md) for step-by-step guides for each method.
+
+---
+
+## Pricing (Cloud)
 
 | Plan | Price | Rate Limit | Features |
 |------|-------|-----------|----------|
-| Free | $0/mo | 100 req/min | Basic WAF, API key management |
+| Free | $0/mo | 100 req/min | Basic WAF, API key management, 3-month trial |
 | Plus | $5.99/mo | 500 req/min | + Response transformation, API mocking |
 | Pro | $11.99/mo | 5,000 req/min | + Custom WAF rules, webhooks |
+| Enterprise | Custom | Unlimited | + SLA, team features, dedicated support |
+
+**Self-hosted?** Unlimited everything. Free forever. MIT License.
 
 ---
 
 ## Documentation
 
-- [Installation Guide](./docs/INSTALLATION.md)
-- [Features Documentation](./docs/FEATURES.md)
-- [API Reference](./docs/API_DOCS.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [Changelog](./docs/CHANGELOG.md)
+- [Installation Guide](./docs/INSTALLATION.md) — Docker + manual setup
+- [Features Documentation](./docs/FEATURES.md) — All features explained
+- [API Reference](./docs/API_DOCS.md) — Full endpoint documentation
+- [Deployment Guide](./docs/DEPLOYMENT.md) — 4 deployment options
+- [Changelog](./docs/CHANGELOG.md) — Release notes
 
 ---
 
@@ -161,12 +263,24 @@ Client Response
 | Built-in WAF Patterns | 17+ |
 | Proxy Overhead | <5ms |
 | Setup Time | 30 seconds |
+| License | MIT |
+
+---
+
+## Contributing
+
+Contributions are welcome! Here's how you can help:
+
+1. **Bug Reports** — [Open an issue](https://github.com/Qureshi-1/Backport-io/issues)
+2. **Feature Requests** — Start a [discussion](https://github.com/Qureshi-1/Backport-io/discussions)
+3. **Pull Requests** — Fork, branch, commit, PR. Keep it small and focused.
+4. **Security** — Report vulnerabilities privately via email
 
 ---
 
 ## License
 
-Proprietary Software. All Rights Reserved.
+MIT License — free for personal and commercial use.
 
 See [LICENSE](./LICENSE) for details.
 
@@ -175,4 +289,6 @@ See [LICENSE](./LICENSE) for details.
 ## Contact
 
 - Website: [backport.in](https://backport.in)
-- Email: sales@backport.in
+- GitHub: [Qureshi-1/Backport-io](https://github.com/Qureshi-1/Backport-io)
+- Email: support@backportio.com
+- Twitter: [@backportio](https://x.com/backportio)

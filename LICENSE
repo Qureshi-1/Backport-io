@@ -1,30 +1,21 @@
-BACKPORT - PROPRIETARY SOFTWARE LICENSE
+MIT License
 
-Copyright (c) 2026 Suhail Qureshi. All Rights Reserved.
+Copyright (c) 2026 Suhail Qureshi
 
-This software and associated documentation files (the "Software") are the 
-proprietary and confidential property of Suhail Qureshi.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-RESTRICTIONS:
-1. The Software may not be copied, modified, distributed, or sublicensed 
-   without the express written permission of the copyright holder.
-2. The source code may not be reverse-engineered, decompiled, or disassembled.
-3. This license does not grant any rights to use the trademarks, trade names, 
-   or service marks associated with the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-WHAT IS INCLUDED:
-- Full source code of Backport (Backend + Frontend)
-- Docker configuration and deployment scripts
-- CI/CD pipeline configurations
-- All associated documentation
-
-DOMAINS (sold separately):
-- backport.in
-- backport.io
-
-DISCLAIMER:
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-
-Contact: sales@backport.in
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

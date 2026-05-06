@@ -75,6 +75,7 @@ const item = {
 
 export default function DashboardOverview() {
   const { user: contextUser } = useUser();
+  const router = useRouter();
   const [user, setUser] = useState<Record<string, unknown> | null>(null);
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [stats, setStats] = useState<AnalyticsStats | null>(null);
@@ -85,6 +86,17 @@ export default function DashboardOverview() {
   const [requestsLastMinute, setRequestsLastMinute] = useState(0);
   const wsRef = useRef<WebSocket | null>(null);
   const pollingRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Auto-redirect to onboarding for new users (no backend URL configured)
+  useEffect(() => {
+    if (contextUser && !contextUser.target_backend_url && !loading) {
+      // Only redirect on first visit, not when user dismisses onboarding
+      const hasVisitedOnboarding = sessionStorage.getItem('backport_onboarding_done');
+      if (!hasVisitedOnboarding) {
+        router.push('/dashboard/onboarding');
+      }
+    }
+  }, [contextUser, loading, router]);
 
   const fetchAllData = useCallback(async () => {
     try {
@@ -440,7 +452,11 @@ export default function DashboardOverview() {
                 <h2 className="text-sm font-bold text-white tracking-wider uppercase">Getting Started</h2>
               </div>
               <p className="text-sm text-[#A2BDDB]/50 mb-6 sm:mb-8">
-                Complete these steps to start protecting your API.
+                Complete these steps to start protecting your API. Or follow the{" "}
+                <Link href="/dashboard/onboarding" className="text-[#04e184] hover:underline">
+                  guided setup wizard
+                </Link>
+                .
               </p>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">

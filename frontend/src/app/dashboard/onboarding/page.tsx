@@ -136,6 +136,15 @@ export default function OnboardingPage() {
           <p className="text-sm text-[#A2BDDB]/60">
             Get your API gateway up and running in 3 steps.
           </p>
+          <button
+            onClick={() => {
+              sessionStorage.setItem('backport_onboarding_done', 'true');
+              router.push("/dashboard");
+            }}
+            className="text-xs text-[#A2BDDB]/30 hover:text-[#A2BDDB]/60 transition-colors mt-1"
+          >
+            Skip setup for now
+          </button>
         </div>
 
         {/* Progress indicator */}
@@ -411,7 +420,10 @@ export default function OnboardingPage() {
                     Back
                   </button>
                   <button
-                    onClick={() => router.push("/dashboard")}
+                    onClick={() => {
+                      sessionStorage.setItem('backport_onboarding_done', 'true');
+                      router.push("/dashboard");
+                    }}
                     className="flex items-center gap-2 bg-[#04e184] hover:bg-white text-black font-semibold px-5 py-2.5 rounded-lg text-sm transition-all min-h-[44px]"
                   >
                     Go to Dashboard

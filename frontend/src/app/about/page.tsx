@@ -4,9 +4,9 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "About Backport — Enterprise-Grade API Gateway",
+  title: "About Backport — Open-Source API Gateway",
   description:
-    "Backport is an enterprise-grade API gateway providing WAF, rate limiting, caching, response transformation, and analytics — with zero code changes.",
+    "Backport is an open-source API gateway providing WAF, rate limiting, caching, response transformation, and analytics — with zero code changes.",
 };
 
 export default function About() {
@@ -22,12 +22,12 @@ export default function About() {
 
         <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">About Backport</h1>
         <p className="text-lg text-[#A2BDDB]/50 mb-12 max-w-2xl leading-relaxed">
-          Backport is an API gateway built for developers who need enterprise-grade protection and performance — without the enterprise complexity.
+          Backport is an open-source API gateway built for developers who need production-grade protection and performance — without the enterprise complexity.
         </p>
 
         <div className="bg-[#04e184]/[0.04] border border-[#04e184]/10 px-5 py-4 rounded-xl mb-16">
           <p className="text-[#A2BDDB]/60 text-sm">
-            <strong className="text-[#04e184]">Backport is production-ready.</strong> It is actively maintained, and production-ready with enterprise-grade security. Check the{" "}
+            <strong className="text-[#04e184]">Backport is open-source and production-ready.</strong> It is actively maintained, and available for self-hosting with full source code on GitHub. Check the{" "}
             <Link href="/changelog" className="text-[#04e184] hover:underline">changelog</Link> for what&apos;s new.
           </p>
         </div>
@@ -38,7 +38,7 @@ export default function About() {
           Adding API gateway features shouldn&apos;t mean deploying heavy infrastructure like Kong or AWS API Gateway, or writing complex middleware. Backport was built to solve this — a lightweight reverse proxy that you can set up in under a minute, giving your backend production-grade protection instantly.
         </p>
         <p className="mb-6 leading-relaxed text-[#A2BDDB]/60">
-          Every request passes through a comprehensive security pipeline — WAF inspection, rate limiting, cache checks, response transformation, and idempotency guards — before reaching your origin server. Your backend stays untouched while gaining enterprise-grade protection and acceleration.
+          Every request passes through a comprehensive security pipeline — WAF inspection, rate limiting, cache checks, response transformation, and idempotency guards — before reaching your origin server. Your backend stays untouched while gaining production-grade protection and acceleration.
         </p>
 
         {/* Production Infrastructure */}
@@ -50,7 +50,7 @@ export default function About() {
             { label: "Database", value: "PostgreSQL" },
             { label: "Payments", value: "Razorpay" },
             { label: "Email", value: "Resend" },
-            { label: "License", value: "Proprietary — Enterprise" },
+            { label: "License", value: "MIT (Open Source)" },
           ].map((item) => (
             <div key={item.label} className="p-4 rounded-xl border border-white/[0.06] bg-white/[0.02]">
               <div className="text-xs uppercase tracking-wider text-[#A2BDDB]/30 mb-1">{item.label}</div>
@@ -82,9 +82,9 @@ export default function About() {
         </ul>
 
         {/* Source Code */}
-        <h2 className="text-2xl font-bold text-white mt-16 mb-6">Source Code</h2>
+        <h2 className="text-2xl font-bold text-white mt-16 mb-6">Open Source</h2>
         <p className="text-[#A2BDDB]/60 leading-relaxed mb-16">
-          Backport is built with enterprise-grade security and performance. Learn more on{" "}
+          Backport is 100% open-source under the MIT License. You can self-host it, modify it, and contribute to it. The full source code is available on{" "
           <a href="https://github.com/Qureshi-1/Backport-io" target="_blank" rel="noopener noreferrer" className="text-[#04e184] hover:underline">
             GitHub
           </a>.

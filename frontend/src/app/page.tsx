@@ -688,7 +688,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {[
             { value: "17+", label: "WAF Patterns" },
-            { value: "99.9%", label: "Uptime SLA" },
+            { value: "MIT", label: "Open Source" },
             { value: "<5ms", label: "Overhead" },
             { value: "30s", label: "Setup Time" },
           ].map((stat) => (

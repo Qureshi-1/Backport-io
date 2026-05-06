@@ -109,7 +109,7 @@ export default function Footer() {
               <span className="text-base font-bold text-white">Backport</span>
             </Link>
             <p className="text-[#A2BDDB]/30 text-sm leading-relaxed max-w-xs mb-6">
-              Enterprise-grade API gateway with WAF, rate limiting, caching, response transformation, and analytics. Protect your backend without the complexity.
+              Open-source API gateway with WAF, rate limiting, caching, response transformation, and analytics. Self-host or use the cloud. Protect your backend without the complexity.
             </p>
             <div className="flex gap-3">
               <a
@@ -161,7 +161,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <p className="text-xs text-[#A2BDDB]/15">
-              Enterprise-grade API Gateway
+              Open-Source API Gateway
             </p>
             <a
               href="#"

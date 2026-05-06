@@ -116,8 +116,8 @@ export default function Terms() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-3">9. Source Code</h2>
-            <p className="leading-relaxed text-[#A2BDDB]/50">The Backport software is proprietary and confidential. Unauthorized copying, distribution, or modification is prohibited. For source code access inquiries, contact <a href="mailto:sales@backport.in" className="text-[#04e184] hover:underline">sales@backport.in</a>.</p>
+            <h2 className="text-2xl font-semibold text-white mb-3">9. Open Source License</h2>
+            <p className="leading-relaxed text-[#A2BDDB]/50">Backport is open-source software released under the <strong className="text-white">MIT License</strong>. You are free to use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the software. The full license text is available on <a href="https://github.com/Qureshi-1/Backport-io/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" className="text-[#04e184] hover:underline">GitHub</a>. The hosted cloud service at backport.in is provided separately and is governed by these Terms of Service.</p>
           </section>
 
           <section>

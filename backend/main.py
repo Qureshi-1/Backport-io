@@ -54,7 +54,7 @@ app = FastAPI(
     docs_url=_docs_url,
     redoc_url=_redoc_url,
     contact={"name": "Backport", "url": "https://backport.in", "email": "support@backportio.com"},
-    license_info={"name": "Proprietary", "url": "https://backport.in/terms"},
+    license_info={"name": "MIT", "url": "https://github.com/Qureshi-1/Backport-io/blob/main/LICENSE"},
 )
 
 @app.on_event("startup")
