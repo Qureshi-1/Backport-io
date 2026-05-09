@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  output: "standalone",
-  transpilePackages: ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "troika-three-text"],
-=======
 import path from "path";
 import type { NextConfig } from "next";
 
@@ -52,9 +45,10 @@ connectDomains.push(...connectDomains.filter(d => d.startsWith("https://")).map(
 
 const nextConfig: NextConfig = {
   output: "standalone",
-  turbopack: {
-    root: path.resolve(process.cwd(), ".."),
-  },
+  transpilePackages: ["three", "@react-three/fiber", "@react-three/drei", "@react-three/postprocessing", "troika-three-text"],
+  // turbopack: {
+  //   root: path.resolve(process.cwd(), ".."),
+  // },
   async headers() {
     return [
       {
@@ -77,7 +71,6 @@ const nextConfig: NextConfig = {
       },
     ];
   },
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 };
 
 export default nextConfig;

@@ -1,12 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import Link from "next/link";
-import { 
-  Shield, Twitter, Github, Linkedin, Youtube, 
-  ArrowUpRight, Globe
-} from "lucide-react";
-=======
 import React, { useState } from "react";
 import Link from "next/link";
 import { Shield, ArrowRight } from "lucide-react";
@@ -16,18 +9,11 @@ const GITHUB_SVG = (
     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
   </svg>
 );
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 const FOOTER_LINKS = [
   {
     title: "Product",
     links: [
-<<<<<<< HEAD
-       { name: "Overview", href: "/#features" },
-       { name: "Pricing", href: "/#pricing" },
-       { name: "Documentation", href: "/docs" }
-    ]
-=======
       { name: "Features", href: "/#features" },
       { name: "Pricing", href: "/#pricing" },
       { name: "Documentation", href: "/docs" },
@@ -43,87 +29,10 @@ const FOOTER_LINKS = [
       { name: "Setup Guide", href: "/setup-guide" },
       { name: "Community", href: "https://github.com/Qureshi-1/Backport-io/discussions", external: true },
     ],
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
   },
   {
     title: "Company",
     links: [
-<<<<<<< HEAD
-       { name: "About", href: "/about" },
-       { name: "Careers", href: "/careers" }
-    ]
-  },
-  {
-    title: "Support",
-    links: [
-       { name: "Help Center", href: "/help" },
-       { name: "System Status", href: "/status" }
-    ]
-  }
-];
-
-export default function Footer() {
-  return (
-    <footer className="bg-[#080C10] py-24 px-6 border-t border-white/5 relative overflow-hidden">
-      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-full h-[300px] bg-radial-mint opacity-10 pointer-events-none" />
-      
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between gap-20 lg:gap-8 pb-20 border-b border-white/5">
-        <div className="md:w-1/3 space-y-8">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="bg-[#2CE8C3] p-1.5 rounded-lg shadow-lg shadow-[#2CE8C3]/20">
-                <Shield className="w-5 h-5 text-black" fill="currentColor" />
-              </div>
-              <span className="font-headline text-2xl font-black tracking-tighter text-white">
-                BACKPORT<span className="text-[#2CE8C3]">.IO</span>
-              </span>
-            </Link>
-            <p className="font-body text-[#A2BDDB] text-base leading-relaxed max-w-sm">
-              The modern infrastructure for secure, high-performance backends. Armed by global edge intelligence.
-            </p>
-            <div className="flex gap-4">
-               {[Twitter, Github, Linkedin, Youtube].map((Icon, i) => (
-                 <a key={i} href="#" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-zinc-400 hover:text-[#2CE8C3] hover:border-[#2CE8C3]/40 transition-all duration-300 transform-gpu hover:-translate-y-1">
-                   <Icon className="w-5 h-5" />
-                 </a>
-               ))}
-            </div>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-24 flex-1">
-           {FOOTER_LINKS.map(sec => (
-             <div key={sec.title} className="space-y-6">
-                <h4 className="font-headline text-[10px] uppercase tracking-[0.4em] font-black text-white/50">{sec.title}</h4>
-                <ul className="space-y-4">
-                  {sec.links.map(l => (
-                    <li key={l.name}>
-                       <Link 
-                        href={l.href}
-                        className="font-body text-sm font-medium text-[#A2BDDB] hover:text-[#6BA9FF] transition-colors flex items-center gap-2 group"
-                       >
-                         {l.name}
-                         <ArrowUpRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all" />
-                       </Link>
-                    </li>
-                  ))}
-                </ul>
-             </div>
-           ))}
-        </div>
-      </div>
-
-      <div className="mt-12 flex flex-col md:flex-row items-center justify-between gap-8 pt-8 text-[10px] font-headline font-semibold text-[#A2BDDB]/40 uppercase tracking-[0.3em]">
-          <div className="flex items-center gap-3">
-             <div className="w-2 h-2 rounded-full bg-[#2CE8C3] pulse-glow" />
-             BACKPORT_NETWORK_LIVE // v0.4.1_ESTABLISHED
-          </div>
-          <div className="flex items-center gap-12">
-             <p>&copy; 2026 Backport Labs, Inc.</p>
-             <div className="flex items-center gap-2 hover:text-[#2CE8C3] cursor-pointer transition-colors">
-                <Globe className="w-3 h-3" />
-                ENGLISH (GLOBAL)
-             </div>
-          </div>
-=======
       { name: "About", href: "/about" },
       { name: "GitHub", href: "https://github.com/Qureshi-1/Backport-io", external: true },
       { name: "Contact", href: "/about" },
@@ -153,7 +62,6 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#080C10] border-t border-white/[0.06]">
-      {/* Newsletter Section */}
       <div className="border-b border-white/[0.04]">
         <div className="max-w-7xl mx-auto px-6 py-16 sm:py-20">
           <div className="max-w-2xl mx-auto text-center">
@@ -189,10 +97,8 @@ export default function Footer() {
         </div>
       </div>
 
-      {/* Main Footer */}
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 md:grid-cols-12 gap-10 py-16">
-          {/* Brand */}
           <div className="col-span-2 md:col-span-4">
             <Link href="/" className="flex items-center gap-2.5 mb-5">
               <div className="bg-[#04e184] p-1.5 rounded-lg">
@@ -223,7 +129,6 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Link columns */}
           {FOOTER_LINKS.map((section) => (
             <div key={section.title} className="md:col-span-2">
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-white/20 mb-4">
@@ -246,7 +151,6 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Bottom Bar */}
         <div className="border-t border-white/[0.04] py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-[#A2BDDB]/20">
             &copy; {new Date().getFullYear()} Backport. MIT License. Open Source.
@@ -268,7 +172,6 @@ export default function Footer() {
             </a>
           </div>
         </div>
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
       </div>
     </footer>
   );

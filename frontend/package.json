@@ -1,11 +1,6 @@
 {
-<<<<<<< HEAD
-  "name": "bb",
-  "version": "0.1.0",
-=======
   "name": "backport-frontend",
   "version": "1.2.0",
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -14,51 +9,33 @@
     "lint": "eslint"
   },
   "dependencies": {
-<<<<<<< HEAD
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/three": "^0.183.1",
-    "animejs": "^4.3.6",
-    "clsx": "^2.1.1",
-    "framer-motion": "^12.34.4",
-    "gsap": "^3.14.2",
-=======
     "animejs": "^3.2.2",
     "clsx": "^2.1.1",
     "framer-motion": "^12.34.4",
     "gsap": "^3.15.0",
     "lottie-react": "^2.4.1",
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
     "lucide-react": "^0.575.0",
-    "next": "^16.2.1",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
+    "next": "15.1.0",
+    "react": "19.0.0",
+    "react-dom": "19.0.0",
     "react-hot-toast": "^2.6.0",
     "recharts": "^3.7.0",
-<<<<<<< HEAD
     "tailwind-merge": "^3.5.0",
     "three": "^0.183.2",
     "troika-three-text": "^0.52.4"
   },
   "devDependencies": {
-    "@netlify/plugin-nextjs": "^5.3.3",
-=======
-    "tailwind-merge": "^3.5.0"
-  },
-  "devDependencies": {
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
     "@tailwindcss/postcss": "^4",
     "@types/animejs": "^3.1.13",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.1.6",
+    "eslint-config-next": "15.1.0",
     "tailwindcss": "^4",
-<<<<<<< HEAD
-    "typescript": "^5"
-=======
-    "typescript": "^5.9.3"
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
+    "typescript": "^5.7.0"
   }
 }

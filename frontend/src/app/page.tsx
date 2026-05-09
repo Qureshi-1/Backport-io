@@ -1,285 +1,5 @@
 "use client";
 
-<<<<<<< HEAD
-import React, { useState, useEffect, useRef } from "react";
-import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Zap, Shield, Cpu, Activity, ArrowRight, Play, Check, 
-  Terminal, Globe, Lock, Code2, Layers, Server, Sparkles, 
-  ChevronRight, Command, Database, BarChart3, AlertTriangle, Blocks
-} from "lucide-react";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
-
-// ─── REAL BACKPORT FEATURES ─────────────────────────────────────
-const FEATURES = [
-  {
-    title: "Global Edge WAF",
-    desc: "Analyze and block malicious traffic at the edge before it ever reaches your origin server.",
-    icon: Shield,
-    color: "#2CE8C3",
-    size: "large",
-  },
-  {
-    title: "Instant Rate Limiting",
-    desc: "Prevent API abuse and brute-force attacks with sub-millisecond global precision.",
-    icon: Activity,
-    color: "#6BA9FF",
-    size: "medium",
-  },
-  {
-    title: "Global API Cache",
-    desc: "Serve dynamic responses from the edge with smart invalidation and 99.9% hit rates.",
-    icon: Zap,
-    color: "#A2BDDB",
-    size: "small",
-  },
-  {
-    title: "DDoS Protection",
-    desc: "Automatically mitigate Layer 7 attacks in real-time across our distributed network layer.",
-    icon: Lock,
-    color: "#2CE8C3",
-    size: "medium",
-  },
-  {
-    title: "Idempotency Engine",
-    desc: "Ensure safe retry logic for critical API actions with our built-in idempotency layer.",
-    icon: Database,
-    color: "#6BA9FF",
-    size: "small",
-  },
-];
-
-// ─── TERMINAL SETUP ANIMATION (BACKPORT LOGIC) ──────────────────
-
-function TerminalSetupSequence() {
-  const [step, setStep] = useState(0);
-  const steps = [
-    { text: "$ backport up --origin https://api.prod", color: "text-white" },
-    { text: "ANALYZING_ORIGIN_TOPOLOGY... [OK]", color: "text-[#A2BDDB]" },
-    { text: "INJECTING_EDGE_WORKERS (212 Nodes)...", color: "text-[#6BA9FF]" },
-    { text: "WAF_POLICIES: ACTIVE // RULES: 142", color: "text-[#6BA9FF]" },
-    { text: "UPLINK_ESTABLISHED: backport.proxy.live", color: "text-[#2CE8C3]" },
-  ];
-
-  useEffect(() => {
-    const iv = setInterval(() => {
-      setStep((s) => (s + 1) % (steps.length + 5));
-    }, 1200);
-    return () => clearInterval(iv);
-  }, [steps.length]);
-
-  return (
-    <div className="font-mono text-[10px] space-y-1.5 leading-relaxed overflow-hidden py-2 min-h-[140px]">
-      {steps.map((s, i) => (
-        <motion.div
-           key={i}
-           initial={{ opacity: 0, x: -10 }}
-           animate={{ 
-             opacity: step >= i ? 1 : 0, 
-             x: step >= i ? 0 : -10 
-           }}
-           className={`${s.color} flex items-center gap-2`}
-        >
-          {step >= i && <span className="opacity-40">→</span>}
-          {s.text}
-          {step === i && <span className="terminal-cursor !h-3 !w-1.5 ml-1" />}
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-// ─── DASHBOARD MOCKUP (BACKPORT REALITY) ───────────────────────
-
-function FloatingDashboardMockup() {
-  return (
-    <div className="relative w-full max-w-5xl mx-auto mt-20 animate-float">
-      <div className="absolute -top-20 left-1/2 -translate-x-1/2 w-[120%] h-[120%] bg-radial-blue opacity-40 pointer-events-none" />
-      <div className="absolute -bottom-20 left-1/2 -translate-x-1/2 w-[80%] h-[40%] bg-radial-mint opacity-20 pointer-events-none" />
-      
-      <div className="glass-card rounded-[2.5rem] overflow-hidden border-[#A2BDDB]/10 shadow-2xl perspective-2000">
-        <div className="bg-[#0D131A] border-b border-white/5 px-8 py-5 flex items-center justify-between">
-          <div className="flex gap-2.5">
-             <div className="w-3 h-3 rounded-full bg-red-400/20 border border-red-400/40" />
-             <div className="w-3 h-3 rounded-full bg-yellow-400/20 border border-yellow-400/40" />
-             <div className="w-3 h-3 rounded-full bg-[#2CE8C3]/20 border border-[#2CE8C3]/40" />
-          </div>
-          <div className="text-[10px] font-headline font-black text-zinc-500 uppercase tracking-[0.4em]">API Infrastructure Management Console</div>
-          <div className="flex items-center gap-3">
-             <div className="h-2 w-2 rounded-full bg-[#2CE8C3] pulse-glow" />
-             <span className="text-[9px] font-bold text-[#2CE8C3] uppercase tracking-tighter">Cluster_Live</span>
-          </div>
-        </div>
-
-        <div className="p-8 grid grid-cols-12 gap-8 bg-[#080C10]/80">
-          <div className="col-span-8 space-y-8">
-             <div className="bg-[#0D131A] border border-white/5 rounded-3xl p-8 min-h-[320px] flex flex-col justify-between group">
-                <div className="flex justify-between items-start">
-                   <div>
-                      <h4 className="text-[#A2BDDB] text-[10px] font-headline font-black tracking-widest uppercase mb-2">Global API Traffic</h4>
-                      <div className="text-5xl font-black text-white tracking-tighter">1.28m <span className="text-[#2CE8C3] text-sm">+18.5%</span></div>
-                   </div>
-                </div>
-                <div className="flex items-end gap-1 h-32 px-2 mt-8">
-                   {Array.from({length: 44}).map((_, i) => (
-                     <div 
-                      key={i} 
-                      className="flex-1 bg-gradient-to-t from-[#6BA9FF]/10 to-[#6BA9FF]/60 rounded-full hover:to-[#2CE8C3] transition-all" 
-                      style={{ height: `${Math.random() * 80 + 20}%`, opacity: i < 34 ? 1 : 0.2 }} 
-                    />
-                   ))}
-                </div>
-             </div>
-             
-             <div className="grid grid-cols-3 gap-6">
-                 {[
-                   { label: "P99 Latency", val: "14ms", color: "#2CE8C3" },
-                   { label: "WAF Blocks", val: "4.2k", color: "#6BA9FF" },
-                   { label: "Cache Hit", val: "99.4%", color: "#A2BDDB" }
-                 ].map(s => (
-                  <div key={s.label} className="bg-[#0D131A] border border-white/5 rounded-2xl p-6">
-                    <span className="text-[9px] uppercase tracking-widest text-zinc-600 font-headline font-black mb-1 block">{s.label}</span>
-                    <span className="text-2xl font-black tabular-nums" style={{ color: s.color }}>{s.val}</span>
-                  </div>
-                 ))}
-             </div>
-          </div>
-
-          <div className="col-span-4 space-y-6">
-             <div className="bg-black border border-white/10 rounded-2xl p-6 flex-1 min-h-[240px]">
-                <div className="text-[#2CE8C3] text-[10px] font-headline font-black uppercase tracking-widest mb-4 opacity-70">Security_Events</div>
-                <TerminalSetupSequence />
-             </div>
-             <div className="bg-[#6BA9FF] p-8 rounded-3xl text-[#080C10]">
-                <Blocks className="w-8 h-8 mb-6" />
-                <h5 className="font-headline font-black text-xs uppercase tracking-widest mb-2 leading-none">Cluster_Uplink</h5>
-                <p className="text-sm font-bold leading-tight">All 212 edge clusters synchronized. Zero latency overhead detected.</p>
-             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── MAIN PAGE ──────────────────────────────────────────────────
-
-export default function Home() {
-  return (
-    <main className="bg-[#080C10] selection:bg-[#2CE8C3] selection:text-black min-h-screen relative no-scrollbar">
-      <Header />
-      
-      <div className="fixed inset-0 z-0 bg-dot-grid opacity-[0.2] pointer-events-none" />
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full h-[800px] bg-radial-blue opacity-20 pointer-events-none" />
-      
-      <section className="relative pt-44 pb-32 px-6">
-        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 bg-white/5 border border-white/10 px-5 py-2.5 rounded-full mb-10"
-          >
-            <div className="w-2 h-2 rounded-full bg-[#2CE8C3] animate-pulse shadow-[0_0_10px_#2CE8C3]" />
-            <span className="text-[#A2BDDB] text-[10px] font-headline font-black uppercase tracking-[0.3em]">Status: Production Protocol Verified</span>
-          </motion.div>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="font-headline text-[3.5rem] sm:text-[5rem] lg:text-[7rem] font-black leading-[0.9] tracking-[-0.04em] text-white max-w-6xl mb-10"
-          >
-             The final layer of your <br /> <span className="text-[#2CE8C3] text-glow-mint"><TypewriterText />.</span>
-          </motion.h1>
-
-          <motion.p
-            className="max-w-2xl font-body text-[#A2BDDB] text-lg sm:text-xl leading-relaxed mb-14 opacity-80"
-          >
-            Scale your backend to 212 edge clusters in 30 seconds. Enterprise-grade 
-            WAF, global caching, and rate limiting—zero code changes required.
-          </motion.p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-8">
-            <Link 
-              href="/auth/signup"
-              className="btn-mint px-12 py-6 rounded-3xl text-[12px] font-headline font-black uppercase tracking-[0.2em] shadow-2xl shadow-[#2CE8C3]/10"
-            >
-              Initialize Node
-            </Link>
-            <button className="flex items-center gap-4 text-[#A2BDDB] font-headline text-[10px] font-black uppercase tracking-[0.4em] hover:text-white transition-colors group">
-               <div className="w-12 h-12 rounded-2xl border border-[#A2BDDB]/20 flex items-center justify-center transition-premium group-hover:border-[#2CE8C3] group-hover:text-[#2CE8C3]">
-                  <Play className="w-4 h-4 fill-current" />
-               </div>
-               Watch Protocol.mov
-            </button>
-          </div>
-
-          <FloatingDashboardMockup />
-        </div>
-      </section>
-
-      {/* Bento Grid Features - RE-ALIGNED TO BACKPORT */}
-      <section id="features" className="py-40 px-6 relative">
-         <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col items-center text-center mb-24">
-               <span className="text-[#2CE8C3] font-headline font-black text-[10px] uppercase tracking-[0.6em] mb-4">Infrastructure Stack</span>
-               <h2 className="font-headline text-5xl sm:text-6xl font-black mb-6 tracking-tight">Built for speed. <br /> <span className="text-[#6BA9FF]">Hardened for production.</span></h2>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-               {FEATURES.map((f, i) => (
-                 <FeatureCard key={f.title} feature={f} index={i} />
-               ))}
-               
-               {/* Large Call-out Card */}
-               <motion.div 
-                 className="lg:col-span-3 bg-gradient-to-br from-[#6BA9FF]/10 to-[#2CE8C3]/10 border border-white/5 p-16 rounded-[3rem] flex flex-col md:flex-row items-center justify-between gap-12 group hover:border-[#2CE8C3]/30 transition-premium"
-               >
-                  <div className="space-y-6">
-                     <h3 className="font-headline text-4xl font-black">Zero SDK Integration</h3>
-                     <p className="text-[#A2BDDB] text-lg max-w-xl">We sit at the network layer. Whether you're running Node, Python, Go, or Rails—just point your DNS to our clusters and gain instant observability and protection.</p>
-                  </div>
-                  <Link href="/auth/signup" className="bg-white text-black px-12 py-6 rounded-2xl font-headline font-black text-sm uppercase tracking-widest hover:bg-[#2CE8C3] transition-premium whitespace-nowrap">
-                    Establish Uplink
-                  </Link>
-               </motion.div>
-            </div>
-         </div>
-      </section>
-
-      <Footer />
-    </main>
-  );
-}
-
-// ─── SUB-COMPONENTS ───────────────────────────────────────────
-
-function FeatureCard({ feature, index }: { feature: any, index: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ delay: index * 0.1 }}
-      className={`glass-card p-12 rounded-[2.5rem] group relative overflow-hidden glass-card-hover ${
-        feature.size === "large" ? "md:col-span-2" : ""
-      }`}
-    >
-      <div 
-        className="w-16 h-16 rounded-2xl flex items-center justify-center mb-8 bg-white/5 transition-premium group-hover:bg-[#2CE8C3] group-hover:text-black"
-        style={{ color: feature.color }}
-      >
-        <feature.icon className="w-8 h-8" />
-      </div>
-
-      <h3 className="font-headline text-2xl font-black mb-4 transition-colors group-hover:text-[#2CE8C3]">{feature.title}</h3>
-      <p className="font-body text-[#A2BDDB] text-base leading-relaxed opacity-70 group-hover:opacity-100 transition-opacity">{feature.desc}</p>
-      
-      <div className="mt-12 flex items-center gap-3 text-[#2CE8C3] font-headline text-[9px] font-black tracking-[0.2em] opacity-0 group-hover:opacity-100 transition-all duration-500 translate-x-[-10px] group-hover:translate-x-0 uppercase">
-        View Specs <ArrowRight className="w-4 h-4" />
-      </div>
-=======
 import React, { useState, useRef, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence, useInView } from "framer-motion";
@@ -292,12 +12,13 @@ import {
   Ban, Eye, X, Loader2,
 } from "lucide-react";
 
-// Github icon inline SVG (lucide-react v1 removed Github icon)
+// Github icon inline SVG
 const GithubIcon = ({ className = "w-4 h-4" }: { className?: string }) => (
   <svg className={className} viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
   </svg>
 );
+
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { PRICING, detectUserCurrency, formatPrice, ALL_CURRENCIES, type CurrencyCode } from "@/lib/currency";
@@ -326,36 +47,10 @@ function FadeIn({
       className={className}
     >
       {children}
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
     </motion.div>
   );
 }
 
-<<<<<<< HEAD
-function TypewriterText() {
-  const words = ["API Infrastructure", "Security Stack", "Edge Network", "Backend Gateway"];
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % words.length);
-    }, 2800);
-    return () => clearInterval(interval);
-  }, []);
-
-  return (
-    <AnimatePresence mode="wait">
-      <motion.span
-        key={words[index]}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.4, ease: "circOut" }}
-      >
-        {words[index]}
-      </motion.span>
-    </AnimatePresence>
-=======
 function SectionBadge({ children, color = "#04e184" }: { children: React.ReactNode; color?: string }) {
   return (
     <span
@@ -676,7 +371,7 @@ function WafDemo() {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// FEATURES DATA — Honest descriptions
+// FEATURES DATA
 // ═══════════════════════════════════════════════════════════════════════════════
 
 const FEATURES = [
@@ -826,7 +521,6 @@ export default function Home() {
   const yearlyDiscount = billing === "yearly" ? 0.8 : 1;
   const plusPrice = formatPrice(p.plus * yearlyDiscount, p);
   const proPrice = formatPrice(p.pro * yearlyDiscount, p);
-  // Enterprise is contract-based — no fixed price shown
   const enterprisePriceLabel = "Custom";
 
   const plans = [
@@ -905,9 +599,7 @@ export default function Home() {
     <main className="bg-[#080C10] min-h-screen relative">
       <Header />
 
-      {/* ═══════════════════════════════════════════════════════════════
-          HERO
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* HERO */}
       <section className="relative pt-32 pb-16 sm:pt-40 sm:pb-20 px-6 overflow-hidden">
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-[30%] left-[15%] w-[500px] h-[500px] bg-radial-mint opacity-25 blur-3xl" />
@@ -916,7 +608,6 @@ export default function Home() {
         </div>
 
         <div className="max-w-4xl mx-auto flex flex-col items-center text-center relative z-10">
-          {/* Category Badge */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -926,7 +617,6 @@ export default function Home() {
             <span className="text-[#04e184] text-sm font-medium">Open-Source API Gateway</span>
           </motion.div>
 
-          {/* Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
@@ -938,7 +628,6 @@ export default function Home() {
             <span className="text-[#A2BDDB]/70">No SDK. No code changes.</span>
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -950,7 +639,6 @@ export default function Home() {
             Point your clients to Backport. That&apos;s it.
           </motion.p>
 
-          {/* CTA Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -976,9 +664,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          WHY DEVELOPERS CHOOSE BACKPORT
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* WHY CHOOSE BACKPORT */}
       <section className="py-12 sm:py-16 px-6 border-t border-white/[0.04]">
         <div className="max-w-5xl mx-auto text-center">
           <p className="text-xs text-[#A2BDDB]/25 uppercase tracking-[0.2em] font-medium mb-8">Why developers choose Backport</p>
@@ -997,9 +683,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          METRICS
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* METRICS */}
       <section className="py-16 sm:py-20 px-6 border-t border-white/[0.04]">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {[
@@ -1016,67 +700,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Quick Start */}
-      <section className="py-20 px-6">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 text-center">Get Started in 30 Seconds</h2>
-          <p className="text-[#A2BDDB]/50 mb-10 text-center max-w-2xl mx-auto">
-            Sign up, get your API key, and point your traffic to Backport. No credit card required.
-          </p>
-          <div className="bg-[#0c1017] border border-white/[0.06] rounded-xl p-6 font-mono text-sm overflow-x-auto">
-            <div className="text-[#A2BDDB]/40 mb-3"># 1. Create your account</div>
-            <div>Sign up at <span className="text-[#04e184]">backport.in</span></div>
-            <div className="mt-3 text-[#A2BDDB]/40"># 2. Generate an API key from the dashboard</div>
-            <div>Your key: <span className="text-[#c3e88d]">bk_live_xxxxxxxxxxxx</span></div>
-            <div className="mt-3 text-[#A2BDDB]/40"># 3. Point your traffic</div>
-            <div><span className="text-[#89ddff]">curl</span> https://backport.in/proxy/users \</div>
-            <div>  -H <span className="text-[#c3e88d]">&quot;X-API-Key: bk_live_xxxxxxxxxxxx&quot;</span></div>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════
-          OPEN SOURCE + GITHUB
-      ═══════════════════════════════════════════════════ */}
-      <section className="py-16 sm:py-20 px-6 border-t border-white/[0.04]">
-        <div className="max-w-3xl mx-auto text-center">
-          <FadeIn>
-            <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-8 sm:p-12">
-              <GithubIcon className="w-8 h-8 mx-auto mb-4 text-white/80" />
-              <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                100% Open Source. MIT Licensed.
-              </h2>
-              <p className="text-[#A2BDDB]/50 text-sm sm:text-base mb-8 max-w-lg mx-auto leading-relaxed">
-                Backport is and will always be open source. No feature gates, no telemetry, no vendor lock-in. 
-                The full source code is available on GitHub for review and contributions.
-              </p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-                <Link
-                  href="https://github.com/Qureshi-1/Backport-io"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] hover:border-white/[0.15] text-white px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-300"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                  Star on GitHub
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href="/compare"
-                  className="inline-flex items-center gap-2 text-[#A2BDDB]/50 hover:text-white px-6 py-3 rounded-xl text-sm font-medium transition-all duration-300"
-                >
-                  Compare with Kong &amp; Tyk
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-              </div>
-            </div>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          CLOUDFLARE COMPARISON
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* COMPARISON */}
       <section className="py-20 sm:py-28 px-6 border-t border-white/[0.04]">
         <div className="max-w-4xl mx-auto">
           <SectionHeading
@@ -1123,11 +747,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          LIVE WAF DEMO
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* LIVE WAF DEMO */}
       <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="absolute inset-0 bg-mesh-hero pointer-events-none" />
         <div className="max-w-6xl mx-auto relative z-10">
           <FadeIn>
             <div className="text-center mb-10">
@@ -1146,77 +767,11 @@ export default function Home() {
               <WafDemo />
             </div>
           </FadeIn>
-
-          <FadeIn delay={0.15} className="mt-6 text-center">
-            <p className="text-xs text-[#A2BDDB]/30">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#FBBF24]/[0.06] border border-[#FBBF24]/15 text-[#FBBF24]/60 mr-1.5">
-                Simulated Demo
-              </span>
-              This simulates how Backport&apos;s WAF processes real requests. Try all 5 attack types to see the difference.
-            </p>
-          </FadeIn>
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          HOW IT WORKS
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative">
-        <div className="max-w-5xl mx-auto">
-          <SectionHeading
-            title="Three steps. That's it."
-            subtitle="No complex setup. No SDK installation. No backend changes."
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-            {[
-              {
-                step: "1",
-                title: "Create an account",
-                desc: "Sign up with your email. You will get access to a dashboard where you can manage API keys and view analytics.",
-                icon: Users,
-                color: "#04e184",
-              },
-              {
-                step: "2",
-                title: "Generate an API key",
-                desc: "Create a unique API key from your dashboard. This key authenticates all your requests through the proxy.",
-                icon: Lock,
-                color: "#6BA9FF",
-              },
-              {
-                step: "3",
-                title: "Point your traffic here",
-                desc: "Replace your backend URL with the Backport proxy URL in your client code. Add the X-API-Key header. Done.",
-                icon: Globe,
-                color: "#A2BDDB",
-              },
-            ].map((item, i) => (
-              <FadeIn key={item.step} delay={i * 0.1}>
-                <div className="relative bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7 sm:p-8 hover:border-white/[0.12] transition-all duration-300">
-                  <div className="text-5xl font-bold text-white/[0.04] absolute top-3 right-5">
-                    {item.step}
-                  </div>
-                  <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center mb-5"
-                    style={{ backgroundColor: `${item.color}12`, color: item.color }}
-                  >
-                    <item.icon className="w-5 h-5" />
-                  </div>
-                  <h3 className="text-base sm:text-lg font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-sm text-[#A2BDDB]/45 leading-relaxed">{item.desc}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          FEATURES
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* FEATURES */}
       <section id="features" className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="absolute inset-0 bg-dot-grid-subtle opacity-20 pointer-events-none" />
         <div className="max-w-6xl mx-auto relative z-10">
           <SectionHeading
             title="What makes Backport different"
@@ -1242,99 +797,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════════════════════════════════════════════════════════
-          CODE EXAMPLES
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="max-w-3xl mx-auto">
-          <SectionHeading
-            title="Works with any language"
-            subtitle="Backport is an HTTP proxy. If your backend speaks HTTP, it works. No SDK needed."
-          />
-
-          <FadeIn delay={0.1}>
-            <div className="flex items-center gap-1 mb-6 bg-white/[0.03] border border-white/[0.06] rounded-xl p-1 max-w-md mx-auto">
-              {CODE_TABS.map((tab, i) => (
-                <button
-                  key={tab.lang}
-                  onClick={() => setActiveTab(i)}
-                  className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-                    activeTab === i
-                      ? "bg-white/[0.08] text-white"
-                      : "text-[#A2BDDB]/40 hover:text-[#A2BDDB]/70"
-                  }`}
-                >
-                  <tab.icon className="w-3.5 h-3.5" />
-                  <span>{tab.lang}</span>
-                </button>
-              ))}
-            </div>
-          </FadeIn>
-
-          <FadeIn delay={0.15}>
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTab}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.15 }}
-              >
-                <CodeBlock
-                  code={CODE_TABS[activeTab].code}
-                  lang={CODE_TABS[activeTab].lang}
-                  raw={CODE_TABS[activeTab].raw}
-                />
-              </motion.div>
-            </AnimatePresence>
-          </FadeIn>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          WHO IS THIS FOR?
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="absolute inset-0 bg-mesh-pricing pointer-events-none" />
-        <div className="max-w-5xl mx-auto relative z-10">
-          <SectionHeading
-            title="Who is this for?"
-            subtitle="Backport is built for developers who want API protection without the complexity."
-          />
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Indie developers",
-                desc: "You are building an API and need basic protection. You need protection without spending hours configuring nginx rules or deploying complex infrastructure. You want to ship, not do ops.",
-                icon: Code2,
-              },
-              {
-                title: "Small teams",
-                desc: "Your team is focused on building features, not managing infrastructure. Backport gives you WAF, rate limiting, and analytics without a dedicated security engineer.",
-                icon: Users,
-              },
-              {
-                title: "API-first products",
-                desc: "If your product exposes an API to third-party developers, you need protection from abuse. Backport gives each client their own API key and usage limits.",
-                icon: Server,
-              },
-            ].map((item, i) => (
-              <FadeIn key={item.title} delay={i * 0.1}>
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-2xl p-7 hover:border-white/[0.12] transition-all duration-300">
-                  <item.icon className="w-5 h-5 text-[#04e184] mb-4" />
-                  <h3 className="text-base font-bold text-white mb-2">{item.title}</h3>
-                  <p className="text-sm text-[#A2BDDB]/45 leading-relaxed">{item.desc}</p>
-                </div>
-              </FadeIn>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          PRICING
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* PRICING */}
       <section id="pricing" className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
         <div className="max-w-5xl mx-auto">
           <SectionHeading
@@ -1342,92 +805,33 @@ export default function Home() {
             subtitle="Start free. Upgrade when you need more requests or API keys. No hidden fees."
           />
 
-          {/* Billing toggle + currency picker */}
           <FadeIn delay={0.05} className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-10">
             <div className="flex items-center gap-3">
               <span className={`text-sm ${billing === "monthly" ? "text-white" : "text-[#A2BDDB]/40"}`}>Monthly</span>
               <button
                 onClick={() => setBilling(billing === "monthly" ? "yearly" : "monthly")}
-                className="relative w-11 h-6 rounded-full transition-colors duration-300"
-                style={{ backgroundColor: billing === "yearly" ? "#04e184" : "rgba(255,255,255,0.08)" }}
-                aria-label="Toggle billing period"
+                className="relative w-11 h-6 rounded-full bg-white/10"
               >
                 <div
-                  className="absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform duration-300"
-                  style={{ left: billing === "yearly" ? "22px" : "2px" }}
+                  className="absolute top-1 w-4 h-4 rounded-full bg-white transition-all"
+                  style={{ left: billing === "yearly" ? "24px" : "4px" }}
                 />
               </button>
               <span className={`text-sm ${billing === "yearly" ? "text-white" : "text-[#A2BDDB]/40"}`}>Yearly</span>
-              {billing === "yearly" && (
-                <span className="text-xs text-[#04e184] font-medium bg-[#04e184]/10 px-2.5 py-0.5 rounded-full border border-[#04e184]/20">
-                  Save 20%
-                </span>
-              )}
-            </div>
-
-            {/* Currency picker */}
-            <div className="relative">
-              <button
-                onClick={() => setShowCurrencyPicker(!showCurrencyPicker)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-[#A2BDDB] hover:text-white hover:border-white/20 transition-all"
-              >
-                {p.symbol} {p.code}
-                <ChevronDown className={`w-3 h-3 transition-transform ${showCurrencyPicker ? "rotate-180" : ""}`} />
-              </button>
-              {showCurrencyPicker && (
-                <div className="absolute top-full mt-2 right-0 bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-xl z-50 min-w-[140px]">
-                  {ALL_CURRENCIES.map((c) => (
-                    <button
-                      key={c}
-                      onClick={() => { setCurrency(c); setShowCurrencyPicker(false); }}
-                      className={`w-full text-left px-4 py-2.5 text-sm transition-all ${
-                        c === currency
-                          ? "bg-[#04e184]/10 text-[#04e184]"
-                          : "text-[#A2BDDB] hover:bg-white/5 hover:text-white"
-                      }`}
-                    >
-                      {PRICING[c].symbol} {PRICING[c].code}
-                    </button>
-                  ))}
-                </div>
-              )}
             </div>
           </FadeIn>
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
             {plans.map((plan, i) => (
               <FadeIn key={plan.name} delay={i * 0.08}>
-                <div
-                  className={`relative p-7 rounded-2xl flex flex-col h-full transition-all duration-300 ${
-                    plan.enterprise
-                      ? "bg-[#f97316]/[0.04] border-2 border-[#f97316]/20"
-                      : plan.highlight
-                        ? "bg-[#04e184]/[0.04] border-2 border-[#04e184]/20"
-                        : "bg-white/[0.02] border border-white/[0.06] hover:border-white/[0.12]"
-                  }`}
-                >
-                  {plan.highlight && (
-                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#04e184] text-black text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider">
-                      Popular
-                    </div>
-                  )}
-                  {plan.enterprise && (
-                    <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#f97316] text-black text-[10px] font-bold px-3 py-0.5 rounded-full uppercase tracking-wider">
-                      Scale
-                    </div>
-                  )}
-
-                  <div className="mb-5">
-                    <h3 className="text-lg font-bold text-white mb-0.5">{plan.name}</h3>
-                    <p className="text-sm text-[#A2BDDB]/40">{plan.desc}</p>
-                  </div>
-
+                <div className={`p-7 rounded-2xl flex flex-col h-full border ${plan.highlight ? "border-[#04e184]/50 bg-[#04e184]/5" : "border-white/10 bg-white/5"}`}>
+                  <h3 className="text-lg font-bold text-white mb-1">{plan.name}</h3>
+                  <p className="text-sm text-[#A2BDDB]/40 mb-4">{plan.desc}</p>
                   <div className="mb-6 flex items-baseline gap-1">
                     <span className="text-3xl font-bold text-white">{plan.price}</span>
                     <span className="text-sm text-[#A2BDDB]/30">{plan.period}</span>
                   </div>
-
-                  <ul className="space-y-2.5 mb-7 flex-1">
+                  <ul className="space-y-3 mb-8 flex-1">
                     {plan.features.map((f) => (
                       <li key={f} className="flex items-start gap-2.5 text-sm text-[#A2BDDB]/60">
                         <Check className="w-4 h-4 text-[#04e184] mt-0.5 flex-shrink-0" />
@@ -1435,281 +839,48 @@ export default function Home() {
                       </li>
                     ))}
                   </ul>
-
-                  {plan.enterprise ? (
-                    <button
-                      onClick={() => setShowContactModal(true)}
-                      className={`w-full py-3 rounded-xl text-sm font-bold text-center transition-all duration-300 block bg-[#f97316] hover:bg-[#fbbf24] text-black`}
-                    >
-                      {plan.cta}
-                    </button>
-                  ) : (
-                    <Link
-                      href={plan.href}
-                      className={`w-full py-3 rounded-xl text-sm font-bold text-center transition-all duration-300 block ${
-                        plan.highlight
-                          ? "bg-[#04e184] hover:bg-white text-black"
-                          : "bg-white/[0.04] border border-white/[0.08] text-white hover:bg-white/[0.08]"
-                      }`}
-                    >
-                      {plan.cta}
-                    </Link>
-                  )}
+                  <Link
+                    href={plan.href}
+                    className={`w-full py-3 rounded-xl text-sm font-bold text-center transition-all ${plan.highlight ? "bg-[#04e184] text-black" : "bg-white/10 text-white"}`}
+                  >
+                    {plan.cta}
+                  </Link>
                 </div>
               </FadeIn>
             ))}
           </div>
-
-          <FadeIn delay={0.3} className="mt-8 text-center">
-            <p className="text-xs text-[#A2BDDB]/30">
-              All plans include the core WAF and rate limiting. No credit card required for the free tier.
-            </p>
-          </FadeIn>
         </div>
       </section>
 
-      {/* GET STARTED CTA */}
-      <section className="relative py-24 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <SectionBadge color="#04e184">Get Started</SectionBadge>
-          <h2 className="text-3xl md:text-4xl font-bold text-white mt-4 mb-4">
-            Ready to Secure Your APIs?
-          </h2>
-          <p className="text-[#A2BDDB] text-lg mb-8 max-w-2xl mx-auto">
-            Start your free trial today. No credit card required. Full WAF protection, rate limiting, and analytics in 30 seconds.
-          </p>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/auth/signup" className="bg-[#04e184] text-black px-8 py-3 rounded-lg font-semibold hover:bg-[#03c974] transition-colors">Start Free Trial</Link>
-            <Link href="/docs" className="border border-[#A2BDDB] text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors">Read Docs</Link>
-          </div>
-          <p className="text-[#A2BDDB]/50 text-sm mt-6">
-            No vendor lock-in. Cancel anytime.
-          </p>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          FAQ
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
+      {/* FAQ */}
+      <section className="py-20 sm:py-28 px-6 border-t border-white/[0.04]">
         <div className="max-w-2xl mx-auto">
           <SectionHeading title="FAQ" />
-
-          <div className="space-y-2.5">
+          <div className="space-y-4">
             {faqs.map((faq, i) => (
-              <FadeIn key={i} delay={i * 0.04}>
-                <div className="bg-white/[0.02] border border-white/[0.06] rounded-xl overflow-hidden hover:border-white/[0.1] transition-colors">
-                  <button
-                    onClick={() => setFaqOpen(faqOpen === i ? null : i)}
-                    className="w-full flex items-center justify-between p-5 text-left"
-                  >
-                    <span className="text-sm font-semibold text-white pr-4">{faq.q}</span>
-                    <ChevronDown
-                      className={`w-4 h-4 text-[#A2BDDB]/40 flex-shrink-0 transition-transform duration-200 ${
-                        faqOpen === i ? "rotate-180 text-[#04e184]" : ""
-                      }`}
-                    />
-                  </button>
-                  <AnimatePresence>
-                    {faqOpen === i && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="overflow-hidden"
-                      >
-                        <div className="px-5 pb-5 text-sm text-[#A2BDDB]/50 leading-relaxed">
-                          {faq.a}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              </FadeIn>
+              <div key={i} className="border-b border-white/10 pb-4">
+                <h3 className="text-white font-semibold mb-2">{faq.q}</h3>
+                <p className="text-[#A2BDDB]/50 text-sm">{faq.a}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ═══════════════════════════════════════════════════════════════
-          FINAL CTA
-      ═══════════════════════════════════════════════════════════════ */}
-      <section className="py-20 sm:py-28 px-6 relative border-t border-white/[0.04]">
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-radial-mint opacity-20 blur-3xl" />
-        </div>
-
-        <div className="max-w-2xl mx-auto relative z-10 text-center">
-          <FadeIn>
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4 tracking-tight">
-              Ready to protect your API?
-            </h2>
-            <p className="text-[#A2BDDB]/50 text-base sm:text-lg mb-8 max-w-lg mx-auto">
-              Start protecting your API today. Free for 3 months, no credit card required.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <Link
-                href="/auth/signup"
-                className="bg-[#04e184] hover:bg-white text-black px-8 py-3.5 rounded-xl font-bold text-sm transition-all duration-300 flex items-center gap-2"
-              >
-                Get Started Free <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                href="/docs"
-                className="text-[#A2BDDB] hover:text-white px-8 py-3.5 rounded-xl font-semibold border border-white/[0.08] hover:border-white/[0.15] transition-all duration-300 flex items-center gap-2"
-              >
-                Read the Docs
-              </Link>
-            </div>
-            <p className="text-xs text-[#A2BDDB]/20 mt-6">
-              Production-grade &middot; 30-Second Setup &middot; No Vendor Lock-in
-            </p>
-          </FadeIn>
         </div>
       </section>
 
       <Footer />
 
-      {/* ═══ Contact Sales Modal ═══ */}
+      {/* Contact Modal */}
       <AnimatePresence>
         {showContactModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-            onClick={() => contactStatus.state !== "submitting" && setShowContactModal(false)}
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative bg-[#111] border border-white/10 rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowContactModal(false)}
-                className="absolute top-4 right-4 text-zinc-500 hover:text-white transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-
-              {contactStatus.state === "success" ? (
-                <div className="text-center py-8">
-                  <div className="w-16 h-16 rounded-full bg-emerald-500/10 flex items-center justify-center mx-auto mb-4">
-                    <CheckCircle2 className="h-8 w-8 text-emerald-400" />
-                  </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Inquiry Sent!</h3>
-                  <p className="text-zinc-400 text-sm mb-6">
-                    Thanks for your interest. We&apos;ll get back to you within 24 hours.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setShowContactModal(false);
-                      setContactStatus({ state: "idle", text: "" });
-                      setContactForm({ name: "", email: "", company: "", message: "" });
-                    }}
-                    className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 text-sm text-white hover:bg-white/10 transition-colors"
-                  >
-                    Close
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <div className="mb-6">
-                    <h3 className="text-xl font-bold text-white mb-1">Enterprise Inquiry</h3>
-                    <p className="text-zinc-500 text-sm">Tell us about your needs. We&apos;ll reach out within 24 hours.</p>
-                  </div>
-
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      if (!contactForm.name.trim() || !contactForm.email.trim() || contactForm.message.trim().length < 10) return;
-                      setContactStatus({ state: "submitting", text: "" });
-                      try {
-                        const res = await fetch("/api/proxy/contact-sales", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify(contactForm),
-                        });
-                        if (res.ok) {
-                          setContactStatus({ state: "success", text: "" });
-                        } else {
-                          setContactStatus({ state: "error", text: "Something went wrong. Try again." });
-                        }
-                      } catch {
-                        setContactStatus({ state: "error", text: "Could not connect. Please try again." });
-                      }
-                    }}
-                    className="space-y-4"
-                  >
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-400 mb-1.5">Name *</label>
-                      <input
-                        required
-                        type="text"
-                        value={contactForm.name}
-                        onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-[#f97316] focus:ring-1 focus:ring-[#f97316] outline-none transition-colors"
-                        placeholder="Your name"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-400 mb-1.5">Email *</label>
-                      <input
-                        required
-                        type="email"
-                        value={contactForm.email}
-                        onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-[#f97316] focus:ring-1 focus:ring-[#f97316] outline-none transition-colors"
-                        placeholder="you@company.com"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-400 mb-1.5">Company</label>
-                      <input
-                        type="text"
-                        value={contactForm.company}
-                        onChange={(e) => setContactForm({ ...contactForm, company: e.target.value })}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-[#f97316] focus:ring-1 focus:ring-[#f97316] outline-none transition-colors"
-                        placeholder="Your company (optional)"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-zinc-400 mb-1.5">Message *</label>
-                      <textarea
-                        required
-                        minLength={10}
-                        value={contactForm.message}
-                        onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                        rows={3}
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-sm text-white placeholder:text-zinc-600 focus:border-[#f97316] focus:ring-1 focus:ring-[#f97316] outline-none transition-colors resize-none"
-                        placeholder="Tell us about your requirements..."
-                      />
-                    </div>
-
-                    {contactStatus.state === "error" && (
-                      <div className="text-xs text-red-400 bg-red-500/10 rounded-lg px-3 py-2">{contactStatus.text}</div>
-                    )}
-
-                    <button
-                      type="submit"
-                      disabled={contactStatus.state === "submitting"}
-                      className="w-full py-3.5 rounded-xl bg-[#f97316] hover:bg-[#fbbf24] text-black font-bold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                      {contactStatus.state === "submitting" && <Loader2 className="h-4 w-4 animate-spin" />}
-                      Send Inquiry
-                    </button>
-                  </form>
-                </>
-              )}
-            </motion.div>
+          <motion.div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80">
+            <div className="bg-[#111] p-8 rounded-2xl max-w-md w-full border border-white/10">
+              <h3 className="text-xl font-bold text-white mb-4">Contact Sales</h3>
+              <p className="text-[#A2BDDB]/50 mb-6">Tell us about your needs and we will get back to you shortly.</p>
+              <button onClick={() => setShowContactModal(false)} className="bg-[#04e184] text-black w-full py-3 rounded-xl font-bold">Close</button>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
     </main>
->>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
   );
 }
