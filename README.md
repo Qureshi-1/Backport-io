@@ -13,8 +13,8 @@
     <a href="https://github.com/Qureshi-1/Backport-io/actions"><img src="https://img.shields.io/github/actions/workflow/status/Qureshi-1/Backport-io/main?style=flat-square" alt="Build" /></a>
   </p>
 
-  <!-- Demo GIF placeholder - Replace with actual animated demo -->
-  <img src="https://raw.githubusercontent.com/Qureshi-1/Backport-io/main/demo.gif" alt="Backport Demo" width="800" />
+  <!-- Demo video demonstrating the Backport dashboard and features -->
+  <img src="demo.webp" alt="Backport Demo" width="800" />
 
 </div>
 
