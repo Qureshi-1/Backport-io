@@ -8,7 +8,11 @@ echo "[Backport] Installing Backport CLI..."
 mkdir -p ~/.backport
 
 # Download the standalone JS file
+<<<<<<< HEAD
 curl -sSL https://backport-io.vercel.app/cli.js -o ~/.backport/cli.js
+=======
+curl -sSL https://backport.in/cli.js -o ~/.backport/cli.js
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 # Create the executable wrapper
 echo '#!/usr/bin/env node' > ~/.backport/backport

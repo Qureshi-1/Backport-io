@@ -31,7 +31,11 @@
     "type": "git",
     "url": "https://github.com/Qureshi-1/Backport-io.git"
   },
+<<<<<<< HEAD
   "homepage": "https://backport-io.vercel.app",
+=======
+  "homepage": "https://backport.in",
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
   "bugs": {
     "url": "https://github.com/Qureshi-1/Backport-io/issues"
   },

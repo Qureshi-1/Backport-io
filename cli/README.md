@@ -9,11 +9,19 @@
 
 1. **Install the CLI globally:**
 ```bash
+<<<<<<< HEAD
 curl -sSL https://backport-io.vercel.app/install.sh | bash
 ```
 Windows users (PowerShell):
 ```powershell
 iwr -useb https://backport-io.vercel.app/install.ps1 | iex
+=======
+curl -sSL https://backport.in/install.sh | bash
+```
+Windows users (PowerShell):
+```powershell
+iwr -useb https://backport.in/install.ps1 | iex
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 ```
 
 2. **Initialize in your project:**
@@ -22,7 +30,11 @@ backport init
 ```
 
 This interactive wizard will:
+<<<<<<< HEAD
 1. Ask for your API key (get one at [backport-io.vercel.app](https://backport-io.vercel.app))
+=======
+1. Ask for your API key (get one at [backport.in](https://backport.in))
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 2. Configure your backend URL
 3. Create a `backport.config.json` in your project
 4. Verify the gateway connection
@@ -71,10 +83,17 @@ Client → Backport Gateway → Your Backend
 
 ## Links
 
+<<<<<<< HEAD
 - **Website:** [backport-io.vercel.app](https://backport-io.vercel.app)
 - **Documentation:** [backport-io.vercel.app/docs](https://backport-io.vercel.app/docs)
 - **GitHub:** [github.com/Qureshi-1/Backport-io](https://github.com/Qureshi-1/Backport-io)
 - **Dashboard:** [backport-io.vercel.app/dashboard](https://backport-io.vercel.app/dashboard)
+=======
+- **Website:** [backport.in](https://backport.in)
+- **Documentation:** [backport.in/docs](https://backport.in/docs)
+- **GitHub:** [github.com/Qureshi-1/Backport-io](https://github.com/Qureshi-1/Backport-io)
+- **Dashboard:** [backport.in/dashboard](https://backport.in/dashboard)
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 ## License
 

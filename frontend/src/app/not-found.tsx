@@ -32,7 +32,11 @@ export default function NotFound() {
           Request Blocked
         </h1>
         <p className="mb-8 text-zinc-400 leading-relaxed">
+<<<<<<< HEAD
           This route doesn't exist — or maybe the gateway blocked it.
+=======
+          This route doesn&apos;t exist — or maybe the gateway blocked it.
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
           Either way, your backend is safe. 🛡️
         </p>
 
@@ -61,7 +65,11 @@ export default function NotFound() {
         transition={{ delay: 0.5 }}
         className="absolute bottom-12 font-mono text-xs text-zinc-700"
       >
+<<<<<<< HEAD
         HTTP/1.1 404 Not Found — backport-gateway/1.0
+=======
+        HTTP/1.1 404 Not Found — backport-gateway/2.0
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
       </motion.div>
     </div>
   );

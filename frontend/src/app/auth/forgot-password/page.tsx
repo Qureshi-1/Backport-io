@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 "use client";
 import { useState } from "react";
 import Link from "next/link";
@@ -129,4 +130,10 @@ export default function ForgotPasswordPage() {
       </div>
     </div>
   );
+=======
+import { redirect } from "next/navigation";
+
+export default function ForgotPasswordPage() {
+  redirect("/auth/login");
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 }

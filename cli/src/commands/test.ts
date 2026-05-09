@@ -53,7 +53,11 @@ export async function testConnection(): Promise<void> {
       s2.warn(chalk.yellow("API key valid but no target backend URL set in dashboard."));
       console.log(
         chalk.dim("    Set your backend URL in: ") +
+<<<<<<< HEAD
           chalk.underline.cyan("https://backport-io.vercel.app/dashboard/settings")
+=======
+          chalk.underline.cyan("https://backport.in/dashboard/settings")
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
       );
     } else if (res.status === 429) {
       s2.succeed(chalk.green("API key valid! (Rate limit applied — everything working)"));

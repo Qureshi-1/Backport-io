@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
+<<<<<<< HEAD
 import { TerminalSquare, Send, Zap, Activity, Clock, ShieldAlert } from "lucide-react";
+=======
+import { TerminalSquare, Send, Zap, Activity, Clock } from "lucide-react";
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 import { fetchApi } from "@/lib/api";
 import toast from "react-hot-toast";
 
@@ -23,7 +27,11 @@ export default function PlaygroundPage() {
           setApiKey(data[0].key);
         }
       })
+<<<<<<< HEAD
       .catch((err) => {
+=======
+      .catch((_err) => {
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
         toast.error("Failed to load API keys for playground");
       });
   }, []);
@@ -49,7 +57,11 @@ export default function PlaygroundPage() {
       path = url.pathname + url.search;
     } catch {}
 
+<<<<<<< HEAD
     const proxyUrl = `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/proxy${path}`;
+=======
+    const proxyUrl = `${process.env.NEXT_PUBLIC_API_URL || "https://backport-io.onrender.com"}/proxy${path}`;
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
     const startTime = performance.now();
     
     try {
@@ -87,9 +99,16 @@ export default function PlaygroundPage() {
         toast.error(`Error: HTTP ${res.status}`);
       }
       
+<<<<<<< HEAD
     } catch (err: any) {
       toast.error(`Request failed: ${err.message}`);
       setResponse({ _error: err.message });
+=======
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Request failed: ${msg}`);
+      setResponse({ _error: msg });
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
       setStats({ ms: Math.round(performance.now() - startTime), status: 0 });
     } finally {
       setLoading(false);
@@ -98,6 +117,7 @@ export default function PlaygroundPage() {
 
   return (
     <div className="space-y-6">
+<<<<<<< HEAD
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-white mb-2 flex items-center gap-2">
           <TerminalSquare className="w-6 h-6 text-emerald-500" />
@@ -106,6 +126,15 @@ export default function PlaygroundPage() {
         <p className="text-zinc-400">
           Make real requests through your Backport Gateway to test Rate Limiting, Caching, WAF, and Idempotency in real-time.
         </p>
+=======
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold text-white mb-1 sm:mb-2">API Playground</h1>
+          <p className="text-sm text-zinc-400">
+            Make real requests through your Backport Gateway to test Rate Limiting, Caching, WAF, and Idempotency in real-time.
+          </p>
+        </div>
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -119,13 +148,21 @@ export default function PlaygroundPage() {
           
           <div>
             <label className="block text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">Request Method</label>
+<<<<<<< HEAD
             <div className="flex gap-2">
+=======
+            <div className="flex flex-wrap gap-2">
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
               {['GET', 'POST', 'PUT', 'DELETE'].map(m => (
                 <button
                   key={m}
                   type="button"
                   onClick={() => setMethod(m)}
+<<<<<<< HEAD
                   className={`px-4 py-2 text-xs font-bold rounded-lg transition-colors ${method === m ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
+=======
+                  className={`px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-colors min-h-[44px] ${method === m ? 'bg-emerald-500 text-black' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}`}
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
                 >
                   {m}
                 </button>

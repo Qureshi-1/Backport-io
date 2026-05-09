@@ -14,7 +14,11 @@ $launcherPath = "$installPath\backport.cmd"
 
 # Download the bundled JavaScript
 Write-Host "[Backport] Downloading CLI script..." -ForegroundColor Gray
+<<<<<<< HEAD
 Invoke-WebRequest -Uri "https://backport-io.vercel.app/cli.js" -OutFile $cliScriptPath -UseBasicParsing
+=======
+Invoke-WebRequest -Uri "https://backport.in/cli.js" -OutFile $cliScriptPath -UseBasicParsing
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 # Create the batch wrapper explicitly using node
 $cmdContent = "@ECHO OFF`nnode `"$cliScriptPath`" %*"

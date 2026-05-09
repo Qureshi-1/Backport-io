@@ -6,4 +6,9 @@ venv/
 .env
 *.db
 *.sqlite3
+<<<<<<< HEAD
 backpack.db
+=======
+backport.db
+tests/
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc

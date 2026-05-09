@@ -1,5 +1,9 @@
 "use client";
 
+<<<<<<< HEAD
+=======
+import { useEffect } from "react";
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 import { Inter } from "next/font/google";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import "./globals.css";
@@ -13,6 +17,12 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+<<<<<<< HEAD
+=======
+  useEffect(() => {
+    console.error("[GlobalError]", error);
+  }, [error]);
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
   return (
     <html lang="en" className="dark">
       <body className={`${inter.className} bg-black text-white min-h-screen flex items-center justify-center p-6`}>

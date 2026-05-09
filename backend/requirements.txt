@@ -6,6 +6,10 @@ starlette==0.41.3
 # Database
 sqlalchemy==2.0.36
 psycopg2-binary==2.9.10
+<<<<<<< HEAD
+=======
+alembic>=1.14.0
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 # Auth & Security
 python-jose[cryptography]==3.3.0
@@ -18,6 +22,10 @@ python-dotenv==1.0.1
 
 # HTTP Client (for proxy)
 httpx==0.27.2
+<<<<<<< HEAD
+=======
+brotli==1.1.0
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 
 # Payments
 razorpay==1.4.2
@@ -28,3 +36,21 @@ annotated-types==0.7.0
 
 # Async utils
 anyio==4.7.0
+<<<<<<< HEAD
+=======
+
+# Cache (Upstash Redis / in-memory fallback)
+redis==5.2.1
+
+# OAuth (Google + GitHub social login)
+authlib==1.3.1
+itsdangerous==2.2.0
+
+# System (razorpay needs pkg_resources from setuptools)
+setuptools>=70.0.0,<82
+
+# Testing
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=5.0.0
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc

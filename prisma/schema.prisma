@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String?
+  businessName  String?
+  taxId         String?
+  address       String?
+  city          String?
+  state         String?
+  zip           String?
+  country       String?
+  bankName      String?
+  bankAccount   String?
+  bankIfsc      String?
+  defaultCurrency String @default("INR")
+  defaultTaxRate Float  @default(18.0)
+  autoRemind    Boolean  @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  clients       Client[]
+  invoices      Invoice[]
+}
+
+model Client {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  company   String?
+  email     String
+  phone     String?
+  city      String?
+  country   String?
+  notes     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices  Invoice[]
+}
+
+model Invoice {
+  id          String       @id @default(cuid())
+  userId      String
+  clientId    String
+  invoiceNumber String
+  status      String       @default("draft")
+  dueDate     DateTime
+  subtotal    Float
+  taxRate     Float        @default(18.0)
+  taxAmount   Float
+  total       Float
+  notes       String?
+  paidAt      DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client      Client       @relation(fields: [clientId], references: [id])
+  items       InvoiceItem[]
+}
+
+model InvoiceItem {
+  id          String  @id @default(cuid())
+  invoiceId   String
+  description String
+  quantity    Float
+  rate        Float
+  amount      Float
+  invoice     Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}

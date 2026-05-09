@@ -33,4 +33,8 @@ export function writeConfig(config: BackportConfig): void {
 }
 
 export const GATEWAY_URL = "https://backport-io.onrender.com";
+<<<<<<< HEAD
 export const DASHBOARD_URL = "https://backport-io.vercel.app";
+=======
+export const DASHBOARD_URL = "https://backport.in";
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc

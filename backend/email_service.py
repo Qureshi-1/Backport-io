@@ -2,6 +2,11 @@
 Email sending via Resend API.
 Uses plain httpx (no extra SDK needed).
 """
+<<<<<<< HEAD
+=======
+import os
+import html
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
 import httpx
 from config import RESEND_API_KEY, FROM_EMAIL, FRONTEND_URL, APP_NAME
 import logging
@@ -78,7 +83,11 @@ def send_verification_email(to: str, token: str) -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           If you didn't create a Backport account, you can safely ignore this email.<br>
+<<<<<<< HEAD
           © 2026 Backport • MIT Licensed • Made with ❤️ in India
+=======
+          © 2026 Backport (MIT License) • Open Source • Made with ❤️ in India
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
         </p>
       </div>
     </body>
@@ -125,7 +134,11 @@ def send_password_reset_email(to: str, token: str) -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           If you didn't request a password reset, you can safely ignore this email.<br>
+<<<<<<< HEAD
           © 2026 Backport • MIT Licensed • Made with ❤️ in India
+=======
+          © 2026 Backport • Made with ❤️ in India
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
         </p>
       </div>
     </body>
@@ -137,8 +150,13 @@ def send_password_reset_email(to: str, token: str) -> bool:
 def send_welcome_email(to: str, name: str = "") -> bool:
     """Send a welcome email after verification."""
     dashboard_url = f"{FRONTEND_URL}/dashboard"
+<<<<<<< HEAD
     display = name or to.split("@")[0]
     html = f"""
+=======
+    safe_name = html.escape(name or to.split("@")[0])
+    html_body = f"""
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
     <!DOCTYPE html>
     <html>
     <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
@@ -154,7 +172,11 @@ def send_welcome_email(to: str, name: str = "") -> bool:
         </div>
 
         <h1 style="font-size: 22px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+<<<<<<< HEAD
           Welcome to Backport, {display}! 🎉
+=======
+          Welcome to Backport, {safe_name}! 🎉
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
         </h1>
         <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 28px;">
           Your email is verified and your account is active. You can now shield any
@@ -171,10 +193,299 @@ def send_welcome_email(to: str, name: str = "") -> bool:
         <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 20px;">
         <p style="color: #52525b; font-size: 12px; margin: 0;">
           Need help? Reply to this email or visit our docs.<br>
+<<<<<<< HEAD
           © 2026 Backport • MIT Licensed
+=======
+          © 2026 Backport (MIT License) • Open Source
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
         </p>
       </div>
     </body>
     </html>
     """
+<<<<<<< HEAD
     return send_email(to, f"Welcome to {APP_NAME} — you're all set! 🚀", html)
+=======
+    return send_email(to, f"Welcome to {APP_NAME} — you're all set! 🚀", html_body)
+
+
+def send_login_notification_email(to: str, ip: str, time_str: str = "") -> bool:
+    """Notify user of a login from a new device/IP."""
+    if not time_str:
+        from datetime import datetime, timezone
+        time_str = datetime.now(timezone.utc).strftime("%d %b %Y, %H:%M UTC")
+    safe_ip = html.escape(ip)
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                 background: #09090b; color: #e4e4e7; margin: 0; padding: 40px 20px;">
+      <div style="max-width: 520px; margin: 0 auto; background: #18181b;
+                  border: 1px solid #27272a; border-radius: 12px; padding: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="width: 32px; height: 32px; background: #10b981;
+                      border-radius: 8px; display: flex; align-items: center;
+                      justify-content: center; font-weight: bold; color: black;">B</div>
+          <span style="font-size: 18px; font-weight: 700; color: #fff;">Backport</span>
+        </div>
+        <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+          New Login Detected 🔐
+        </h1>
+        <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 20px;">
+          We detected a new login to your Backport account. If this was you, no action is needed.
+        </p>
+        <div style="background: #0f172a; padding: 16px 20px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 20px;">
+          <p style="color: #71717a; font-size: 12px; margin: 0 0 4px;">IP Address</p>
+          <p style="color: #fff; font-size: 14px; font-family: monospace; margin: 0 0 12px;">{safe_ip}</p>
+          <p style="color: #71717a; font-size: 12px; margin: 0 0 4px;">Time</p>
+          <p style="color: #fff; font-size: 14px; margin: 0;">{html.escape(time_str)}</p>
+        </div>
+        <p style="color: #71717a; font-size: 13px; margin: 0;">
+          If you didn't log in, please <a href="{FRONTEND_URL}/auth/forgot-password" style="color: #10b981;">reset your password</a> immediately.
+        </p>
+        <hr style="border: none; border-top: 1px solid #27272a; margin: 20px 0 0;">
+        <p style="color: #52525b; font-size: 12px; margin: 0;">
+          © 2026 Backport (MIT License) • Open Source
+        </p>
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(to, f"[Backport] New login from {safe_ip}", html_body)
+
+
+def send_payment_receipt_email(to: str, name: str, plan: str, amount_inr: int, payment_id: str) -> bool:
+    """Send payment receipt after successful purchase."""
+    dashboard_url = f"{FRONTEND_URL}/dashboard/billing"
+    safe_name = html.escape(name or to.split("@")[0])
+    plan_labels = {"plus": "Plus", "pro": "Pro", "enterprise": "Enterprise"}
+    plan_label = plan_labels.get(plan, plan.title())
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                 background: #09090b; color: #e4e4e7; margin: 0; padding: 40px 20px;">
+      <div style="max-width: 520px; margin: 0 auto; background: #18181b;
+                  border: 1px solid #27272a; border-radius: 12px; padding: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="width: 32px; height: 32px; background: #10b981;
+                      border-radius: 8px; display: flex; align-items: center;
+                      justify-content: center; font-weight: bold; color: black;">B</div>
+          <span style="font-size: 18px; font-weight: 700; color: #fff;">Backport</span>
+        </div>
+        <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+          Payment Successful ✅
+        </h1>
+        <p style="color: #a1a1aa; font-size: 15px; margin: 0 0 24px;">
+          Thank you, {safe_name}! Your {plan_label} plan is now active.
+        </p>
+        <div style="background: #0f172a; padding: 20px; border-radius: 8px; border: 1px solid #1e293b; margin-bottom: 24px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="color: #71717a; font-size: 13px;">Plan</span>
+            <span style="color: #fff; font-size: 14px; font-weight: 600;">{plan_label}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="color: #71717a; font-size: 13px;">Amount</span>
+            <span style="color: #10b981; font-size: 14px; font-weight: 600;">₹{amount_inr // 100}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+            <span style="color: #71717a; font-size: 13px;">Duration</span>
+            <span style="color: #fff; font-size: 14px;">30 Days</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: #71717a; font-size: 13px;">Payment ID</span>
+            <span style="color: #71717a; font-size: 12px; font-family: monospace;">{html.escape(payment_id[:20])}</span>
+          </div>
+        </div>
+        <a href="{dashboard_url}" style="display: inline-block; background: #10b981; color: #000;
+           font-weight: 700; font-size: 14px; text-decoration: none; padding: 10px 24px; border-radius: 8px;">
+          Manage Billing →
+        </a>
+        <hr style="border: none; border-top: 1px solid #27272a; margin: 24px 0 0;">
+        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport (MIT License) • Open Source</p>
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(to, f"[Backport] Payment receipt — {plan_label} plan activated", html_content)
+
+
+def send_plan_expiry_reminder(to: str, name: str, plan: str, expiry_date: str) -> bool:
+    """Send reminder before plan expiry."""
+    dashboard_url = f"{FRONTEND_URL}/dashboard/billing"
+    safe_name = html.escape(name or to.split("@")[0])
+    plan_labels = {"plus": "Plus", "pro": "Pro", "enterprise": "Enterprise"}
+    plan_label = plan_labels.get(plan, plan.title())
+    html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                 background: #09090b; color: #e4e4e7; margin: 0; padding: 40px 20px;">
+      <div style="max-width: 520px; margin: 0 auto; background: #18181b;
+                  border: 1px solid #27272a; border-radius: 12px; padding: 40px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="width: 32px; height: 32px; background: #f59e0b;
+                      border-radius: 8px; display: flex; align-items: center;
+                      justify-content: center; font-weight: bold; color: black;">⚠</div>
+          <span style="font-size: 18px; font-weight: 700; color: #fff;">Backport</span>
+        </div>
+        <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+          Plan Expiring Soon ⏰
+        </h1>
+        <p style="color: #a1a1aa; font-size: 15px; line-height: 1.6; margin: 0 0 24px;">
+          Hey {safe_name}, your <strong style="color:#fff">{plan_label}</strong> plan expires on
+          <strong style="color:#f59e0b">{html.escape(expiry_date)}</strong>. Renew now to keep all your features active.
+        </p>
+        <a href="{dashboard_url}" style="display: inline-block; background: #10b981; color: #000;
+           font-weight: 700; font-size: 14px; text-decoration: none; padding: 10px 24px; border-radius: 8px;">
+          Renew Plan →
+        </a>
+        <hr style="border: none; border-top: 1px solid #27272a; margin: 24px 0 0;">
+        <p style="color: #52525b; font-size: 12px; margin: 0;">© 2026 Backport (MIT License) • Open Source</p>
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(to, f"[Backport] Your {plan_label} plan expires on {expiry_date}", html_content)
+
+
+def send_feedback_notification(feedback_type: str, message: str, user_email: str, user_name: str = "") -> bool:
+    """Send a notification email to the admin when a user submits feedback or bug report."""
+    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.in")
+    if not admin_to:
+        logger.warning("ADMIN_EMAIL not properly configured — skipping feedback notification")
+        return False
+
+    type_labels = {
+        "bug": "Bug Report",
+        "feature": "Feature Request",
+        "improvement": "Improvement",
+        "general": "General Feedback",
+    }
+    type_label = html.escape(type_labels.get(feedback_type, feedback_type))
+    safe_name = html.escape(user_name or user_email.split("@")[0])
+    safe_email = html.escape(user_email)
+    safe_message = html.escape(message)
+    # Color code by type
+    type_colors = {"bug": "#ef4444", "feature": "#6366f1", "improvement": "#f59e0b", "general": "#10b981"}
+    color = type_colors.get(feedback_type, "#10b981")
+
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                 background: #09090b; color: #e4e4e7; margin: 0; padding: 40px 20px;">
+      <div style="max-width: 520px; margin: 0 auto; background: #18181b;
+                  border: 1px solid #27272a; border-radius: 12px; padding: 40px;">
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="width: 32px; height: 32px; background: #10b981;
+                      border-radius: 8px; display: flex; align-items: center;
+                      justify-content: center; font-weight: bold; color: black;">B</div>
+          <span style="font-size: 18px; font-weight: 700; color: #fff;">Backport</span>
+        </div>
+
+        <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+          New {type_label}
+        </h1>
+        <p style="color: #a1a1aa; font-size: 14px; margin: 0 0 24px;">
+          A user just submitted a {type_label.lower()} on Backport.
+        </p>
+
+        <!-- Type Badge -->
+        <div style="display: inline-block; background: {color}20; color: {color};
+                    padding: 4px 12px; border-radius: 20px; font-size: 12px;
+                    font-weight: 700; text-transform: uppercase; margin-bottom: 20px;">
+          {type_label}
+        </div>
+
+        <!-- Message -->
+        <div style="background: #0f172a; padding: 16px; border-radius: 8px;
+                    border: 1px solid #1e293b; margin-bottom: 20px;">
+          <p style="color: #e4e4e7; font-size: 14px; line-height: 1.7; margin: 0; white-space: pre-wrap;">
+{safe_message}
+          </p>
+        </div>
+
+        <!-- User Info -->
+        <div style="border-top: 1px solid #27272a; padding-top: 16px;">
+          <p style="color: #71717a; font-size: 12px; margin: 0 0 4px;">
+            <strong style="color: #a1a1aa;">From:</strong> {safe_name}
+          </p>
+          <p style="color: #71717a; font-size: 12px; margin: 0;">
+            <strong style="color: #a1a1aa;">Email:</strong> {safe_email}
+          </p>
+        </div>
+
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(admin_to, f"[Backport] New {type_label}: {safe_message[:60]}{'...' if len(safe_message) > 60 else ''}", html_body)
+
+
+def send_contact_sales_email(name: str, email: str, company: str, message: str) -> bool:
+    """Send an email to the admin when someone fills the Contact Sales form."""
+    admin_to = os.getenv("ADMIN_EMAIL", "admin@backport.in")
+    if not admin_to:
+        logger.warning("ADMIN_EMAIL not properly configured — skipping contact sales email")
+        return False
+
+    safe_name = html.escape(name)
+    safe_email = html.escape(email)
+    safe_company = html.escape(company) if company else 'Not specified'
+    safe_message = html.escape(message)
+
+    html_body = f"""
+    <!DOCTYPE html>
+    <html>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                 background: #09090b; color: #e4e4e7; margin: 0; padding: 40px 20px;">
+      <div style="max-width: 520px; margin: 0 auto; background: #18181b;
+                  border: 1px solid #27272a; border-radius: 12px; padding: 40px;">
+
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 32px;">
+          <div style="width: 32px; height: 32px; background: #f97316;
+                      border-radius: 8px; display: flex; align-items: center;
+                      justify-content: center; font-weight: bold; color: black;">$</div>
+          <span style="font-size: 18px; font-weight: 700; color: #fff;">Enterprise Inquiry</span>
+        </div>
+
+        <h1 style="font-size: 20px; font-weight: 700; color: #fff; margin: 0 0 8px;">
+          New Enterprise Sales Inquiry
+        </h1>
+        <p style="color: #a1a1aa; font-size: 14px; margin: 0 0 24px;">
+          Someone is interested in the Enterprise plan and wants to talk to you.
+        </p>
+
+        <!-- Info Fields -->
+        <div style="background: #0f172a; padding: 20px; border-radius: 8px;
+                    border: 1px solid #1e293b; margin-bottom: 20px;">
+          <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 8px;">
+            <strong style="color: #fff;">Name:</strong> {safe_name}
+          </p>
+          <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 8px;">
+            <strong style="color: #fff;">Email:</strong> <a href="mailto:{safe_email}" style="color: #f97316;">{safe_email}</a>
+          </p>
+          <p style="color: #a1a1aa; font-size: 13px; margin: 0 0 16px;">
+            <strong style="color: #fff;">Company:</strong> {safe_company}
+          </p>
+          <hr style="border: none; border-top: 1px solid #27272a; margin: 0 0 12px;">
+          <p style="color: #e4e4e7; font-size: 14px; line-height: 1.7; margin: 0; white-space: pre-wrap;">
+{safe_message}
+          </p>
+        </div>
+
+        <a href="mailto:{safe_email}?subject=Re:%20Backport%20Enterprise%20Plan"
+           style="display: inline-block; background: #f97316; color: #000;
+                  font-weight: 700; font-size: 14px; text-decoration: none;
+                  padding: 10px 24px; border-radius: 8px;">
+          Reply to {safe_email} →
+        </a>
+
+      </div>
+    </body>
+    </html>
+    """
+    return send_email(admin_to, f"[Backport] Enterprise Inquiry from {safe_name} ({safe_company})", html_body)
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc

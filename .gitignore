@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 frontend/.next/
 frontend/node_modules/
 frontend/npm-debug.log
@@ -12,3 +13,96 @@ backport.config.json
 *.pyc
 .DS_Store
 nul
+=======
+# Environment Variables (CRITICAL - Never commit!)
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Ruff cache
+.ruff_cache/
+
+# Node.js
+node_modules/
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+/.next/
+/out/
+/build
+
+# Testing
+/coverage
+*.tsbuildinfo
+next-env.d.ts
+coverage/
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Misc
+.DS_Store
+*.pem
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+logs/
+server.log
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+.claude
+.z-ai-config
+
+# Vercel
+.vercel
+
+# Skills directory (internal)
+/skills/
+
+# Local dev files
+local-*
+dev.log
+dev.out.log
+test
+prompt
+>>>>>>> 369eadd36bd1a259f5b95fb908ea824a3484f6cc
